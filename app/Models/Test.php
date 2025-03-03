@@ -24,7 +24,7 @@ class Test extends Model
 
     public function documents(): HasMany
     {
-        return $this->hasMany(Documents::class);
+        return $this->hasMany(Document::class);
     }
 
     public function labSchedules(): BelongsToMany
