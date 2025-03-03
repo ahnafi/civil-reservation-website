@@ -10,14 +10,13 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('test_results', function (Blueprint $table) {
+        Schema::create('lab_schedules', function (Blueprint $table) {
             $table->id();
-            $table->enum("status", ["testing", "completed"])->default("testing");
-            $table->text("note")->nullable();
-            $table->dateTime("completed_at")->nullable();
+            $table->date("date");
+            $table->unsignedInteger("available_slots")->default(0);
+            $table->foreignId("laboratory_id")->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
-            $table->foreignId("submission_id")->constrained()->cascadeOnDelete();
         });
     }
 
@@ -26,6 +25,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('test_results');
+        Schema::dropIfExists('lab_schedules');
     }
 };

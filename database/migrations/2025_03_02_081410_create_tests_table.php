@@ -10,15 +10,15 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('documents', function (Blueprint $table) {
+        Schema::create('tests', function (Blueprint $table) {
             $table->id();
-            $table->string("name");
-            $table->string("path");
-
+            $table->enum("status", ["testing", "completed"])->default("testing");
+            $table->text("note")->nullable();
+            $table->dateTime("completed_at")->nullable();
+            $table->date("test_date")->nullable();
             $table->timestamps();
             $table->softDeletes();
-
-            $table->foreignId("tests_id")->constrained()->cascadeOnDelete();
+            $table->foreignId("submission_id")->constrained()->cascadeOnDelete();
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('documents');
+        Schema::dropIfExists('test_results');
     }
 };

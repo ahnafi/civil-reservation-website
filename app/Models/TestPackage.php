@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TestPackage extends Model
@@ -18,11 +19,17 @@ class TestPackage extends Model
 
     public function testTypes(): BelongsToMany
     {
-        return $this->belongsToMany(TestType::class)->withTimestamps()->withPivot('deleted_at');
+        return $this->belongsToMany(TestType::class)->withTimestamps();
     }
 
-    public function submissions(): BelongsToMany
+    public function submissionItems(): HasMany
     {
-        return $this->belongsToMany(Submission::class)->withTimestamps()->withPivot("deleted_at");
+        return $this->hasMany(SubmissionItem::class);
     }
+
+//    public function submissions(): BelongsToMany
+//    {
+//        return $this->belongsToMany(Submission::class)->withTimestamps()->withPivot("deleted_at");
+//    }
+
 }

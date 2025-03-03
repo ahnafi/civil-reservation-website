@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class TestResult extends Model
+class SubmissionItem extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
-        "note",
-        "status"
+        "submission_id",
+        "test_type_id",
+        "test_package_id"
     ];
 
     public function submission(): BelongsTo
@@ -22,8 +22,13 @@ class TestResult extends Model
         return $this->belongsTo(Submission::class);
     }
 
-    public function documents(): HasMany
+    public function testType(): BelongsTo
     {
-        return $this->hasMany(Documents::class);
+        return $this->belongsTo(TestType::class);
+    }
+
+    public function testPackage(): BelongsTo
+    {
+        return $this->belongsTo(TestType::class);
     }
 }

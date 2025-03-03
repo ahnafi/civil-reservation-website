@@ -10,14 +10,17 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('test_packages', function (Blueprint $table) {
+        Schema::create('unit_categories', function (Blueprint $table) {
             $table->id();
             $table->string("name");
-            $table->unsignedInteger("price")->default(0);
             $table->text("description")->nullable();
-            $table->string("image")->nullable();
             $table->timestamps();
             $table->softDeletes();
+        });
+
+        Schema::table("test_types", function (Blueprint $table) {
+            $table->integer("minimum_unit")->default(0);
+            $table->foreignId("unit_category_id")->constrained()->cascadeOnDelete();
         });
     }
 
@@ -26,6 +29,10 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('test_packags');
+        Schema::dropIfExists('unit_categories');
+        Schema::table('test_types', function (Blueprint $table) {
+            $table->dropColumn('minimum_unit');
+            $table->dropColumn('unit_category_id');
+        });
     }
 };

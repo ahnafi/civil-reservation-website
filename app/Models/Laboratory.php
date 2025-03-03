@@ -4,20 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Documents extends Model
+class Laboratory extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
         "name",
-        "path",
-        "test_id"
+        "room",
+        "daily_slots"
     ];
 
-    public function test(): BelongsTo
+    public function labSchedules(): HasMany
     {
-        return $this->belongsTo(Test::class);
+        return $this->hasMany(LabSchedule::class);
     }
 }

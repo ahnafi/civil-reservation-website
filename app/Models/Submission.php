@@ -18,9 +18,11 @@ class Submission extends Model
         "company_name",
         "project_name",
         "project_address",
-        "sample_qty",
+        "unit_qty",
         "status",
         "note",
+        "total_cost",
+        "approval_date",
     ];
 
     public function user(): BelongsTo
@@ -28,13 +30,18 @@ class Submission extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function testResult(): HasOne
+    public function test(): HasOne
     {
-        return $this->hasOne(TestResult::class);
+        return $this->hasOne(Test::class);
     }
 
-    public function testTypes(): BelongsToMany
+    public function items(): HasMany
     {
-        return $this->belongsToMany(TestType::class)->withTimestamps()->withPivot("deleted_at");
+        return $this->hasMany(SubmissionItem::class);
     }
+
+//    public function testTypes(): BelongsToMany
+//    {
+//        return $this->belongsToMany(TestType::class)->withTimestamps()->withPivot("deleted_at");
+//    }
 }

@@ -14,7 +14,6 @@ return new class extends Migration {
             $table->foreignId("test_package_id")->constrained()->cascadeOnDelete();
             $table->foreignId("test_type_id")->constrained()->cascadeOnDelete();
             $table->timestamps();
-            $table->softDeletes();
             $table->primary(['test_package_id', 'test_type_id']);
         });
     }

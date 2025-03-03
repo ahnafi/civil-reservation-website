@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string("company_name");
             $table->string("project_name");
             $table->string("project_address");
-            $table->unsignedInteger("sample_qty")->default(0);
+            $table->unsignedInteger("unit_qty")->default(0);
             $table->enum("status", ["submitted", "approved", "rejected"])->default("submitted");
             $table->unsignedInteger("total_cost")->default(0)->nullable();
             $table->text("note")->nullable();
