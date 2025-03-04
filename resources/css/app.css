@@ -57,6 +57,9 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+
+    --color-light-base: oklch(0.985 0.002 247.839);
+    --color-blue-base: oklch(0.546 0.245 262.881);
 }
 
 /*
@@ -74,6 +77,44 @@
     ::backdrop,
     ::file-selector-button {
         border-color: var(--color-gray-200, currentColor);
+    }
+
+    h1 {
+        @apply text-2xl md:text-3xl lg:text-4xl;
+    }
+
+    h2 {
+        @apply text-xl md:text-2xl lg:text-3xl;
+    }
+
+    h3 {
+        @apply text-lg md:text-xl lg:text-2xl;
+    }
+
+    h4 {
+        @apply text-base md:text-lg lg:text-xl;
+    }
+
+    h5 {
+        @apply text-sm md:text-base lg:text-lg;
+    }
+
+    h6 {
+        @apply text-sm md:text-sm lg:text-base;
+    }
+
+    p {
+        @apply text-sm sm:text-base;
+    }
+
+    small {
+        @apply text-sm lg:text-base;
+    }
+}
+
+@layer components {
+    p {
+        @apply text-sm sm:text-base;
     }
 }
 
