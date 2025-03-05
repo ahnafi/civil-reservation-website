@@ -21,4 +21,9 @@ class Laboratory extends Model
     {
         return $this->hasMany(LabSchedule::class);
     }
+
+    public function testTypes(): HasMany
+    {
+        return $this->hasMany(TestType::class);
+    }
 }

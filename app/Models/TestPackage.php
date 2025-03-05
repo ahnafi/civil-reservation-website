@@ -15,11 +15,12 @@ class TestPackage extends Model
         "name",
         "price",
         "description",
+        "image"
     ];
 
     public function testTypes(): BelongsToMany
     {
-        return $this->belongsToMany(TestType::class)->withTimestamps();
+        return $this->belongsToMany(TestType::class, "test_package_test_type", "test_package_id", "test_type_id")->withTimestamps();
     }
 
     public function submissionItems(): HasMany
