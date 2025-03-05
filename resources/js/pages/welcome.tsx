@@ -1,6 +1,5 @@
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ModeToggle } from "@/components/mode-toggle";
 
 export default function Welcome() {
     const { auth } = usePage<SharedData>().props;

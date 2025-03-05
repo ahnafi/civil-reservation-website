@@ -22,6 +22,7 @@ createInertiaApp({
 
         root.render(
             <ThemeProvider>
+                <ModeToggle />
                 <App {...props} />
             </ThemeProvider>
         );
