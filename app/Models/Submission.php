@@ -40,6 +40,11 @@ class Submission extends Model
         return $this->hasMany(SubmissionItem::class);
     }
 
+    public function transaction(): HasOne
+    {
+        return $this->hasOne(Transaction::class);
+    }
+
 //    public function testTypes(): BelongsToMany
 //    {
 //        return $this->belongsToMany(TestType::class)->withTimestamps()->withPivot("deleted_at");
