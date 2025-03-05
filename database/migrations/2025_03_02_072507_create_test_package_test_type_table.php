@@ -11,10 +11,10 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('test_package_test_type', function (Blueprint $table) {
-            $table->foreignId("test_package_id")->constrained()->cascadeOnDelete();
-            $table->foreignId("test_type_id")->constrained()->cascadeOnDelete();
+            $table->id();
+            $table->foreignId("test_package_id")->references("id")->on("test_packages")->onDelete("cascade");
+            $table->foreignId("test_type_id")->references("id")->on("test_types")->onDelete("cascade");
             $table->timestamps();
-            $table->primary(['test_package_id', 'test_type_id']);
         });
     }
 
