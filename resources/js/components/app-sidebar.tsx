@@ -5,8 +5,6 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, Sid
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, University, FlaskConical, Hammer } from 'lucide-react';
-import AppLogo from './app-logo';
-import LaboratoryLogo from "@/components/laboratory-logo";
 
 const mainNavItems: NavItem[] = [
     {
