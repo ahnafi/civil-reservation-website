@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, University, FlaskConical, Hammer } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, HardHat, FlaskConical, Hammer, Package } from 'lucide-react';
 
 const mainNavItems: NavItem[] = [
     {
@@ -15,18 +15,18 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Laboratorium',
         url: '/laboratories',
-        icon: University,
+        icon: FlaskConical,
     },
     {
         title: 'Pengujian',
         url: '/tests',
-        icon: FlaskConical,
+        icon: HardHat,
     },
     {
-        title: 'Peralatan',
-        url: '/tools',
-        icon: Hammer,
-    },
+        title: 'Paket',
+        url: '/packages',
+        icon: Package,
+    }
 ];
 
 const footerNavItems: NavItem[] = [

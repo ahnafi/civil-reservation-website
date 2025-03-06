@@ -64,6 +64,9 @@
     --color-purple-base: oklch(0.558 0.288 302.321);
     --color-teal-base: oklch(0.6 0.118 184.704);
     --color-red-base: oklch(0.577 0.245 27.325);
+    --color-green-base: oklch(0.627 0.194 149.214);
+    --color-lime-base: oklch(0.648 0.2 131.684);
+    --color-cyan-base: oklch(0.609 0.126 221.723);
 }
 
 /*
@@ -112,7 +115,7 @@
     }
 
     small {
-        @apply text-sm lg:text-base;
+        @apply text-xs lg:text-sm;
     }
 }
 
