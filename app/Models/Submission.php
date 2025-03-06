@@ -50,4 +50,9 @@ class Submission extends Model
     {
         return $this->belongsToMany(TestPackage::class, "submission_item")->withTimestamps();
     }
+
+    public function transaction(): HasOne
+    {
+        return $this->hasOne(Transaction::class);
+    }
 }
