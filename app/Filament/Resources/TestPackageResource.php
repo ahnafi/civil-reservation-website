@@ -65,7 +65,7 @@ class TestPackageResource extends Resource
                         foreach ($selectedTests as $testTypeId) {
                             $testType = TestType::find($testTypeId);
                             if ($testType) {
-                                $totalPrice += $testType->price * $testType->minimum_unit;
+                                $totalPrice += $testType->price;
                             }
                         }
 

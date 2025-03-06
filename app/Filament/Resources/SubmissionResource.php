@@ -5,13 +5,26 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SubmissionResource\Pages;
 use App\Filament\Resources\SubmissionResource\RelationManagers;
 use App\Models\Submission;
+use App\Models\TestPackage;
+use App\Models\TestType;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\Wizard;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Radio;
+use Filament\Forms\Components\DatePicker;
 
 class SubmissionResource extends Resource
 {
@@ -23,30 +36,62 @@ class SubmissionResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('company_name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('project_name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('project_address')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('unit_qty')
-                    ->required()
-                    ->numeric()
-                    ->default(0),
-                Forms\Components\TextInput::make('status')
-                    ->required(),
-                Forms\Components\TextInput::make('total_cost')
-                    ->numeric()
-                    ->default(0),
-                Forms\Components\Textarea::make('note')
-                    ->columnSpanFull(),
-                Forms\Components\DateTimePicker::make('approval_date'),
-                Forms\Components\Select::make('user_id')
-                    ->relationship('user', 'name')
-                    ->required(),
+
+                Wizard::make([
+                    Wizard\Step::make('Pilih Pengujian')
+                        ->schema([
+
+                            Repeater::make('Paket pengujian')
+                                ->relationship("submissionItems")
+                                ->addActionLabel("Tambah paket pengujian")
+                                ->schema([
+                                    Select::make('test_package_id')
+                                        ->relationship("testPackage", "name")
+                                        ->required(),
+                                ]),
+
+                            Repeater::make("pengujian satuan")
+                                ->relationship("submissionItems")
+                                ->schema([
+                                    Select::make("test_type_id")
+                                        ->relationship("testType", "name")
+                                        ->required()
+                                ])
+                                
+                        ]),
+                    Wizard\Step::make('Delivery')
+                        ->schema([
+                            Forms\Components\TextInput::make('company_name')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('project_name')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('project_address')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('unit_qty')
+                                ->required()
+                                ->numeric()
+                                ->default(0),
+                            Forms\Components\TextInput::make('status')
+                                ->required(),
+                            Forms\Components\TextInput::make('total_cost')
+                                ->numeric()
+                                ->default(0),
+                            Forms\Components\Textarea::make('note')
+                                ->columnSpanFull(),
+                            Forms\Components\DateTimePicker::make('approval_date'),
+                            Forms\Components\Select::make('user_id')
+                                ->relationship('user', 'name')
+                                ->required(),
+                        ]),
+                    Wizard\Step::make('Billing')
+                        ->schema([
+                            // ...
+                        ]),
+                ])->columnSpanFull()
+
             ]);
     }
 

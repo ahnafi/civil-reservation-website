@@ -23,6 +23,7 @@ class Submission extends Model
         "note",
         "total_cost",
         "approval_date",
+        "user_id"
     ];
 
     public function user(): BelongsTo
@@ -35,13 +36,18 @@ class Submission extends Model
         return $this->hasOne(Test::class);
     }
 
-    public function items(): HasMany
+    public function submissionItems(): HasMany
     {
         return $this->hasMany(SubmissionItem::class);
     }
 
-//    public function testTypes(): BelongsToMany
-//    {
-//        return $this->belongsToMany(TestType::class)->withTimestamps()->withPivot("deleted_at");
-//    }
+    public function testTypes(): BelongsToMany
+    {
+        return $this->belongsToMany(TestType::class, "submission_item")->withTimestamps();
+    }
+
+    public function testPackages(): BelongsToMany
+    {
+        return $this->belongsToMany(TestPackage::class, "submission_item")->withTimestamps();
+    }
 }

@@ -44,9 +44,9 @@ class TestType extends Model
         return $this->belongsTo(Laboratory::class);
     }
 
-//    public function submissions(): BelongsToMany
-//    {
-//        return $this->belongsToMany(Submission::class)->withTimestamps()->withPivot("deleted_at");
-//    }
+    public function submissions(): BelongsToMany
+    {
+        return $this->belongsToMany(Submission::class, "submission_item")->withTimestamps();
+    }
 
 }
