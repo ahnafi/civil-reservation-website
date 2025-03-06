@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('schedule_testing', function (Blueprint $table) {
             $table->id();
             $table->foreignId("schedule_id")->references("id")->on("schedules")->onDelete("cascade");
-            $table->foreignId("testing_id")->references("id")->on("testing")->onDelete("cascade");
+            $table->foreignId("testing_id")->references("id")->on("testings")->onDelete("cascade");
             $table->timestamps();
         });
     }
