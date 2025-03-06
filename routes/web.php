@@ -9,14 +9,26 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        return Inertia::render('dashboard/index');
-    })->name('tests1');
+        return Inertia::render('dashboard');
+    })->name('dashboard');
+    Route::get('laboratories', function () {
+        return Inertia::render('laboratories/index');
+    })->name('laboratories');
+    Route::get('laboratories/example', function () {
+        return Inertia::render('laboratories/example');
+    })->name('tests-example');
     Route::get('tests', function () {
         return Inertia::render('tests/index');
-    })->name('tests2');
+    })->name('tests');
     Route::get('tests/example', function () {
         return Inertia::render('tests/example');
     })->name('tests-example');
+    Route::get('packages', function () {
+        return Inertia::render('packages/index');
+    })->name('packages');
+    Route::get('packages/example', function () {
+        return Inertia::render('packages/example');
+    })->name('packages-example');
 });
 
 require __DIR__.'/settings.php';
