@@ -9,11 +9,11 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+        return Inertia::render('dashboard/index');
+    })->name('tests1');
     Route::get('tests', function () {
         return Inertia::render('tests/index');
-    })->name('tests');
+    })->name('tests2');
     Route::get('tests/example', function () {
         return Inertia::render('tests/example');
     })->name('tests-example');
