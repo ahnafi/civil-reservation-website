@@ -33,15 +33,19 @@ class Test extends Model
     {
         return $this->belongsTo(Category::class);
     }
-    
+
     public function laboratory(): BelongsTo
     {
         return $this->belongsTo(Laboratory::class);
     }
-    
+
     public function schedules(): HasMany
     {
         return $this->hasMany(Schedule::class);
+    }
+    public function submissionTests(): HasMany
+    {
+        return $this->hasMany(SubmissionTest::class);
     }
 
 }

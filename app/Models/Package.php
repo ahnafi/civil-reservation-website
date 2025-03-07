@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Package extends Model
@@ -25,6 +26,11 @@ class Package extends Model
     public function submissions(): BelongsToMany
     {
         return $this->belongsToMany(Submission::class)->withTimestamps();
+    }
+
+    public function submissionPackages(): HasMany
+    {
+        return $this->hasMany(SubmissionPackage::class);
     }
 
 }

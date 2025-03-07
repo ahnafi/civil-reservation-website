@@ -50,4 +50,13 @@ class Submission extends Model
         return $this->belongsToMany(Package::class)->withTimestamps();
     }
 
+    public function submissionPackages(): HasMany
+    {
+        return $this->hasMany(SubmissionPackage::class);
+    }
+    public function submissionTests(): HasMany
+    {
+        return $this->hasMany(SubmissionTest::class);
+    }
+
 }

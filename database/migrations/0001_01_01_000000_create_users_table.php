@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->string('password');
             $table->string("phone")->nullable();
             $table->string("photo")->nullable();
-            $table->string("nik")->nullable();
+            $table->string("identity")->nullable();
             $table->enum("role", ["admin", "external", "internal"])->nullable();
             $table->rememberToken();
             $table->timestamps();
