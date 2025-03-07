@@ -60,7 +60,7 @@ const dummyData: {
     notes: 'Untuk kebutuhan dasar sebelum produksi atau riset awal.',
 };
 
-export default function Example() {
+export default function Package() {
     const [mainImage, setMainImage] = useState(dummyData.image[0]);
 
     const formatRupiah = (value:number, currency = "IDR") => {

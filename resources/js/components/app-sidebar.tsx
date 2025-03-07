@@ -4,9 +4,9 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, HardHat, FlaskConical, Hammer, Package } from 'lucide-react';
+import { BookOpen, BookOpenCheck, FlaskConical, Folder, HardHat, History, LayoutGrid, Package, ShoppingCart } from 'lucide-react';
 
-const mainNavItems: NavItem[] = [
+const serviceNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         url: '/dashboard',
@@ -26,7 +26,25 @@ const mainNavItems: NavItem[] = [
         title: 'Paket',
         url: '/packages',
         icon: Package,
-    }
+    },
+];
+
+const orderNavItems: NavItem[] = [
+    {
+        title: 'Keranjang',
+        url: '/orders/cart',
+        icon: ShoppingCart,
+    },
+    {
+        title: 'Status',
+        url: '/orders/status',
+        icon: BookOpenCheck,
+    },
+    {
+        title: 'Riwayat',
+        url: '/orders/history',
+        icon: History,
+    },
 ];
 
 const footerNavItems: NavItem[] = [
@@ -50,7 +68,7 @@ export function AppSidebar() {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link href="/dashboard" prefetch>
-                                <img src="/img/logos/unsoed.png" alt="Unsoed Logo" className="w-10"/>
+                                <img src="/img/logos/unsoed.png" alt="Unsoed Logo" className="w-10" />
                                 <div className="flex flex-col gap-1">
                                     <small className="text-xs font-black">Laboratorium Teknik Sipil</small>
                                     <small className="text-[10px] font-medium">Universitas Jenderal Soedirman</small>
@@ -62,7 +80,8 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain label="Layanan" items={serviceNavItems} />
+                <NavMain label="Pesanan" items={orderNavItems} />
             </SidebarContent>
 
             <SidebarFooter>
