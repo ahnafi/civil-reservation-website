@@ -29,6 +29,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('packages/example', function () {
         return Inertia::render('packages/example');
     })->name('packages-example');
+    Route::get('orders/cart', function () {
+        return Inertia::render('orders/cart');
+    })->name('orders-cart');
+    Route::get('orders/cart/form', function () {
+        return Inertia::render('orders/form');
+    })->name('orders-cart-form');
+    Route::get('orders/status', function () {
+        return Inertia::render('orders/status');
+    })->name('orders-status');
+    Route::get('orders/history', function () {
+        return Inertia::render('orders/history');
+    })->name('orders-history');
 });
 
 require __DIR__.'/settings.php';

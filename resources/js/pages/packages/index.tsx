@@ -139,7 +139,7 @@ const dummyData: {
     },
 ];
 
-export default function Dashboard() {
+export default function Packages() {
     const formatRupiah = (value: number, currency = 'IDR') => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
