@@ -1,3 +1,5 @@
+import React, {useState} from 'react';
+
 import {
     Table,
     TableBody,
@@ -23,6 +25,7 @@ import AppLayout from '@/layouts/app-layout';
 import { HardHat, ChevronDown } from "lucide-react"
 import { Head} from '@inertiajs/react';
 import InfoCard from '@/components/ui/InfoCard';
+import { DateRange } from 'react-day-picker';
 // import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 // <HardHat />
 // <ChevronDown />
@@ -45,7 +48,7 @@ const dummyTableData: { date: string; company: string; status: string }[] = [
     {
         date: "2025-03-02",
         company: "Gunung Mas Perkasa",
-        status: "Tidak Disetujui",
+        status: "Pending",
     },
     {
         date: "2025-03-03",
@@ -55,7 +58,7 @@ const dummyTableData: { date: string; company: string; status: string }[] = [
     {
         date: "2025-03-04",
         company: "Puncak Sejahtera Konstruksi",
-        status: "Tidak Disetujui",
+        status: "Pending",
     },
     {
         date: "2025-03-05",
@@ -67,6 +70,12 @@ const dummyTableData: { date: string; company: string; status: string }[] = [
 
 
 export default function MainDashboard() {
+    const [selectedTest, setSelectedTest] = useState<string>(dummyTestData[0]);
+    const [selectedDate, setSelectedDate] = useState<DateRange | undefined>({
+        from : new Date(),
+        to : new Date()
+    });
+
 
 
     const breadcrumbs: BreadcrumbItem[] = [
@@ -81,13 +90,9 @@ export default function MainDashboard() {
             <Head title="Dashboard" />
 
             <div className="flex flex-col">
-                
+
             <div className="page-title">
                 <h1 className="text-4xl text-center mt-2 font-extrabold">Dashboard</h1>
-            </div>
-
-            <div className="user-cards flex justify-evenly mt-6">
-                <InfoCard status="Pengajuan" count={5} color="blue"/>
             </div>
 
             <div className="table-options flex justify-evenly mt-6">
@@ -100,7 +105,9 @@ export default function MainDashboard() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
                             {dummyTestData.map((test, index) => (
-                                <DropdownMenuItem key={index}>{test}</DropdownMenuItem>
+                                <DropdownMenuItem key={index} onClick={()=>setSelectedTest(test)}>
+                                    {test}
+                                </DropdownMenuItem>
                             ))}
                         </DropdownMenuContent>
                     </DropdownMenu>
@@ -111,7 +118,11 @@ export default function MainDashboard() {
                 </div>
             </div>
 
-            <div className="table-container mx-auto w-[90vw] mt-6">
+            <div className="ms-3 mt-6 text-lg font-medium text-center">
+                Jadwal Pengujian {selectedTest} pada tanggal {selectedDate}
+            </div>
+
+            <div className="table-container mx-auto w-[90vw] mt-1">
                 <Table>
                     <TableCaption>Daftar Pengajuan</TableCaption>
                     <TableHeader>
@@ -126,7 +137,15 @@ export default function MainDashboard() {
                             <TableRow key={index}>
                                 <TableCell>{row.date}</TableCell>
                                 <TableCell>{row.company}</TableCell>
-                                <TableCell>{row.status}</TableCell>
+                                <TableCell>
+                                    {row.status === "Disetujui" ? (
+                                        <span className="bg-green-500 p-1 font-medium rounded">{row.status}</span>
+                                    ) : row.status === "Pending" ? (
+                                        <span className="bg-yellow-500 p-1 font-medium rounded">{row.status}</span>
+                                    ) : (
+                                        row.status
+                                    )}
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
