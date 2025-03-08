@@ -20,7 +20,7 @@ return new class extends Migration {
             $table->string("document")->nullable();
             $table->enum("status", ["submitted", "approved", "rejected"])->default("submitted");
             $table->text("note")->nullable();
-            $table->dateTime("approval_date");
+            $table->dateTime("approval_date")->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

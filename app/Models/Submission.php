@@ -25,6 +25,13 @@ class Submission extends Model
         "approval_date"
     ];
 
+    protected function casts(): array
+    {
+        return [
+            "approval_date" => "datetime"
+        ];
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

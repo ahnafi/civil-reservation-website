@@ -4,17 +4,22 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SubmissionResource\Pages;
 use App\Filament\Resources\SubmissionResource\RelationManagers;
+use App\Models\Package;
 use App\Models\Submission;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Carbon;
 
 class SubmissionResource extends Resource
 {
@@ -36,16 +41,52 @@ class SubmissionResource extends Resource
                                         ->required()
                                         ->searchable()
                                         ->relationship("package", "name")
+                                        ->reactive()
+                                        ->afterStateUpdated(function ($state, Set $set, $get) {
+                                            $package = Package::find($state);
+                                            if ($package) {
+                                                $set("package_price", $package->price);
+                                            }
+                                        }),
+                                    TextInput::make('package_price')
+                                        ->numeric()
+                                        ->dehydrated(false)
+                                        ->disabled()
+                                        ->default(function ($get) {
+                                            return $get("package_price");
+                                        }),
                                 ])->columns(),
 
                             Repeater::make("submissionTests")
                                 ->relationship()
                                 ->schema([
-                                    Forms\Components\Select::make('test_id')
+                                    Select::make('test_id')
                                         ->required()
                                         ->searchable()
-                                        ->relationship("test", "name")
-                                ])->columns(),
+                                        ->relationship('test', 'name')
+                                        ->reactive()
+                                        ->afterStateUpdated(function ($state, Forms\Set $set, $get) {
+                                            $test = \App\Models\Test::find($state);
+                                            if ($test) {
+                                                $set('quantity', $test->minimum_unit);
+                                                $set('quantity_min_value', $test->minimum_unit);
+                                                $set('unit_price', $test->price);
+                                            }
+                                        })->columnSpan(2),
+
+                                    TextInput::make('quantity')
+                                        ->numeric()
+                                        ->required()
+                                        ->minValue(function ($get) {
+                                            return $get('quantity_min_value') ?? 0;
+                                        }),
+
+                                    TextInput::make('unit_price')
+                                        ->numeric()
+                                        ->dehydrated(false)
+                                        ->disabled(),
+
+                                ])->columns(4),
 
                         ]),
                     Wizard\Step::make('Delivery')
@@ -65,8 +106,18 @@ class SubmissionResource extends Resource
                             Forms\Components\TextInput::make('total_cost')
                                 ->numeric()
                                 ->default(0),
-                            Forms\Components\TextInput::make('document')
-                                ->maxLength(255),
+                            Forms\Components\FileUpload::make('document')
+                                ->preserveFilenames() // Mempertahankan nama file asli
+                                ->acceptedFileTypes([
+                                    'application/pdf',
+                                    'application/msword',
+                                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                ])
+                                ->maxSize(2048)
+                                ->directory("submission")
+                                ->helperText('Format file yang diterima: PDF, DOC, DOCX. Maksimal ukuran file: 2MB.')
+                                ->openable()
+                                ->columns(),
                             ToggleButtons::make('status')
                                 ->inline()
                                 ->options([
@@ -83,13 +134,24 @@ class SubmissionResource extends Resource
                                     'submitted' => 'heroicon-o-pencil',
                                     'rejected' => 'heroicon-o-x-circle',
                                     'approved' => 'heroicon-o-check-circle',
-                                ]),
+                                ])
+                                ->reactive()
+                                ->afterStateUpdated(function ($state, Set $set) {
+                                    if ($state === "approved") {
+                                        $set('approval_date', Carbon::now()->format('Y-m-d\TH:i:s'));
+                                    } else {
+                                        $set('approval_date', null);
+                                    }
+                                }),
                             Forms\Components\Textarea::make('note')
                                 ->columnSpanFull(),
-                            Forms\Components\DateTimePicker::make('approval_date')
-                                ->required(),
+                            Forms\Components\DateTimePicker::make('approval_date'),
                         ]),
                     Wizard\Step::make('Billing')
+                        ->schema([
+                            // ...
+                        ]),
+                    Wizard\Step::make('Testing')
                         ->schema([
                             // ...
                         ]),
@@ -113,8 +175,6 @@ class SubmissionResource extends Resource
                 Tables\Columns\TextColumn::make('total_cost')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('document')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('status'),
                 Tables\Columns\TextColumn::make('approval_date')
                     ->dateTime()
