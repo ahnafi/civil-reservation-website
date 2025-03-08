@@ -20,4 +20,8 @@ class Document extends Model
     {
         return $this->belongsTo(Testing::class);
     }
+
+    protected $casts = [
+        'path' => 'array',
+    ];
 }

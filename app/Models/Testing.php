@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Testing extends Model
@@ -30,8 +31,8 @@ class Testing extends Model
         return $this->belongsTo(Submission::class);
     }
 
-    public function documents(): HasMany
+    public function documents(): HasOne
     {
-        return $this->hasMany(Document::class);
+        return $this->hasOne(Document::class);
     }
 }
