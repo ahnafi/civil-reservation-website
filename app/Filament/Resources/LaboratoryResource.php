@@ -17,18 +17,24 @@ class LaboratoryResource extends Resource
 {
     protected static ?string $model = Laboratory::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $modelLabel = 'Lab';
+    protected static ?string $navigationIcon = 'heroicon-o-home-modern';
+    protected static ?string $navigationGroup = 'Pengujian';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('room')
-                    ->required()
-                    ->maxLength(255),
+                Forms\Components\Section::make([
+                    Forms\Components\TextInput::make('name')
+                        ->label('Nama laboratorium')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('room')
+                        ->label('Kode ruangan laboratorium')
+                        ->required()
+                        ->maxLength(255),
+                ])->columns(),
             ]);
     }
 
@@ -37,18 +43,23 @@ class LaboratoryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nama laboratorium')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('room')
+                    ->label('Kode ruangan laboratorium')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label("Tanggal Ditambahkan")
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label("Tanggal Update")
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
+                    ->label("Tanggal Dihapus")
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -58,6 +69,8 @@ class LaboratoryResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
