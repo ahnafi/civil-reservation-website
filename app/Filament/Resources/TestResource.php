@@ -20,7 +20,7 @@ class TestResource extends Resource
 
     protected static ?string $modelLabel = 'Pengujian';
     protected static ?string $navigationIcon = 'heroicon-o-beaker';
-    protected static ?string $navigationGroup = 'Booking';
+    protected static ?string $navigationGroup = 'Pengujian';
 
     public static function getNavigationBadge(): ?string
     {
@@ -34,6 +34,7 @@ class TestResource extends Resource
                 Forms\Components\Split::make([
                     Forms\Components\Section::make([
                         Forms\Components\FileUpload::make('image')
+                            ->directory('test_images')
                             ->label('Foto pengujian')
                             ->image()
                             ->columnSpanFull(),
@@ -111,7 +112,7 @@ class TestResource extends Resource
                     ->label('Status')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label("Tanggal Registrasi")
+                    ->label("Tanggal Ditambahkan")
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

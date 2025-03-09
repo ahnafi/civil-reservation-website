@@ -17,33 +17,47 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class PackageResource extends Resource
 {
     protected static ?string $model = Package::class;
+    protected static ?string $modelLabel = 'Paket Pengujian';
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-group';
+    protected static ?string $navigationGroup = 'Pengujian';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
+                Forms\Components\FileUpload::make('image')
+                    ->label("Foto Paket Pengujian")
+                    ->directory("package_images")
+                    ->image()
+                    ->columnSpanFull()
+                    ->imageEditor(),
                 Forms\Components\TextInput::make('name')
+                    ->label('Nama Paket')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('price')
+                    ->label('Harga Paket')
+                    ->helperText("Harga paket otomatis dijumlah dari total pengujian")
                     ->required()
                     ->numeric()
                     ->default(0)
+                    ->minValue(0)
                     ->prefix('Rp'),
-                Forms\Components\FileUpload::make('image')
-                    ->image(),
                 Forms\Components\Textarea::make('description')
-                    ->columnSpanFull(),
+                    ->label('Deskripsi Paket'),
                 Forms\Components\Select::make("tests")
                     ->relationship("tests", "name")
+                    ->label("Pilih Pengujian")
                     ->required()
                     ->multiple()
                     ->searchable()
                     ->reactive()
                     ->afterStateUpdated(function ($state, callable $set) {
-                        // Ambil harga dari relasi test yang dipilih
                         $selectedTests = Test::findMany($state);
                         $totalPrice = $selectedTests->sum('price');
                         $set('price', $totalPrice);
@@ -56,20 +70,24 @@ class PackageResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Nama Paket')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('price')
                     ->money("IDR")
+                    ->label('Harga Paket')
                     ->sortable(),
-                Tables\Columns\ImageColumn::make('image'),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label("Tanggal Ditambahkan")
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label("Tanggal Update")
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
+                    ->label("Tanggal Dihapus")
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -79,6 +97,9 @@ class PackageResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
