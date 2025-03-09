@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
 class TestingsRelationManager extends RelationManager
 {
     protected static string $relationship = 'testing';
+    protected static ?string $modelLabel = 'Pengujian';
 
     public function form(Form $form): Form
     {
@@ -25,7 +26,7 @@ class TestingsRelationManager extends RelationManager
                     ->inline()
                     ->required()
                     ->options([
-                        "testing" => "Pengujian",
+                        "testing" => "Sedang Berjalan",
                         "completed" => "Selesai",
                     ])
                     ->colors([
@@ -62,8 +63,10 @@ class TestingsRelationManager extends RelationManager
                 Forms\Components\Fieldset::make()
                     ->relationship("documents")
                     ->schema([
-                        Forms\Components\TextInput::make('name'),
+                        Forms\Components\TextInput::make('name')
+                        ->label('Nama penguji'),
                         Forms\Components\FileUpload::make('path')
+                            ->label('Upload Hasil Pengujian')
                             ->multiple()
                             ->preserveFilenames()
                             ->acceptedFileTypes([

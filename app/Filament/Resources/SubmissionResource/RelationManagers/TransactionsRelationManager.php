@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\SubmissionResource\RelationManagers;
 
+use App\Models\Submission;
+use App\Models\Transaction;
 use Filament\Forms;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
@@ -16,6 +18,7 @@ use Illuminate\Support\Carbon;
 class TransactionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'transactions';
+    protected static ?string $modelLabel = 'Transaksi';
 
     public function form(Form $form): Form
     {
@@ -28,6 +31,7 @@ class TransactionsRelationManager extends RelationManager
                     ->prefix("Rp"),
 
                 Forms\Components\TextInput::make('payment_method')
+                    ->label("Metode Pembayaran")
                     ->required(),
 
                 ToggleButtons::make('status')
@@ -82,12 +86,9 @@ class TransactionsRelationManager extends RelationManager
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'pending' => 'Pending',
-                        'paid' => 'Paid',
-                        'failed' => 'Failed',
-                        'expired' => 'Expired',
-                        'refunded' => 'Refunded',
-                        'canceled' => 'Canceled',
+                        "pending" => "Pending",
+                        "success" => "Berhasil",
+                        "failed" => "Gagal"
                     ]),
             ])
             ->headerActions([
@@ -95,6 +96,7 @@ class TransactionsRelationManager extends RelationManager
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),

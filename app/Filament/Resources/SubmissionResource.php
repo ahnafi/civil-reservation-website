@@ -27,7 +27,14 @@ class SubmissionResource extends Resource
 {
     protected static ?string $model = Submission::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
+    protected static ?string $modelLabel = 'Booking';
+    protected static ?string $navigationGroup = 'Booking';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
+    }
 
     public static function form(Form $form): Form
     {
@@ -36,6 +43,11 @@ class SubmissionResource extends Resource
                 Forms\Components\Split::make([
                     Forms\Components\Section::make()
                         ->schema([
+                            Forms\Components\TextInput::make('user_role')
+                                ->hidden()
+                                ->disabled()
+                                ->dehydrated(false)
+                                ->formatStateUsing(fn($state, Get $get) => $state ?: (User::find($get("user_id"))?->role ?? "external")),
                             Select::make('user_id')
                                 ->relationship('user', 'name')
                                 ->searchable()
@@ -63,20 +75,26 @@ class SubmissionResource extends Resource
                                     }
                                 }),
                             TextInput::make('company_name')
+                                ->label('Nama perusahaan')
+                                ->helperText("Penguji internal tidak wajib mengisi")
                                 ->maxLength(255)
                                 ->required(fn(Get $get) => $get("user_role") === "external"),
                             TextInput::make('project_name')
+                                ->label('Nama proyek')
                                 ->required()
                                 ->maxLength(255),
                             TextInput::make('project_address')
+                                ->label('Alamat proyek')
                                 ->required()
                                 ->maxLength(255),
                             TextInput::make('total_cost')
+                                ->label('Total biaya')
                                 ->numeric()
                                 ->prefix("Rp")
                                 ->default(0)
                                 ->reactive(),
                             Forms\Components\FileUpload::make('document')
+                                ->label('Lampiran')
                                 ->preserveFilenames()
                                 ->acceptedFileTypes([
                                     'application/pdf',
@@ -89,14 +107,17 @@ class SubmissionResource extends Resource
                                 ->openable()
                                 ->columnSpanFull(),
                             Forms\Components\Textarea::make('note')
+                                ->label('Catatan')
                                 ->columnSpanFull(),
 
 //                            paket
 
                             Repeater::make("submissionPackages")
+                                ->label('Paket pengujian')
                                 ->relationship()
                                 ->schema([
                                     Select::make('package_id')
+                                        ->label('Pilih paket pengujian')
                                         ->required()
                                         ->searchable()
                                         ->relationship("package", "name")
@@ -116,6 +137,7 @@ class SubmissionResource extends Resource
                                             }
                                         }),
                                     TextInput::make('package_price')
+                                        ->label('Harga paket')
                                         ->numeric()
                                         ->dehydrated(false)
                                         ->disabled()
@@ -132,9 +154,11 @@ class SubmissionResource extends Resource
 //                            test
 
                             Repeater::make("submissionTests")
+                                ->label('Pengujian satuan')
                                 ->relationship()
                                 ->schema([
                                     Select::make('test_id')
+                                        ->label('Pilih pengujian satuan')
                                         ->required()
                                         ->searchable()
                                         ->columnSpan(2)
@@ -152,6 +176,7 @@ class SubmissionResource extends Resource
                                         }),
 
                                     TextInput::make('quantity')
+                                        ->label('Jumlah pengujian')
                                         ->numeric()
                                         ->required()
                                         ->minValue(fn(Get $get) => $get("min_unit") ?? 1)
@@ -162,12 +187,13 @@ class SubmissionResource extends Resource
                                         }),
 
                                     TextInput::make('unit_price')
+                                        ->label('Harga satuan pengujian')
                                         ->numeric()
                                         ->reactive()
                                         ->dehydrated(false)
                                         ->disabled()
                                         ->default(fn(Get $get) => $get("unit_price") ?? 0)
-                                        ->formatStateUsing(fn($state, Get $get) => $state ?: fn(Get $get) => $get("unit_price") ?? 0),
+                                        ->formatStateUsing(fn($state, Get $get) => $state ?: (Test::find($get("test_id"))?->price ?? 0)),
                                 ])
                                 ->columns(4)
                                 ->columnSpanFull()
@@ -181,6 +207,7 @@ class SubmissionResource extends Resource
 
                     Forms\Components\Section::make([
                         ToggleButtons::make('status')
+                            ->label('Status pengajuan')
                             ->inline()
                             ->required()
                             ->options([
@@ -206,11 +233,13 @@ class SubmissionResource extends Resource
                                     $set('approval_date', null);
                                 }
                             }),
-                        Forms\Components\DateTimePicker::make('approval_date'),
+                        Forms\Components\DateTimePicker::make('approval_date')
+                            ->label('Tanggal diterima'),
                         Forms\Components\Placeholder::make('created_at')
+                            ->label('Tanggal dibuat')
                             ->content(fn(Submission $record): string => $record->created_at->toFormattedDateString())
                             ->visible(fn(?Submission $record): bool => $record !== null),
-                        ])->grow(false)->columnSpan(1),
+                    ])->grow(false)->columnSpan(1),
                 ])->columnSpanFull()->from("md"),
 
             ]);
@@ -220,40 +249,61 @@ class SubmissionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('user.name')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('company_name')
+                Tables\Columns\TextColumn::make('user.email')
+                    ->label("Email pengguna")
                     ->searchable(),
                 Tables\Columns\TextColumn::make('project_name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('project_address')
+                    ->label("Nama proyek")
                     ->searchable(),
                 Tables\Columns\TextColumn::make('total_cost')
+                    ->label("Total harga")
+                    ->money("IDR")
+                    ->prefix("Rp ")
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('status'),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'submitted' => 'info',
+                        'approved' => 'success',
+                        'rejected' => 'danger',
+                    }),
                 Tables\Columns\TextColumn::make('approval_date')
+                    ->label("Tanggal diterima")
                     ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label("Tanggal Dibuat")
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label("Tanggal Update")
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('deleted_at')
+                    ->label("Tanggal Dihapus")
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        "submitted" => "Diajukan",
+                        "approved" => "Diterima",
+                        "rejected" => "Ditolak"
+                    ])
+                    ->multiple()
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
