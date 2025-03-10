@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, BookOpenCheck, FlaskConical, Folder, HardHat, History, LayoutGrid, Package, ShoppingCart } from 'lucide-react';
+import { BookOpen, BookOpenCheck, FileText, CalendarDays, FlaskConical, Folder, HardHat, History, LayoutGrid, Package, ShoppingCart } from 'lucide-react';
 
 const serviceNavItems: NavItem[] = [
     {
@@ -27,6 +27,11 @@ const serviceNavItems: NavItem[] = [
         url: '/packages',
         icon: Package,
     },
+    {
+        title: 'Jadwal Pengujian',
+        url: '/schedules',
+        icon: CalendarDays,
+    },
 ];
 
 const orderNavItems: NavItem[] = [
@@ -36,14 +41,9 @@ const orderNavItems: NavItem[] = [
         icon: ShoppingCart,
     },
     {
-        title: 'Status',
-        url: '/orders/status',
-        icon: BookOpenCheck,
-    },
-    {
-        title: 'Riwayat',
-        url: '/orders/history',
-        icon: History,
+        title: 'Hasil Pengujian',
+        url: '/',
+        icon: FileText,
     },
 ];
 
