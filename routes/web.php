@@ -8,9 +8,39 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('schedule', function () {
+        return Inertia::render('schedule/index');
+    })->name('schedule');
+    Route::get('laboratories', function () {
+        return Inertia::render('laboratories/index');
+    })->name('laboratories');
+    Route::get('laboratories/example', function () {
+        return Inertia::render('laboratories/example');
+    })->name('tests-example');
+    Route::get('tests', function () {
+        return Inertia::render('tests/index');
+    })->name('tests');
+    Route::get('tests/example', function () {
+        return Inertia::render('tests/example');
+    })->name('tests-example');
+    Route::get('packages', function () {
+        return Inertia::render('packages/index');
+    })->name('packages');
+    Route::get('packages/example', function () {
+        return Inertia::render('packages/example');
+    })->name('packages-example');
+    Route::get('orders/cart', function () {
+        return Inertia::render('orders/cart');
+    })->name('orders-cart');
+    Route::get('orders/cart/form', function () {
+        return Inertia::render('orders/form');
+    })->name('orders-cart-form');
+    Route::get('orders/status', function () {
+        return Inertia::render('orders/status');
+    })->name('orders-status');
+    Route::get('orders/history', function () {
+        return Inertia::render('orders/history');
+    })->name('orders-history');
 });
 
 require __DIR__.'/settings.php';

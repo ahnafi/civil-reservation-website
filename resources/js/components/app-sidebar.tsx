@@ -4,14 +4,46 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
-import AppLogo from './app-logo';
+import { BookOpen, BookOpenCheck, FileText, CalendarDays, FlaskConical, Folder, HardHat, History, LayoutGrid, Package, ShoppingCart } from 'lucide-react';
 
-const mainNavItems: NavItem[] = [
+const serviceNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         url: '/dashboard',
         icon: LayoutGrid,
+    },
+    {
+        title: 'Laboratorium',
+        url: '/laboratories',
+        icon: FlaskConical,
+    },
+    {
+        title: 'Pengujian',
+        url: '/tests',
+        icon: HardHat,
+    },
+    {
+        title: 'Paket',
+        url: '/packages',
+        icon: Package,
+    },
+    {
+        title: 'Jadwal Pengujian',
+        url: '/schedules',
+        icon: CalendarDays,
+    },
+];
+
+const orderNavItems: NavItem[] = [
+    {
+        title: 'Keranjang',
+        url: '/orders/cart',
+        icon: ShoppingCart,
+    },
+    {
+        title: 'Hasil Pengujian',
+        url: '/',
+        icon: FileText,
     },
 ];
 
@@ -36,7 +68,11 @@ export function AppSidebar() {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link href="/dashboard" prefetch>
-                                <AppLogo />
+                                <img src="/img/logos/unsoed.png" alt="Unsoed Logo" className="w-10" />
+                                <div className="flex flex-col gap-1">
+                                    <small className="text-xs font-black">Laboratorium Teknik Sipil</small>
+                                    <small className="text-[10px] font-medium">Universitas Jenderal Soedirman</small>
+                                </div>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -44,7 +80,8 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain label="Layanan" items={serviceNavItems} />
+                <NavMain label="Pesanan" items={orderNavItems} />
             </SidebarContent>
 
             <SidebarFooter>
