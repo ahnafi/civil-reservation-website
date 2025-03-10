@@ -30,6 +30,11 @@ class Testing extends Model
         return $this->hasOne(Document::class);
     }
 
+    public function reviews(): HasOne
+    {
+        return $this->hasOne(Reviews::class);
+    }
+
     public function schedules(): BelongsToMany
     {
         return $this->belongsToMany(Schedule::class)->withTimestamps();
