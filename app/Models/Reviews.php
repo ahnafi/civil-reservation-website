@@ -3,25 +3,21 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Document extends Model
+class Reviews extends Model
 {
-    use SoftDeletes;
+    use softDeletes;
 
     protected $fillable = [
-        "name",
-        "path",
-        "testing_id"
+        'rating',
+        'content',
+        'testing_id',
     ];
 
     public function testing(): BelongsTo
     {
         return $this->belongsTo(Testing::class);
     }
-
-    protected $casts = [
-        'path' => 'array',
-    ];
 }

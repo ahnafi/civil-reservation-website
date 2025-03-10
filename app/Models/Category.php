@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Laboratory extends Model
+class Category extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
         "name",
-        "room"
+        "description"
     ];
 
     public function tests(): HasMany

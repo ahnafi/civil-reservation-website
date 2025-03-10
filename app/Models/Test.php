@@ -13,22 +13,44 @@ class Test extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        "note",
-        "status"
+        "name",
+        "price",
+        "description",
+        "image",
+        "minimum_unit",
+        "daily_slot",
+        "is_active",
+        "category_id",
+        "laboratory_id"
     ];
 
-    public function submission(): BelongsTo
+    public function packages(): BelongsToMany
     {
-        return $this->belongsTo(Submission::class);
+        return $this->belongsToMany(Package::class)->withTimestamps();
     }
 
-    public function documents(): HasMany
+    public function category(): BelongsTo
     {
-        return $this->hasMany(Document::class);
+        return $this->belongsTo(Category::class);
     }
 
-    public function labSchedules(): BelongsToMany
+    public function laboratory(): BelongsTo
     {
-        return $this->belongsToMany(LabSchedule::class,"test_scheduling")->withTimestamps();
+        return $this->belongsTo(Laboratory::class);
     }
+
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(Schedule::class);
+    }
+    public function submissionTests(): HasMany
+    {
+        return $this->hasMany(SubmissionTest::class);
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
 }

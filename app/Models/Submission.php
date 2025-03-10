@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -15,33 +14,56 @@ class Submission extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        "user_id",
         "company_name",
         "project_name",
         "project_address",
-        "unit_qty",
+        "total_cost",
+        "document",
         "status",
         "note",
-        "total_cost",
-        "approval_date",
+        "approval_date"
     ];
+
+    protected function casts(): array
+    {
+        return [
+            "approval_date" => "datetime"
+        ];
+    }
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function test(): HasOne
+    public function transactions(): HasMany
     {
-        return $this->hasOne(Test::class);
+        return $this->hasMany(Transaction::class);
     }
 
-    public function items(): HasMany
+    public function testing(): HasOne
     {
-        return $this->hasMany(SubmissionItem::class);
+        return $this->hasOne(Testing::class);
     }
 
-//    public function testTypes(): BelongsToMany
-//    {
-//        return $this->belongsToMany(TestType::class)->withTimestamps()->withPivot("deleted_at");
-//    }
+    public function tests(): BelongsToMany
+    {
+        return $this->belongsToMany(Test::class)->withTimestamps()->withPivot("quantity");
+    }
+
+    public function packages(): BelongsToMany
+    {
+        return $this->belongsToMany(Package::class)->withTimestamps();
+    }
+
+    public function submissionPackages(): HasMany
+    {
+        return $this->hasMany(SubmissionPackage::class);
+    }
+    public function submissionTests(): HasMany
+    {
+        return $this->hasMany(SubmissionTest::class);
+    }
+
 }
