@@ -116,14 +116,14 @@ export default function MainDashboard() {
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: "Dashboard",
+            title: "Jadwal Pengujian",
             href: "/dashboard",
         },
     ];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Dashboard" />
+            <Head title="Jadwal Pengujian" />
 
             <div className="flex flex-col">
                 <div className="page-title">
