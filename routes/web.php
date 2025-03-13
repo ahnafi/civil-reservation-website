@@ -8,6 +8,9 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('dashboard', function() {
+        return Inertia::render('dashboard/index');
+    })->name('dashboard');
     Route::get('schedule', function () {
         return Inertia::render('schedule/index');
     })->name('schedule');

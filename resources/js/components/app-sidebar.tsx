@@ -29,7 +29,7 @@ const serviceNavItems: NavItem[] = [
     },
     {
         title: 'Jadwal Pengujian',
-        url: '/schedules',
+        url: '/schedule',
         icon: CalendarDays,
     },
 ];
