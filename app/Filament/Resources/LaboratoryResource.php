@@ -26,6 +26,10 @@ class LaboratoryResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make([
+                    Forms\Components\TextInput::make('code')
+                        ->label('Kode laboratorium')
+                        ->required()
+                        ->maxLength(255),
                     Forms\Components\TextInput::make('name')
                         ->label('Nama laboratorium')
                         ->required()
@@ -42,6 +46,9 @@ class LaboratoryResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('code')
+                    ->label('Kode laboratorium')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama laboratorium')
                     ->searchable(),

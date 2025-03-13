@@ -11,6 +11,7 @@ class Laboratory extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        "code",
         "name",
         "room"
     ];

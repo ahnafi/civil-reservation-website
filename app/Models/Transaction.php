@@ -11,6 +11,9 @@ class Transaction extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        "code",
+        "payment_invoice_file",
+        "payment_receipt_image",
         "amount",
         "payment_method",
         "status",
