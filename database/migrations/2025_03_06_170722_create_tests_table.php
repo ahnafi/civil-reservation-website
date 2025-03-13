@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->string("name");
             $table->unsignedInteger("price");
             $table->text("description")->nullable();
-            $table->string("image")->nullable();
+            $table->text("images")->nullable();
             $table->integer("minimum_unit")->default(0);
             $table->integer("daily_slot")->default(0);
             $table->boolean("is_active")->default(true);

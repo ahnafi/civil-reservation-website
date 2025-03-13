@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string("name");
             $table->unsignedInteger("price")->default(0);
-            $table->string("image")->nullable();
+            $table->text("images")->nullable();
             $table->text("description")->nullable();
             $table->timestamps();
             $table->softDeletes();
