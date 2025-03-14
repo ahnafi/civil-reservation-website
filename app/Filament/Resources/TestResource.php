@@ -33,10 +33,11 @@ class TestResource extends Resource
             ->schema([
                 Forms\Components\Split::make([
                     Forms\Components\Section::make([
-                        Forms\Components\FileUpload::make('image')
+                        Forms\Components\FileUpload::make('images')
                             ->directory('test_images')
                             ->label('Foto pengujian')
                             ->image()
+                            ->multiple()
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('name')
                             ->label('Nama pegujian')

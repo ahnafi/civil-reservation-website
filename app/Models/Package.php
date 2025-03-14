@@ -14,8 +14,12 @@ class Package extends Model
     protected $fillable = [
         "name",
         "price",
-        "image",
+        "images",
         "description"
+    ];
+
+    protected $casts = [
+        "images" => "array",
     ];
 
     public function tests(): BelongsToMany

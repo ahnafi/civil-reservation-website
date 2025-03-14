@@ -20,6 +20,7 @@ class UserResource extends Resource
     protected static ?string $modelLabel = 'Pengguna';
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationGroup = 'Booking';
+
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::count();
@@ -49,7 +50,6 @@ class UserResource extends Resource
                     ->label('Nomor Telepon')
                     ->tel()
                     ->telRegex('/^(\\+62|0)[0-9]{9,12}$/')
-                    ->required()
                     ->validationMessages([
                         'telRegex' => 'Format nomor telepon tidak valid. Gunakan format +62 atau 0 diikuti dengan 9-12 digit angka.',
                     ]),
@@ -100,7 +100,12 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('role')
                     ->label("Role")
-                    ->badge(),
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'external' => 'info',
+                        'internal' => 'success',
+                        'admin' => 'danger',
+                    }),
                 Tables\Columns\TextColumn::make("email_verified_at")
                     ->label("Tanggal verifikasi Email")
                     ->sortable()

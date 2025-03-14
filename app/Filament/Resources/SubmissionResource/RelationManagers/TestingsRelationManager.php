@@ -60,26 +60,39 @@ class TestingsRelationManager extends RelationManager
                     ->label('Tanggal Selesai')
                     ->nullable(),
 
-                Forms\Components\Fieldset::make()
-                    ->relationship("documents")
-                    ->schema([
-                        Forms\Components\TextInput::make('name')
-                        ->label('Nama penguji'),
-                        Forms\Components\FileUpload::make('path')
-                            ->label('Upload Hasil Pengujian')
-                            ->multiple()
-                            ->preserveFilenames()
-                            ->acceptedFileTypes([
-                                'application/pdf',
-                                'application/msword',
-                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                            ])
-                            ->maxSize(2048)
-                            ->directory("testing")
-                            ->helperText('Format file yang diterima: PDF, DOC, DOCX. Maksimal ukuran file: 2MB.')
-                            ->openable()
-                            ->columnSpanFull(),
+                Forms\Components\FileUpload::make('documents')
+                    ->label('Lampiran')
+                    ->multiple()
+                    ->directory('testing_documents')
+                    ->acceptedFileTypes([
+                        'application/pdf',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                     ])
+                    ->openable()
+                    ->helperText('Format file yang diterima: PDF, DOC, DOCX. Maksimal ukuran file: 2MB.')
+                    ->columnSpanFull()
+
+//                Forms\Components\Fieldset::make()
+//                    ->relationship("documents")
+//                    ->schema([
+//                        Forms\Components\TextInput::make('name')
+//                        ->label('Nama penguji'),
+//                        Forms\Components\FileUpload::make('path')
+//                            ->label('Upload Hasil Pengujian')
+//                            ->multiple()
+//                            ->preserveFilenames()
+//                            ->acceptedFileTypes([
+//                                'application/pdf',
+//                                'application/msword',
+//                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+//                            ])
+//                            ->maxSize(2048)
+//                            ->directory("testing")
+//                            ->helperText('Format file yang diterima: PDF, DOC, DOCX. Maksimal ukuran file: 2MB.')
+//                            ->openable()
+//                            ->columnSpanFull(),
+//                    ])
             ]);
     }
 
@@ -100,6 +113,7 @@ class TestingsRelationManager extends RelationManager
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),

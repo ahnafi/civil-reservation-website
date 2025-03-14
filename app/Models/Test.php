@@ -16,12 +16,17 @@ class Test extends Model
         "name",
         "price",
         "description",
-        "image",
+        "images",
         "minimum_unit",
         "daily_slot",
         "is_active",
         "category_id",
         "laboratory_id"
+    ];
+
+    protected $casts = [
+        "is_active" => "boolean",
+        "images" => "array",
     ];
 
     public function packages(): BelongsToMany
@@ -43,6 +48,7 @@ class Test extends Model
     {
         return $this->hasMany(Schedule::class);
     }
+
     public function submissionTests(): HasMany
     {
         return $this->hasMany(SubmissionTest::class);

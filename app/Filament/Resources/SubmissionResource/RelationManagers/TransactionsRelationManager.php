@@ -14,6 +14,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class TransactionsRelationManager extends RelationManager
 {
@@ -24,10 +25,25 @@ class TransactionsRelationManager extends RelationManager
     {
         return $form
             ->schema([
+                Forms\Components\TextInput::make('code')
+                    ->label('Kode Unik Transaksi')
+                    ->required()
+                    ->unique(ignoreRecord: true)
+                    ->default(function () {
+                        $submission = $this->getOwnerRecord();
+                        $submissionId = $submission?->id ?? '000';
+                        $userId = $submission?->user_id ?? '000';
+                        $transactionCount = $submission ? $submission->transactions()->count() + 1 : 1;
+
+                        return 'CVL-' . now()->format('Ymd') . $submissionId . $userId . $transactionCount;
+                    })
+                    ->disabled(),
+
                 Forms\Components\TextInput::make('amount')
                     ->numeric()
                     ->required()
                     ->label('Total Pembayaran')
+                    ->default(fn() => $this->getOwnerRecord()->total_cost ?? 0)
                     ->prefix("Rp"),
 
                 Forms\Components\TextInput::make('payment_method')
@@ -62,7 +78,12 @@ class TransactionsRelationManager extends RelationManager
                         }
                     }),
 
-                Forms\Components\FileUpload::make('image')
+                Forms\Components\FileUpload::make('payment_invoice_file')
+                    ->label('Invoice Pembayaran')
+                    ->image()
+                    ->directory('payment_invoice'),
+
+                Forms\Components\FileUpload::make('payment_receipt_image')
                     ->label('Bukti Pembayaran')
                     ->image()
                     ->directory('payment_receipts'),
@@ -77,7 +98,7 @@ class TransactionsRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('amount')->label('Total')->sortable(),
+                Tables\Columns\TextColumn::make('code')->label('Kode')->sortable(),Tables\Columns\TextColumn::make('amount')->label('Total')->sortable(),
                 Tables\Columns\TextColumn::make('payment_method')->label('Metode Pembayaran')->sortable(),
                 Tables\Columns\TextColumn::make('status')->label('Status')->sortable()->badge(),
                 Tables\Columns\TextColumn::make('payment_date')->label('Tanggal Pembayaran')->dateTime(),

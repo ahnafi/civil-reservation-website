@@ -18,7 +18,6 @@ return new class extends Migration {
             $table->enum("status", ["pending", "success", "failed"])->default("pending");
             $table->string("payment_invoice_file")->nullable();
             $table->string("payment_receipt_image")->nullable();
-            $table->string("image")->nullable();
             $table->dateTime("payment_date")->nullable();
             $table->foreignId("submission_id")->constrained()->cascadeOnDelete();
             $table->timestamps();

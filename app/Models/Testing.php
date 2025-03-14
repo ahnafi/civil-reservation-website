@@ -17,17 +17,17 @@ class Testing extends Model
         "note",
         "test_date",
         "completed_at",
+        "documents",
         "submission_id"
+    ];
+
+    protected $casts = [
+        "documents" => "array",
     ];
 
     public function submission(): BelongsTo
     {
         return $this->belongsTo(Submission::class);
-    }
-
-    public function documents(): HasOne
-    {
-        return $this->hasOne(Document::class);
     }
 
     public function reviews(): HasOne

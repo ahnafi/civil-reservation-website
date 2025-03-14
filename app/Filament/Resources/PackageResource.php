@@ -30,26 +30,16 @@ class PackageResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\FileUpload::make('image')
+                Forms\Components\FileUpload::make('images')
                     ->label("Foto Paket Pengujian")
                     ->directory("package_images")
                     ->image()
-                    ->columnSpanFull()
-                    ->imageEditor(),
+                    ->multiple()
+                    ->columnSpanFull(),
                 Forms\Components\TextInput::make('name')
                     ->label('Nama Paket')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('price')
-                    ->label('Harga Paket')
-                    ->helperText("Harga paket otomatis dijumlah dari total pengujian")
-                    ->required()
-                    ->numeric()
-                    ->default(0)
-                    ->minValue(0)
-                    ->prefix('Rp'),
-                Forms\Components\Textarea::make('description')
-                    ->label('Deskripsi Paket'),
                 Forms\Components\Select::make("tests")
                     ->relationship("tests", "name")
                     ->label("Pilih Pengujian")
@@ -62,6 +52,16 @@ class PackageResource extends Resource
                         $totalPrice = $selectedTests->sum('price');
                         $set('price', $totalPrice);
                     }),
+                Forms\Components\Textarea::make('description')
+                    ->label('Deskripsi Paket'),
+                Forms\Components\TextInput::make('price')
+                    ->label('Harga Paket')
+                    ->helperText("Harga paket otomatis dijumlah dari total pengujian")
+                    ->required()
+                    ->numeric()
+                    ->default(0)
+                    ->minValue(0)
+                    ->prefix('Rp'),
             ]);
     }
 
