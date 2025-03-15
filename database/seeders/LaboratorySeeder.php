@@ -13,20 +13,41 @@ class LaboratorySeeder extends Seeder
      */
     public function run(): void
     {
-        Laboratory::create([
-            "name" => "LT",
-            "room" => "D 101",
-            "daily_slots" => 5,
-        ]);
-        Laboratory::create([
-            "name" => "LH",
-            "room" => "D 102",
-            "daily_slots" => 5,
-        ]);
-        Laboratory::create([
-            "name" => "LSBB",
-            "room" => "D 103",
-            "daily_slots" => 5,
-        ]);
+        $laboratories=[
+            [
+                "code" => "LT",
+                "name" => "Lab Tanah",
+                "room" => "D 101",
+
+            ],
+            [
+                "code" => "LH",
+                "name" => "Lab Hidrologi",
+                "room" => "D 102",
+
+            ],
+            [
+                "code" => "LSBB",
+                "name" => "Lab Struktur dan Bahan Bangunan",
+                "room" => "D 103",
+
+            ],
+            [
+                "code" => "LP",
+                "name" => "Lab Pemetaan",
+                "room" => "D 104",
+
+            ],
+            [
+                "code" => "LMT",
+                "name" => "Lab Mekanika Tanah",
+                "room" => "D 105",
+
+            ]
+        ];
+
+        foreach ($laboratories as $laboratory) {
+            Laboratory::create($laboratory);
+        }
     }
 }
