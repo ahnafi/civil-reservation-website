@@ -19,7 +19,8 @@ class Transaction extends Model
         "payment_method",
         "status",
         "payment_date",
-        "submission_id"
+        "submission_id",
+        "note"
     ];
 
     protected static function boot(): void
