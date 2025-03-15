@@ -91,6 +91,10 @@ class TransactionsRelationManager extends RelationManager
                 Forms\Components\DateTimePicker::make('payment_date')
                     ->label('Tanggal Pembayaran')
                     ->nullable(),
+                Forms\Components\Textarea::make('note')
+                    ->label('Catatan')
+                    ->nullable()
+                    ->columnSpanFull(),
             ]);
     }
 

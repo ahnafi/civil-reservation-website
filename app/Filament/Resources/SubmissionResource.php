@@ -201,7 +201,7 @@ class SubmissionResource extends Resource
                                     self::updateTotalCost($get, $set);
                                 })
 
-                        ])->columns(),
+                        ])->grow(false)->columns(),
 
 //                    approval
 
@@ -239,7 +239,7 @@ class SubmissionResource extends Resource
                             ->label('Tanggal dibuat')
                             ->content(fn(Submission $record): string => $record->created_at->toFormattedDateString())
                             ->visible(fn(?Submission $record): bool => $record !== null),
-                    ])->grow(false)->columnSpan(1),
+                    ])->columnSpan(1),
                 ])->columnSpanFull()->from("md"),
 
             ]);
