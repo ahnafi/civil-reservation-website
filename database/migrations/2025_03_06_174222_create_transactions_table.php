@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string("code")->unique();
             $table->unsignedInteger("amount")->default(0);
-            $table->string("payment_method");
+            $table->enum("payment_method", ["BANK JATENG", "BANK MANDIRI", "BANK BNI", "BANK BRI", "BANK BSI", "BANK BTN"])->nullable();
             $table->text("note")->nullable();
             $table->enum("status", ["pending", "success", "failed"])->default("pending");
             $table->string("payment_invoice_file")->nullable();

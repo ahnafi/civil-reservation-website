@@ -46,9 +46,25 @@ class TransactionsRelationManager extends RelationManager
                     ->default(fn() => $this->getOwnerRecord()->total_cost ?? 0)
                     ->prefix("Rp"),
 
-                Forms\Components\TextInput::make('payment_method')
+                ToggleButtons::make('payment_method')
                     ->label("Metode Pembayaran")
-                    ->required(),
+                    ->inline()
+                    ->options([
+                        "BANK JATENG" => "BANK JATENG",
+                        "BANK MANDIRI" => "BANK MANDIRI",
+                        "BANK BNI" => "BANK BNI",
+                        "BANK BRI" => "BANK BRI",
+                        "BANK BSI" => "BANK BSI",
+                        "BANK BTN" => "BANK BTN"
+                    ])
+                    ->colors([
+                        'BANK JATENG' => 'success',
+                        'BANK MANDIRI' => 'success',
+                        'BANK BNI' => 'success',
+                        'BANK BRI' => 'success',
+                        'BANK BSI' => 'success',
+                        'BANK BTN' => 'success',
+                    ]),
 
                 ToggleButtons::make('status')
                     ->inline()
@@ -80,7 +96,11 @@ class TransactionsRelationManager extends RelationManager
 
                 Forms\Components\FileUpload::make('payment_invoice_file')
                     ->label('Invoice Pembayaran')
-                    ->image()
+                    ->acceptedFileTypes([
+                        'application/pdf',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    ])
                     ->directory('payment_invoice'),
 
                 Forms\Components\FileUpload::make('payment_receipt_image')
@@ -102,9 +122,15 @@ class TransactionsRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('code')->label('Kode')->sortable(),Tables\Columns\TextColumn::make('amount')->label('Total')->sortable(),
+                Tables\Columns\TextColumn::make('code')->label('Kode')->sortable(),
+                Tables\Columns\TextColumn::make('amount')->label('Total')->sortable(),
                 Tables\Columns\TextColumn::make('payment_method')->label('Metode Pembayaran')->sortable(),
-                Tables\Columns\TextColumn::make('status')->label('Status')->sortable()->badge(),
+                Tables\Columns\TextColumn::make('status')->label('Status')->sortable()->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        "pending" => "info",
+                        "success" => "success",
+                        "failed" => "danger"
+                    }),
                 Tables\Columns\TextColumn::make('payment_date')->label('Tanggal Pembayaran')->dateTime(),
             ])
             ->filters([

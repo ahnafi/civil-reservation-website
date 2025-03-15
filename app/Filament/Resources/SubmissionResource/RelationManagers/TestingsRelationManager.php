@@ -23,6 +23,7 @@ class TestingsRelationManager extends RelationManager
         return $form
             ->schema([
                 ToggleButtons::make('status')
+                ->label('Status Pengujian')
                     ->inline()
                     ->required()
                     ->options([
@@ -72,27 +73,6 @@ class TestingsRelationManager extends RelationManager
                     ->openable()
                     ->helperText('Format file yang diterima: PDF, DOC, DOCX. Maksimal ukuran file: 2MB.')
                     ->columnSpanFull()
-
-//                Forms\Components\Fieldset::make()
-//                    ->relationship("documents")
-//                    ->schema([
-//                        Forms\Components\TextInput::make('name')
-//                        ->label('Nama penguji'),
-//                        Forms\Components\FileUpload::make('path')
-//                            ->label('Upload Hasil Pengujian')
-//                            ->multiple()
-//                            ->preserveFilenames()
-//                            ->acceptedFileTypes([
-//                                'application/pdf',
-//                                'application/msword',
-//                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-//                            ])
-//                            ->maxSize(2048)
-//                            ->directory("testing")
-//                            ->helperText('Format file yang diterima: PDF, DOC, DOCX. Maksimal ukuran file: 2MB.')
-//                            ->openable()
-//                            ->columnSpanFull(),
-//                    ])
             ]);
     }
 
@@ -100,10 +80,14 @@ class TestingsRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('status')->label('Status')->sortable(),
+                Tables\Columns\TextColumn::make('status')->label('Status')->sortable()
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        "testing" => "warning",
+                        "completed" => "success",
+                    }),
                 Tables\Columns\TextColumn::make('test_date')->label('Tanggal Testing')->dateTime(),
                 Tables\Columns\TextColumn::make('completed_at')->label('Selesai')->dateTime(),
-                Tables\Columns\TextColumn::make('note'),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make()
