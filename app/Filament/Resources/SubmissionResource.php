@@ -201,14 +201,13 @@ class SubmissionResource extends Resource
                                     self::updateTotalCost($get, $set);
                                 })
 
-                        ])->grow(false)->columns(),
+                        ])->columns()->grow(false),
 
 //                    approval
 
                     Forms\Components\Section::make([
                         ToggleButtons::make('status')
                             ->label('Status pengajuan')
-                            ->inline()
                             ->required()
                             ->options([
                                 "submitted" => "Diajukan",
@@ -239,7 +238,7 @@ class SubmissionResource extends Resource
                             ->label('Tanggal dibuat')
                             ->content(fn(Submission $record): string => $record->created_at->toFormattedDateString())
                             ->visible(fn(?Submission $record): bool => $record !== null),
-                    ])->columnSpan(1),
+                    ])->grow(false),
                 ])->columnSpanFull()->from("md"),
 
             ]);
