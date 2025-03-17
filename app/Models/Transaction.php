@@ -33,7 +33,7 @@ class Transaction extends Model
             $userId = $submission?->user_id ?? '000';
             $transactionCount = $submission ? $submission->transactions()->count() + 1 : 1;
 
-            $transaction->code = 'TRX-' . now()->format('Ymd') . $submissionId . $userId . $transactionCount;
+            $transaction->code = 'CVL-' . now()->format('Ymd') . $submissionId . $userId . $transactionCount;
         });
     }
 
