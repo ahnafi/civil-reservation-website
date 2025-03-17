@@ -1,71 +1,28 @@
-import {useState} from "react";
-import AppLayout from "@/layouts/app-layout";
-import { type BreadcrumbItem} from "@/types";
-import { Head, Link } from "@inertiajs/react";
-import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import { Button } from '@/components/ui/button';
-import {Separator} from "@/components/ui/separator";
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { Separator } from '@/components/ui/separator';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem, Package, Test } from '@/types';
+import { Head, Link } from '@inertiajs/react';
+import { useState } from 'react';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: "Paket",
-        href: "/packages",
-    },
-    {
-        title: "Uji Material Kerikil Lengkap", // Didapat dari Laravel
-        href: "/tests/example",
-    },
-];
+export default function Detail({ data }: { data: Package }) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Paket',
+            href: '/packages',
+        },
+        {
+            title: data.name,
+            href: '/tests/' + data.slug,
+        },
+    ];
 
-const dummyData: {
-    title: string;
-    description: string;
-    image: string[];
-    price: number;
-    link: string;
-    testPackages: {
-        title: string;
-        price: number;
-    }[];
-    notes?: string;
-} =
-{
-    title: 'Uji Material Kerikil Lengkap',
-    description: 'Uji material kerikil lengkap untuk mengetahui kualitas kerikil.',
-    image: ["/img/tests/laboratory-1.jpg", "/img/tests/laboratory-1.jpg", "/img/tests/laboratory-1.jpg", "/img/tests/laboratory-1.jpg"],
-    price: 850000,
-    link: 'packages/example',
-    testPackages: [
-        {
-            title: 'Uji Kadar Air',
-            price: 100000,
-        },
-        {
-            title: 'Uji Berat Jenis',
-            price: 150000,
-        },
-        {
-            title: 'Uji Kadar Lumpur',
-            price: 200000,
-        },
-        {
-            title: 'Uji Kadar Tanah Liat',
-            price: 200000,
-        },
-        {
-            title: 'Uji Kadar Tanah Liat',
-            price: 200000,
-        },
-    ],
-    notes: 'Untuk kebutuhan dasar sebelum produksi atau riset awal.',
-};
+    const [mainImage, setMainImage] = useState(data.images[0]);
 
-export default function Package() {
-    const [mainImage, setMainImage] = useState(dummyData.image[0]);
-
-    const formatRupiah = (value:number, currency = "IDR") => {
-        return new Intl.NumberFormat("id-ID", {
-            style: "currency",
+    const formatRupiah = (value: number, currency = 'IDR') => {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
             currency: currency,
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
@@ -74,16 +31,16 @@ export default function Package() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={dummyData.title} />
+            <Head title={data.name} />
 
             <div className="grid grid-cols-1 gap-6 p-4 lg:grid-cols-2 xl:grid-cols-3">
                 <div className="row-span-2 space-y-2">
-                    <img src={mainImage} alt={dummyData.title} className="max-h-96 w-full rounded-lg object-cover" />
+                    <img src={'/storage/' + mainImage} alt={data.name} className="max-h-96 w-full rounded-lg object-cover" />
                     <Carousel>
                         <CarouselContent>
-                            {dummyData.image.map((image, index) => (
+                            {data.images?.map((image, index) => (
                                 <CarouselItem className="basis-1/2 md:basis-1/3 lg:basis-1/4" key={index}>
-                                    <img src={image} alt={dummyData.title} className="rounded-md" onClick={() => setMainImage(image)}/>
+                                    <img src={'/storage/' + image} alt={data.name} className="rounded-md" onClick={() => setMainImage(image)} />
                                 </CarouselItem>
                             ))}
                         </CarouselContent>
@@ -91,25 +48,25 @@ export default function Package() {
                 </div>
 
                 <div className="space-y-4">
-                    <h1 className="font-black">{dummyData.title}</h1>
+                    <h1 className="font-black">{data.name}</h1>
                     <Separator />
                     <div>
                         <p className="font-semibold text-neutral-400">Deskripsi</p>
-                        <p>{dummyData.description}</p>
+                        <p>{data.description}</p>
                     </div>
 
-                    <div>
-                        <p className="font-semibold text-neutral-400">
-                            Catatan <span className="text-red-base">*</span>
-                        </p>
-                        <p>{dummyData.notes}</p>
-                    </div>
+                    {/*<div>*/}
+                    {/*    <p className="font-semibold text-neutral-400">*/}
+                    {/*        Catatan <span className="text-red-base">*</span>*/}
+                    {/*    </p>*/}
+                    {/*    <p>{data.}</p>*/}
+                    {/*</div>*/}
 
                     <div>
                         <p className="font-semibold text-neutral-400">Pengujian yang Didapat</p>
                         <ul className="list-inside list-disc">
-                            {dummyData.testPackages.map((testPackage, index) => (
-                                <li key={index} className="flex items-center gap-2">
+                            {data.tests?.map((test: Test) => (
+                                <li key={test.id} className="flex items-center gap-2">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         viewBox="0 0 448 512"
@@ -119,8 +76,10 @@ export default function Package() {
                                         <path d="M438.6 105.4c12.5 12.5 12.5 32.8 0 45.3l-256 256c-12.5 12.5-32.8 12.5-45.3 0l-128-128c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0L160 338.7 393.4 105.4c12.5-12.5 32.8-12.5 45.3 0z" />
                                     </svg>
                                     <div className="flex w-full justify-between">
-                                        <Link href="/tests/example" className="hover:underline">{testPackage.title}</Link>
-                                        <p className="font-medium">{formatRupiah(testPackage.price)}</p>
+                                        <Link href={'/tests/' + test.slug} className="hover:underline">
+                                            {test.name}
+                                        </Link>
+                                        <p className="font-medium">{formatRupiah(test.price)}</p>
                                     </div>
                                 </li>
                             ))}
@@ -131,7 +90,7 @@ export default function Package() {
                 <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
                         <h2 className="font-black">
-                            Mulai Dari <span className="text-blue-base">{formatRupiah(dummyData.price)}</span>
+                            Mulai Dari <span className="text-blue-base">{formatRupiah(data.price)}</span>
                         </h2>
                         <p>Pembayaran fleksibel tersedia dengan E-money atau M-banking.</p>
                         <Button className="bg-blue-base text-light-base dark:text-light-base cursor-pointer transition-colors duration-300 ease-out hover:bg-blue-700 hover:decoration-current! dark:bg-blue-500 dark:hover:bg-blue-600 dark:hover:decoration-current!">

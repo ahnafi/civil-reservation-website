@@ -38,3 +38,15 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface Package {
+    id: number;
+    name: string;
+    slug: string;
+    price: number;
+    images: string[];
+    description: string;
+    tests: Test[] | null;
+}
+
+export type PaginatedPackage = Pagination<Package>;

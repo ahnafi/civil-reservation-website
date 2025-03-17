@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PackageController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -8,7 +9,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function() {
+    Route::get('dashboard', function () {
         return Inertia::render('dashboard/index');
     })->name('dashboard');
     Route::get('schedule', function () {
@@ -26,12 +27,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('tests/example', function () {
         return Inertia::render('tests/example');
     })->name('tests-example');
-    Route::get('packages', function () {
-        return Inertia::render('packages/index');
-    })->name('packages');
-    Route::get('packages/example', function () {
-        return Inertia::render('packages/example');
-    })->name('packages-example');
+    Route::get('packages', [PackageController::class,"index"])->name('packages');
+    Route::get('packages/{package:slug}',[PackageController::class,"detail"])->name('packages-detail');
     Route::get('orders/cart', function () {
         return Inertia::render('orders/cart');
     })->name('orders-cart');
@@ -46,5 +43,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('orders-history');
 });
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';
