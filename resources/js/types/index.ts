@@ -40,7 +40,6 @@ export interface User {
 
     [key: string]: unknown; // This allows for additional properties...
 }
-
 export interface Category {
     id: number;
     name: string;
@@ -77,6 +76,16 @@ export interface Test {
     laboratory: Laboratory;
 }
 
+export interface Package {
+    id: number;
+    name: string;
+    slug: string;
+    price: number;
+    images: string[];
+    description: string;
+    tests: Test[] | null;
+}
+
 export interface Pagination<T> {
     total: number;
     per_page: number;
@@ -93,3 +102,4 @@ export interface Pagination<T> {
 }
 
 export type PaginatedTests = Pagination<Test>;
+export type PaginatedPackage = Pagination<Package>;

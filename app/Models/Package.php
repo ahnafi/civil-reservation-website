@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Package extends Model
 {
@@ -13,6 +14,7 @@ class Package extends Model
 
     protected $fillable = [
         "name",
+        "slug",
         "price",
         "images",
         "description"
@@ -21,6 +23,22 @@ class Package extends Model
     protected $casts = [
         "images" => "array",
     ];
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->slug = Str::slug($model->name) . '-' . Str::lower(Str::random(4));
+        });
+
+        static::updating(function ($model) {
+            if ($model->isDirty('name')) {
+                $model->slug = Str::slug($model->name) . '-' . Str::lower(Str::random(4));
+            }
+        });
+    }
+
 
     public function tests(): BelongsToMany
     {
