@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TestController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -20,9 +21,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('laboratories/example', function () {
         return Inertia::render('laboratories/example');
     })->name('tests-example');
-    Route::get('tests', function () {
-        return Inertia::render('tests/index');
-    })->name('tests');
+    Route::get('tests',[TestController::class,"index"])->name('tests');
     Route::get('tests/example', function () {
         return Inertia::render('tests/example');
     })->name('tests-example');
