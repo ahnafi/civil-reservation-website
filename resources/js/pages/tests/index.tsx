@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, PaginatedTests, Test } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -10,119 +10,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const dummyData: {
-    title: string;
-    description: string;
-    image: string;
-    satuan: string;
-    laboratorium: string;
-    minimumPemesanan: number;
-    harga: number;
-    link: string;
-}[] = [
-    {
-        title: 'Uji Bor Tangan',
-        description: 'Uji bor tangan adalah uji yang dilakukan untuk mengetahui kekuatan tahanan bor tangan terhadap tertentu.',
-        image: '/img/tests/laboratory-1.jpg',
-        satuan: 'Sampel',
-        laboratorium: 'LMT',
-        minimumPemesanan: 1,
-        harga: 500000,
-        link: 'tests/example',
-    },
-    {
-        title: 'Uji Tekan Beton',
-        description: 'Uji tekan beton untuk mengetahui kekuatan tekan beton.',
-        image: '/img/tests/laboratory-2.jpg',
-        satuan: 'Sampel',
-        laboratorium: 'LMT',
-        minimumPemesanan: 2,
-        harga: 750000,
-        link: 'tests/example',
-    },
-    {
-        title: 'Uji Tarik Baja',
-        description: 'Uji tarik baja untuk mengetahui kekuatan tarik baja.',
-        image: '/img/tests/laboratory-3.jpg',
-        satuan: 'Sampel',
-        laboratorium: 'LMT',
-        minimumPemesanan: 3,
-        harga: 1000000,
-        link: 'tests/example',
-    },
-    {
-        title: 'Uji Lentur Kayu',
-        description: 'Uji lentur kayu untuk mengetahui kekuatan lentur kayu.',
-        image: '/img/tests/laboratory-4.jpg',
-        satuan: 'Sampel',
-        laboratorium: 'LMT',
-        minimumPemesanan: 1,
-        harga: 600000,
-        link: 'tests/example',
-    },
-    {
-        title: 'Uji Geser Tanah',
-        description: 'Uji geser tanah untuk mengetahui kekuatan geser tanah.',
-        image: '/img/tests/laboratory-5.jpg',
-        satuan: 'Sampel',
-        laboratorium: 'LMT',
-        minimumPemesanan: 2,
-        harga: 800000,
-        link: 'tests/example',
-    },
-    {
-        title: 'Uji Kuat Tekan Bata',
-        description: 'Uji kuat tekan bata untuk mengetahui kekuatan tekan bata.',
-        image: '/img/tests/laboratory-6.jpg',
-        satuan: 'Sampel',
-        laboratorium: 'LMT',
-        minimumPemesanan: 1,
-        harga: 450000,
-        link: 'tests/example',
-    },
-    {
-        title: 'Uji Kuat Tarik Baja',
-        description: 'Uji kuat tarik baja untuk mengetahui kekuatan tarik baja.',
-        image: '/img/tests/laboratory-7.jpg',
-        satuan: 'Sampel',
-        laboratorium: 'LMT',
-        minimumPemesanan: 3,
-        harga: 950000,
-        link: 'tests/example',
-    },
-    {
-        title: 'Uji Kuat Lentur Beton',
-        description: 'Uji kuat lentur beton untuk mengetahui kekuatan lentur beton.',
-        image: '/img/tests/laboratory-8.jpg',
-        satuan: 'Sampel',
-        laboratorium: 'LMT',
-        minimumPemesanan: 2,
-        harga: 700000,
-        link: 'tests/example',
-    },
-    {
-        title: 'Uji Kuat Geser Kayu',
-        description: 'Uji kuat geser kayu untuk mengetahui kekuatan geser kayu.',
-        image: '/img/tests/laboratory-9.jpg',
-        satuan: 'Sampel',
-        laboratorium: 'LMT',
-        minimumPemesanan: 1,
-        harga: 550000,
-        link: 'tests/example',
-    },
-    {
-        title: 'Uji Kuat Tekan Tanah',
-        description: 'Uji kuat tekan tanah untuk mengetahui kekuatan tekan tanah.',
-        image: '/img/tests/laboratory-10.jpg',
-        satuan: 'Sampel',
-        laboratorium: 'LMT',
-        minimumPemesanan: 2,
-        harga: 850000,
-        link: 'tests/example',
-    },
-];
-
-export default function Tests() {
+export default function Tests({ tests }: { tests: PaginatedTests }) {
     const formatRupiah = (value: number, currency = 'IDR') => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -137,15 +25,15 @@ export default function Tests() {
             <Head title="Pengujian" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="grid auto-rows-min grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {dummyData.map((data, index) => (
-                        <Card className="gap-0 p-2" key={index}>
+                    {tests.data.map((data: Test) => (
+                        <Card className="gap-0 p-2" key={data.id}>
                             <CardHeader className="px-0">
-                                <Link href={data.link}>
-                                    <img src="/img/tests/laboratory-1.jpg" alt="Laboratory 1 Image" className="rounded-md" />
+                                <Link href={'tests/' + data.slug}>
+                                    <img src={'/storage/' + data.images[0]} alt={data.name} className="rounded-md" />
                                 </Link>
                                 <CardTitle>
-                                    <Link href={data.link}>
-                                        <h3>{data.title}</h3>
+                                    <Link href={'tests/' + data.slug}>
+                                        <h3>{data.name}</h3>
                                     </Link>
                                 </CardTitle>
                             </CardHeader>
@@ -162,7 +50,7 @@ export default function Tests() {
                                             >
                                                 <path d="M342.6 9.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l9.4 9.4L28.1 342.6C10.1 360.6 0 385 0 410.5L0 416c0 53 43 96 96 96l5.5 0c25.5 0 49.9-10.1 67.9-28.1L448 205.3l9.4 9.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-32-32-96-96-32-32zM205.3 256L352 109.3 402.7 160l-96 96-101.5 0z" />
                                             </svg>
-                                            <span className="small-font-size">{data.satuan}</span>
+                                            <span className="small-font-size">{data.category.name}</span>
                                         </div>
                                         <div
                                             className="text-light-base bg-purple-base flex items-center gap-1 rounded-md px-2 py-1"
@@ -176,27 +64,28 @@ export default function Tests() {
                                             >
                                                 <path d="M48 0C21.5 0 0 21.5 0 48L0 464c0 26.5 21.5 48 48 48l96 0 0-80c0-26.5 21.5-48 48-48s48 21.5 48 48l0 80 96 0c26.5 0 48-21.5 48-48l0-416c0-26.5-21.5-48-48-48L48 0zM64 240c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zm112-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zM80 96l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zM272 96l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16z" />
                                             </svg>
-                                            <span className="small-font-size">{data.laboratorium}</span>
+                                            <span className="small-font-size">{data.laboratory.name}</span>
                                         </div>
                                         <div
                                             className="text-light-base bg-teal-base flex items-center gap-1 rounded-md px-2 py-1"
                                             title="Minimum Pemesanan"
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                 viewBox="0 0 448 512"
-                                                 fill="currentColor"
-                                                 className="h-4 w-4 md:h-5 md:w-5">
-                                                <path
-                                                    d="M160 112c0-35.3 28.7-64 64-64s64 28.7 64 64l0 48-128 0 0-48zm-48 48l-64 0c-26.5 0-48 21.5-48 48L0 416c0 53 43 96 96 96l256 0c53 0 96-43 96-96l0-208c0-26.5-21.5-48-48-48l-64 0 0-48C336 50.1 285.9 0 224 0S112 50.1 112 112l0 48zm24 48a24 24 0 1 1 0 48 24 24 0 1 1 0-48zm152 24a24 24 0 1 1 48 0 24 24 0 1 1 -48 0z"/>
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 448 512"
+                                                fill="currentColor"
+                                                className="h-4 w-4 md:h-5 md:w-5"
+                                            >
+                                                <path d="M160 112c0-35.3 28.7-64 64-64s64 28.7 64 64l0 48-128 0 0-48zm-48 48l-64 0c-26.5 0-48 21.5-48 48L0 416c0 53 43 96 96 96l256 0c53 0 96-43 96-96l0-208c0-26.5-21.5-48-48-48l-64 0 0-48C336 50.1 285.9 0 224 0S112 50.1 112 112l0 48zm24 48a24 24 0 1 1 0 48 24 24 0 1 1 0-48zm152 24a24 24 0 1 1 48 0 24 24 0 1 1 -48 0z" />
                                             </svg>
-                                            <span className="small-font-size">{data.minimumPemesanan}</span>
+                                            <span className="small-font-size">{data.minimum_unit}</span>
                                         </div>
                                     </div>
                                 </CardDescription>
                                 <div className="flex flex-wrap items-center justify-between">
-                                    <h4 className="font-semibold">{formatRupiah(data.harga)}</h4>
+                                    <h4 className="font-semibold">{formatRupiah(data.price)}</h4>
                                     <Link
-                                        href={data.link}
+                                        href={'tests/' + data.slug}
                                         className="bg-blue-base text-light-base flex items-center justify-between gap-1 rounded-md px-3 py-2"
                                     >
                                         <svg

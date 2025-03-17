@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Test extends Model
 {
@@ -14,6 +15,7 @@ class Test extends Model
 
     protected $fillable = [
         "name",
+        "slug",
         "price",
         "description",
         "images",
@@ -28,6 +30,26 @@ class Test extends Model
         "is_active" => "boolean",
         "images" => "array",
     ];
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            $model->slug = Str::slug($model->name) . '-' . Str::lower(Str::random(4));
+        });
+
+        static::updating(function ($model) {
+            if ($model->isDirty('name')) {
+                $model->slug = Str::slug($model->name) . '-' . Str::lower(Str::random(4));
+            }
+        });
+    }
+
+//    public function getRouteKeyName(): string
+//    {
+//        return 'slug';
+//    }
 
     public function packages(): BelongsToMany
     {
