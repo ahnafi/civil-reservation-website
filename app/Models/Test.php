@@ -46,6 +46,11 @@ class Test extends Model
         });
     }
 
+//    public function getRouteKeyName(): string
+//    {
+//        return 'slug';
+//    }
+
     public function packages(): BelongsToMany
     {
         return $this->belongsToMany(Package::class)->withTimestamps();

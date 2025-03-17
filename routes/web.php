@@ -22,9 +22,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('laboratories/example');
     })->name('tests-example');
     Route::get('tests',[TestController::class,"index"])->name('tests');
-    Route::get('tests/example', function () {
-        return Inertia::render('tests/example');
-    })->name('tests-example');
+    Route::get('tests/{test:slug}',[TestController::class,"detail"])->name('tests-detail');
     Route::get('packages', function () {
         return Inertia::render('packages/index');
     })->name('packages');
