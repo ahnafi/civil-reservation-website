@@ -13,7 +13,8 @@ return new class extends Migration {
         Schema::create('tests', function (Blueprint $table) {
             $table->id();
             $table->string("name");
-            $table->unsignedInteger("price");
+            $table->string("slug")->unique()->nullable();
+            $table->unsignedInteger("price")->default(0);
             $table->text("description")->nullable();
             $table->text("images")->nullable();
             $table->integer("minimum_unit")->default(0);
