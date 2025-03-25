@@ -47,7 +47,7 @@ class Package extends Model
 
     public function submissions(): BelongsToMany
     {
-        return $this->belongsToMany(Submission::class)->withTimestamps();
+        return $this->belongsToMany(Submission::class, "submission_package")->withTimestamps();
     }
 
     public function submissionPackages(): HasMany

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\SubmissionController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -21,23 +22,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('laboratories');
     Route::get('laboratories/example', function () {
         return Inertia::render('laboratories/example');
-    })->name('tests-example');
+    })->name('tests.example');
     Route::get('tests',[TestController::class,"index"])->name('tests');
-    Route::get('tests/{test:slug}',[TestController::class,"detail"])->name('tests-detail');
+    Route::get('tests/{test:slug}',[TestController::class,"detail"])->name('tests.detail');
     Route::get('packages', [PackageController::class,"index"])->name('packages');
-    Route::get('packages/{package:slug}',[PackageController::class,"detail"])->name('packages-detail');
+    Route::get('packages/{package:slug}',[PackageController::class,"detail"])->name('packages.detail');
     Route::get('orders/cart', function () {
         return Inertia::render('orders/cart');
-    })->name('orders-cart');
+    })->name('orders.cart');
     Route::get('orders/cart/form', function () {
         return Inertia::render('orders/form');
-    })->name('orders-cart-form');
+    })->name('orders.cart.form');
+    Route::post("orders/cart/form", [SubmissionController::class, "create"])->name('post.orders.cart.form');
     Route::get('orders/status', function () {
         return Inertia::render('orders/status');
-    })->name('orders-status');
+    })->name('orders.status');
     Route::get('orders/history', function () {
         return Inertia::render('orders/history');
-    })->name('orders-history');
+    })->name('orders.history');
 });
 
 require __DIR__ . '/settings.php';
