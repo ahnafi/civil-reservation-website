@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -13,9 +14,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard/index');
     })->name('dashboard');
-    Route::get('schedule', function () {
-        return Inertia::render('schedule/index');
-    })->name('schedule');
+    Route::get('schedule', [ScheduleController::class, "index"])->name("schedule");
     Route::get('laboratories', function () {
         return Inertia::render('laboratories/index');
     })->name('laboratories');
