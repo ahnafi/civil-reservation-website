@@ -20,6 +20,7 @@ class Submission extends Model
         "project_address",
         "total_cost",
         "document",
+        "test_submission_date",
         "status",
         "note",
         "approval_date"
@@ -65,5 +66,13 @@ class Submission extends Model
     {
         return $this->hasMany(SubmissionTest::class);
     }
+
+public function scopeWithJoin($query)
+{
+    return $query->join('submission_tests', 'submissions.id', '=', 'submission_tests.submission_id')
+        ->join('submission_packages', 'submissions.id', '=', 'submission_packages.submission_id')
+        ->join('tests', 'submission_tests.test_id', '=', 'tests.id')
+        ->select('submissions.id', 'submissions.status', 'submissions.company_name', 'submission_tests.test_id', 'submission_packages.package_id', 'tests.name');
+}
 
 }
