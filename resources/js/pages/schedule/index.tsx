@@ -15,13 +15,13 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table"
-import {ArrowUpDown, ChevronDown, HardHat} from "lucide-react"
+import {ArrowUpDown, ChevronDown, HardHat, Search} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuItem,
+    // DropdownMenuItem,
     DropdownMenuTrigger,
     DropdownMenuCheckboxItem
 } from "@/components/ui/dropdown-menu";
@@ -43,58 +43,11 @@ import {
 import type {BreadcrumbItem} from "@/types";
 import {Head} from "@inertiajs/react";
 import {DatePicker} from "@/components/DatePicker";
+import SearchableSelect from "@/components/ui/SearchableSelect";
 import {useEffect, useState} from "react";
 import { type SubmissionSchedule, SimpleOption, Laboratory_Simple} from "@/types";
 
-// interface Props {
-//     submissions: SubmissionSchedule[];
-//     tests: SimpleOption[];
-//     packages: SimpleOption[];
-//     laboratories: Laboratory[];
-// }
 
-// const data: Submission[] = [
-//     {
-//         id: "sbm1",
-//         date: "2024-10-01",
-//         company_name: "Rancang Bangun Nusantara",
-//         status: "approved",
-//         test: "Uji Aspal",
-//         lab: "LB",
-//     },
-//     {
-//         id: "sbm2",
-//         date: "2023-10-02",
-//         company_name: "Rangka Naga",
-//         status: "approved",
-//         test: "Uji Beton",
-//         lab: "LSBB",
-//     },
-//     {
-//         id: "sbm3",
-//         date: "2023-10-03",
-//         company_name: "PT Aman Sentosa",
-//         status: "submitted",
-//         test: "Uji Tanah",
-//         lab: "LT",
-//     },
-//     {
-//         id: "sbm4",
-//         date: "2024-10-04",
-//         company_name: "Graha Nusantara Konstruksi",
-//         status: "approved",
-//         test: "Uji Gradasi Pasir",
-//         lab: "LT",
-//     },
-//     {
-//         id: "sbm5",
-//         date: "2023-10-05",
-//         company_name: "TitanBuild Solutions",
-//         status: "rejected",
-//         test: "Uji Kualitas Baja",
-//         lab: "LSBB",
-//     },
-// ]
 
 export const columns: ColumnDef<SubmissionSchedule>[] = [
     {
@@ -128,17 +81,7 @@ export const columns: ColumnDef<SubmissionSchedule>[] = [
     },
     {
         accessorKey: "company_name",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Perusahaan
-                    <ArrowUpDown />
-                </Button>
-            )
-        },
+        header: () => <div>Perusahaan</div>,
         cell: ({ row }) => <div>{row.getValue("company_name")}</div>,
     },
     {
@@ -147,15 +90,14 @@ export const columns: ColumnDef<SubmissionSchedule>[] = [
         cell: ({ row }) => <div>{row.getValue("lab_code")}</div>,
     },
     {
-        accessorKey: "test_name", // still needed for sorting, filtering
+        accessorKey: "test_name",
         header: () => <div>Jenis Pengujian</div>,
         cell: ({ row }) => {
-            const test = row.getValue("test_name");
-            const pkg = row.original.package_name; // get full row data
-            return <div>{test || pkg || "-"}</div>;
+            const test = row.getValue("test_name") as string | null;
+            const pkg = row.original.package_name as string | null;
+            return <div>{(test || pkg || "-") as React.ReactNode}</div>;
         },
     },
-
     {
         accessorKey: "status",
         header: () => <div className={`text-center`}>Status</div>,
@@ -169,7 +111,7 @@ export const columns: ColumnDef<SubmissionSchedule>[] = [
                         : "bg-yellow-500"
 
             return (
-                <div className={`capitalize text-center items-center mx-0 px-0 rounded-2xl py-1 w-[6rem] ${statusColor}`}>
+                <div className={`capitalize text-center items-center mx-0 px-0 rounded-2xl py-1 w-[6rem] font-medium ${statusColor}`}>
                     {row.getValue("status")}
                 </div>
             )
@@ -177,14 +119,22 @@ export const columns: ColumnDef<SubmissionSchedule>[] = [
     }
 ]
 
+export const columnLabels: Record<string, string> = {
+    id: "ID Pengajuan",
+    test_submission_date: "Tanggal Pengujian",
+    company_name: "Perusahaan",
+    lab_code: "Lab",
+    test_name: "Jenis Pengujian",
+    status: "Status",
+};
+
+
 export default function DataTable({ submissions, tests }: { submissions: SubmissionSchedule[], tests: SimpleOption[] }) {
     const [sorting, setSorting] = React.useState<SortingState>([])
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-        []
-    )
-    const [columnVisibility, setColumnVisibility] =
-        React.useState<VisibilityState>({})
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
+    const [rows, setRows] = useState<number>(10);
 
     const table = useReactTable<SubmissionSchedule>({
         data: submissions,
@@ -204,6 +154,10 @@ export default function DataTable({ submissions, tests }: { submissions: Submiss
             rowSelection,
         },
     })
+
+    useEffect(() => {
+        table.setPageSize(rows);
+    }, [rows, table]);
 
     const [selectedTest, setSelectedTest] = useState<SimpleOption | null>(null);
     const [initialDate, setInitialDate] = useState<Date>(new Date());
@@ -262,20 +216,15 @@ export default function DataTable({ submissions, tests }: { submissions: Submiss
                     </div>
                     <div className="table-filters flex justify-between mx-10 mt-6">
                         <div className="test-type">
-                            <DropdownMenu>
-                                <DropdownMenuTrigger className="font-medium text-base flex items-center gap-2 px-4 py-2 border rounded-md">
-                                    <span><HardHat/></span>
-                                    <span>{selectedTest? selectedTest.name : "Pilih Tipe Pengujian"}</span>
-                                    <ChevronDown />
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                    {tests.map((test, index) => (
-                                        <DropdownMenuItem key={index} onClick={()=>setSelectedTest(test)}>
-                                            {test.name}
-                                        </DropdownMenuItem>
-                                    ))}
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                            <SearchableSelect
+                                label="Jenis Pengujian"
+                                options={tests}
+                                selectedOption={selectedTest}
+                                setSelectedOption={setSelectedTest}
+                                placeholder="Cari Jenis Pengujian..."
+                                searchIcon={<HardHat size={18} />}
+                            />
+
                         </div>
 
                         <div className="date-range-picker flex items-center gap-4">
@@ -295,41 +244,63 @@ export default function DataTable({ submissions, tests }: { submissions: Submiss
                         {initialDate ? format(initialDate, 'PPPP', { locale: id }) : ''}
                         {finalDate && finalDate !== initialDate ? ` - ${format(finalDate, 'PPPP', { locale: id })}` : ''}
                     </div>
-                    {/*<div>*/}
-                    {/*    <pre> {JSON.stringify(submissions, null, 2)} </pre>*/}
-                    {/*</div>*/}
                 </div>
 
                 <div className="table">
 
-                    <div className="table-column-filter mb-2">
+                    <div className="flex justify-between">
+                        <div className="table-column-filter mb-2">
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="ml-auto">
+                                        Kolom <ChevronDown />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    {table
+                                        .getAllColumns()
+                                        .filter((column) => column.getCanHide())
+                                        .map((column) => {
+                                            return (
+                                                <DropdownMenuCheckboxItem
+                                                    key={column.id}
+                                                    className="capitalize"
+                                                    checked={column.getIsVisible()}
+                                                    onCheckedChange={(value) =>
+                                                        column.toggleVisibility(!!value)
+                                                    }
+                                                >
+                                                    {columnLabels[column.id] ?? column.id}
+                                                </DropdownMenuCheckboxItem>
+                                            )
+                                        })}
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+
+                        <div className="pagination-rows-selector mb-2">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline" className="ml-auto">
-                                    Columns <ChevronDown />
+                                    Tampilkan {rows} Baris <ChevronDown className="ml-1 h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                {table
-                                    .getAllColumns()
-                                    .filter((column) => column.getCanHide())
-                                    .map((column) => {
-                                        return (
-                                            <DropdownMenuCheckboxItem
-                                                key={column.id}
-                                                className="capitalize"
-                                                checked={column.getIsVisible()}
-                                                onCheckedChange={(value) =>
-                                                    column.toggleVisibility(!!value)
-                                                }
-                                            >
-                                                {column.id}
-                                            </DropdownMenuCheckboxItem>
-                                        )
-                                    })}
+                            <DropdownMenuContent align="end" >
+                                {[10, 25, 50, 100].map((size) => (
+                                    <DropdownMenuCheckboxItem
+                                        key={size}
+                                        checked={rows === size}
+                                        onCheckedChange={() => setRows(size)}
+                                        className="text-sm "
+                                    >
+                                        {size} baris
+                                    </DropdownMenuCheckboxItem>
+                                ))}
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
+                    </div>
+
 
                     <div className="table-main">
                         <div className="rounded-md border">
