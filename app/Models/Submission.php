@@ -67,12 +67,29 @@ class Submission extends Model
         return $this->hasMany(SubmissionTest::class);
     }
 
-public function scopeWithJoin($query)
-{
-    return $query->join('submission_tests', 'submissions.id', '=', 'submission_tests.submission_id')
-        ->join('submission_packages', 'submissions.id', '=', 'submission_packages.submission_id')
-        ->join('tests', 'submission_tests.test_id', '=', 'tests.id')
-        ->select('submissions.id', 'submissions.status', 'submissions.company_name', 'submission_tests.test_id', 'submission_packages.package_id', 'tests.name');
-}
+    public function scopeWithScheduleJoin($query)
+    {
+        return $query
+            ->leftJoin('submission_test', 'submissions.id', '=', 'submission_test.submission_id')
+            ->leftJoin('submission_package', 'submissions.id', '=', 'submission_package.submission_id')
+            ->leftJoin('tests', 'submission_test.test_id', '=', 'tests.id')
+            ->leftJoin('packages', 'submission_package.package_id', '=', 'packages.id')
+            ->leftJoin('laboratories', 'tests.laboratory_id', '=', 'laboratories.id')
+            ->select(
+                'submissions.id',
+                'submissions.company_name',
+                'submissions.test_submission_date',
+                'submissions.status',
+                'submission_test.test_id',
+                'submission_package.package_id',
+                'tests.name as test_name',
+                'packages.name as package_name',
+                'laboratories.id as lab_id',
+                'laboratories.code as lab_code',
+                'laboratories.name as lab_name',
+            )
+            ->orderBy('submissions.test_submission_date', 'desc');
+    }
+
 
 }
