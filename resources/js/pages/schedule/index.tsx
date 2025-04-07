@@ -15,10 +15,9 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table"
-import {ArrowUpDown, ChevronDown, HardHat, MoreHorizontal} from "lucide-react"
+import {ArrowUpDown, ChevronDown, HardHat} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -32,7 +31,6 @@ import { id } from 'date-fns/locale';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import { Input } from "@/components/ui/input"
 
 import {
     Table,
@@ -46,82 +44,72 @@ import type {BreadcrumbItem} from "@/types";
 import {Head} from "@inertiajs/react";
 import {DatePicker} from "@/components/DatePicker";
 import {useEffect, useState} from "react";
+import { type SubmissionSchedule, SimpleOption, Laboratory_Simple} from "@/types";
 
-const data: Submission[] = [
-    {
-        id: "sbm1",
-        date: "2024-10-01",
-        company_name: "Rancang Bangun Nusantara",
-        status: "approved",
-        test: "Uji Aspal",
-        lab: "LB",
-    },
-    {
-        id: "sbm2",
-        date: "2023-10-02",
-        company_name: "Rangka Naga",
-        status: "approved",
-        test: "Uji Beton",
-        lab: "LSBB",
-    },
-    {
-        id: "sbm3",
-        date: "2023-10-03",
-        company_name: "PT Aman Sentosa",
-        status: "submitted",
-        test: "Uji Tanah",
-        lab: "LT",
-    },
-    {
-        id: "sbm4",
-        date: "2024-10-04",
-        company_name: "Graha Nusantara Konstruksi",
-        status: "approved",
-        test: "Uji Gradasi Pasir",
-        lab: "LT",
-    },
-    {
-        id: "sbm5",
-        date: "2023-10-05",
-        company_name: "TitanBuild Solutions",
-        status: "rejected",
-        test: "Uji Kualitas Baja",
-        lab: "LSBB",
-    },
-]
+// interface Props {
+//     submissions: SubmissionSchedule[];
+//     tests: SimpleOption[];
+//     packages: SimpleOption[];
+//     laboratories: Laboratory[];
+// }
 
-const dummyTestData: string[] = [
-    "Uji Tarik Baja",
-    "Uji Tekan Material",
-    "Uji Gradasi Pasir",
-    "Uji Abrasi",
-    "Uji Marshall",
-    "Uji Kekekalan Agregat"
-];
+// const data: Submission[] = [
+//     {
+//         id: "sbm1",
+//         date: "2024-10-01",
+//         company_name: "Rancang Bangun Nusantara",
+//         status: "approved",
+//         test: "Uji Aspal",
+//         lab: "LB",
+//     },
+//     {
+//         id: "sbm2",
+//         date: "2023-10-02",
+//         company_name: "Rangka Naga",
+//         status: "approved",
+//         test: "Uji Beton",
+//         lab: "LSBB",
+//     },
+//     {
+//         id: "sbm3",
+//         date: "2023-10-03",
+//         company_name: "PT Aman Sentosa",
+//         status: "submitted",
+//         test: "Uji Tanah",
+//         lab: "LT",
+//     },
+//     {
+//         id: "sbm4",
+//         date: "2024-10-04",
+//         company_name: "Graha Nusantara Konstruksi",
+//         status: "approved",
+//         test: "Uji Gradasi Pasir",
+//         lab: "LT",
+//     },
+//     {
+//         id: "sbm5",
+//         date: "2023-10-05",
+//         company_name: "TitanBuild Solutions",
+//         status: "rejected",
+//         test: "Uji Kualitas Baja",
+//         lab: "LSBB",
+//     },
+// ]
 
-export type Submission = {
-    id: string
-    date: string
-    company_name: string
-    status: "submitted" | "approved" | "rejected"
-    test: string
-    lab: string
-}
-
-export const columns: ColumnDef<Submission>[] = [
+export const columns: ColumnDef<SubmissionSchedule>[] = [
     {
         header: "#",
         cell: ({ row }) => row.index + 1,
     },
     {
         accessorKey: "id",
-        header: "Submission Id",
+        header: "ID Pengajuan",
         cell: ({ row }) => (
             <div className="capitalize">{row.getValue("id")}</div>
         ),
     },
     {
-        accessorKey: "date",
+        accessorKey: "test_submission_date",
         header: ({ column }) => {
             return (
                 <Button
@@ -135,7 +123,7 @@ export const columns: ColumnDef<Submission>[] = [
             )
         },
         cell: ({ row }) => (
-            <div className="capitalize text-center">{row.getValue("date")}</div>
+            <div className="capitalize text-center">{row.getValue("test_submission_date")}</div>
         ),
     },
     {
@@ -154,15 +142,20 @@ export const columns: ColumnDef<Submission>[] = [
         cell: ({ row }) => <div>{row.getValue("company_name")}</div>,
     },
     {
-        accessorKey: "lab",
+        accessorKey: "lab_code",
         header: () => <div>Lab</div>,
-        cell: ({ row }) => <div>{row.getValue("lab")}</div>,
+        cell: ({ row }) => <div>{row.getValue("lab_code")}</div>,
     },
     {
-        accessorKey: "test",
+        accessorKey: "test_name", // still needed for sorting, filtering
         header: () => <div>Jenis Pengujian</div>,
-        cell: ({row}) => <div>{row.getValue("test")}</div>,
+        cell: ({ row }) => {
+            const test = row.getValue("test_name");
+            const pkg = row.original.package_name; // get full row data
+            return <div>{test || pkg || "-"}</div>;
+        },
     },
+
     {
         accessorKey: "status",
         header: () => <div className={`text-center`}>Status</div>,
@@ -184,7 +177,7 @@ export const columns: ColumnDef<Submission>[] = [
     }
 ]
 
-export default function DataTableDemo() {
+export default function DataTable({ submissions, tests }: { submissions: SubmissionSchedule[], tests: SimpleOption[] }) {
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
         []
@@ -193,8 +186,8 @@ export default function DataTableDemo() {
         React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
 
-    const table = useReactTable({
-        data,
+    const table = useReactTable<SubmissionSchedule>({
+        data: submissions,
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
@@ -212,7 +205,7 @@ export default function DataTableDemo() {
         },
     })
 
-    const [selectedTest, setSelectedTest] = useState<string | null>(null);
+    const [selectedTest, setSelectedTest] = useState<SimpleOption | null>(null);
     const [initialDate, setInitialDate] = useState<Date>(new Date());
     const [finalDate, setFinalDate] = useState<Date | undefined>(undefined);
     const [finalDateKey, setFinalDateKey] = useState<number>(Date.now());
@@ -272,13 +265,13 @@ export default function DataTableDemo() {
                             <DropdownMenu>
                                 <DropdownMenuTrigger className="font-medium text-base flex items-center gap-2 px-4 py-2 border rounded-md">
                                     <span><HardHat/></span>
-                                    <span>{selectedTest? selectedTest : "Pilih Tipe Pengujian"}</span>
+                                    <span>{selectedTest? selectedTest.name : "Pilih Tipe Pengujian"}</span>
                                     <ChevronDown />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent>
-                                    {dummyTestData.map((test, index) => (
+                                    {tests.map((test, index) => (
                                         <DropdownMenuItem key={index} onClick={()=>setSelectedTest(test)}>
-                                            {test}
+                                            {test.name}
                                         </DropdownMenuItem>
                                     ))}
                                 </DropdownMenuContent>
@@ -298,10 +291,13 @@ export default function DataTableDemo() {
                         </div>
                     </div>
                     <div className="table-label ms-3 mt-6 text-lg font-medium text-center">
-                        <div> Jadwal Pengujian {selectedTest} </div>
+                        <div> Jadwal Pengujian {selectedTest?.name ?? ''} </div>
                         {initialDate ? format(initialDate, 'PPPP', { locale: id }) : ''}
                         {finalDate && finalDate !== initialDate ? ` - ${format(finalDate, 'PPPP', { locale: id })}` : ''}
                     </div>
+                    {/*<div>*/}
+                    {/*    <pre> {JSON.stringify(submissions, null, 2)} </pre>*/}
+                    {/*</div>*/}
                 </div>
 
                 <div className="table">

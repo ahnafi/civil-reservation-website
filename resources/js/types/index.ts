@@ -101,5 +101,30 @@ export interface Pagination<T> {
     data: T[];
 }
 
+export interface SubmissionSchedule {
+    id: number;
+    company_name: string;
+    test_submission_date: string;
+    status: string;
+    test_id: number;
+    package_id: number;
+    test_name: string;
+    package_name: string;
+    lab_id: number;
+    lab_code: string;
+    lab_name: string;
+}
+
+export interface SimpleOption {
+    id: number;
+    name: string;
+}
+
+export interface Laboratory_Simple {
+    id: number;
+    code: string;
+    name: string;
+}
+
 export type PaginatedTests = Pagination<Test>;
 export type PaginatedPackage = Pagination<Package>;
