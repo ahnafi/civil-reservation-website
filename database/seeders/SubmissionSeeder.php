@@ -43,7 +43,7 @@ class SubmissionSeeder extends Seeder
                 'status'        => 'rejected',
             ],
             [
-                'user_id'       => 4,
+                'user_id'       => 1,
                 'company_name'  => 'PT. Maju Jaya',
                 'project_name'  => 'Pembangunan Sekolah',
                 'project_address' => 'Jl. Pendidikan No. 4',
@@ -52,7 +52,7 @@ class SubmissionSeeder extends Seeder
                 'status'        => 'submitted',
             ],
             [
-                'user_id'       => 5,
+                'user_id'       => 2,
                 'company_name'  => 'PT. Karya Mandiri',
                 'project_name'  => 'Pembangunan Mall',
                 'project_address' => 'Jl. Belanja No. 5',
@@ -61,7 +61,7 @@ class SubmissionSeeder extends Seeder
                 'status'        => 'approved',
             ],
             [
-                'user_id'       => 6,
+                'user_id'       => 3,
                 'company_name'  => 'PT. Sukses Bersama',
                 'project_name'  => 'Pembangunan Hotel',
                 'project_address' => 'Jl. Wisata No. 6',
@@ -70,7 +70,7 @@ class SubmissionSeeder extends Seeder
                 'status'        => 'rejected',
             ],
             [
-                'user_id'       => 7,
+                'user_id'       => 1,
                 'company_name'  => 'PT. Cipta Karya',
                 'project_name'  => 'Pembangunan Apartemen',
                 'project_address' => 'Jl. Hunian No. 7',
@@ -79,7 +79,7 @@ class SubmissionSeeder extends Seeder
                 'status'        => 'submitted',
             ],
             [
-                'user_id'       => 8,
+                'user_id'       => 2,
                 'company_name'  => 'PT. Mega Konstruksi',
                 'project_name'  => 'Pembangunan Pabrik',
                 'project_address' => 'Jl. Industri No. 8',
@@ -88,7 +88,7 @@ class SubmissionSeeder extends Seeder
                 'status'        => 'approved',
             ],
             [
-                'user_id'       => 9,
+                'user_id'       => 3,
                 'company_name'  => 'PT. Prima Jaya',
                 'project_name'  => 'Pembangunan Gudang',
                 'project_address' => 'Jl. Logistik No. 9',
@@ -97,7 +97,7 @@ class SubmissionSeeder extends Seeder
                 'status'        => 'rejected',
             ],
             [
-                'user_id'       => 10,
+                'user_id'       => 1,
                 'company_name'  => 'PT. Karya Utama',
                 'project_name'  => 'Pembangunan Stadion',
                 'project_address' => 'Jl. Olahraga No. 10',
@@ -106,7 +106,7 @@ class SubmissionSeeder extends Seeder
                 'status'        => 'submitted',
             ],
             [
-                'user_id'       => 11,
+                'user_id'       => 2,
                 'company_name'  => 'PT. Bangun Persada',
                 'project_name'  => 'Pembangunan Pelabuhan',
                 'project_address' => 'Jl. Laut No. 11',
@@ -115,7 +115,7 @@ class SubmissionSeeder extends Seeder
                 'status'        => 'approved',
             ],
             [
-                'user_id'       => 12,
+                'user_id'       => 3,
                 'company_name'  => 'PT. Konstruksi Abadi',
                 'project_name'  => 'Pembangunan Bandara',
                 'project_address' => 'Jl. Udara No. 12',
@@ -124,7 +124,7 @@ class SubmissionSeeder extends Seeder
                 'status'        => 'rejected',
             ],
             [
-                'user_id'       => 13,
+                'user_id'       => 1,
                 'company_name'  => 'PT. Maju Terus',
                 'project_name'  => 'Pembangunan Jalan Tol',
                 'project_address' => 'Jl. Tol No. 13',
@@ -133,7 +133,7 @@ class SubmissionSeeder extends Seeder
                 'status'        => 'submitted',
             ],
             [
-                'user_id'       => 14,
+                'user_id'       => 2,
                 'company_name'  => 'PT. Karya Sejahtera',
                 'project_name'  => 'Pembangunan Bendungan',
                 'project_address' => 'Jl. Air No. 14',
@@ -142,7 +142,7 @@ class SubmissionSeeder extends Seeder
                 'status'        => 'approved',
             ],
             [
-                'user_id'       => 15,
+                'user_id'       => 3,
                 'company_name'  => 'PT. Sukses Makmur',
                 'project_name'  => 'Pembangunan Taman',
                 'project_address' => 'Jl. Hijau No. 15',
@@ -151,7 +151,7 @@ class SubmissionSeeder extends Seeder
                 'status'        => 'rejected',
             ],
             [
-                'user_id'       => 16,
+                'user_id'       => 1,
                 'company_name'  => 'PT. Cipta Mandiri',
                 'project_name'  => 'Pembangunan Perumahan',
                 'project_address' => 'Jl. Rumah No. 16',
@@ -160,7 +160,7 @@ class SubmissionSeeder extends Seeder
                 'status'        => 'submitted',
             ],
             [
-                'user_id'       => 17,
+                'user_id'       => 2,
                 'company_name'  => 'PT. Mega Sejahtera',
                 'project_name'  => 'Pembangunan Pasar',
                 'project_address' => 'Jl. Pasar No. 17',
@@ -169,7 +169,7 @@ class SubmissionSeeder extends Seeder
                 'status'        => 'approved',
             ],
             [
-                'user_id'       => 18,
+                'user_id'       => 3,
                 'company_name'  => 'PT. Prima Karya',
                 'project_name'  => 'Pembangunan Terminal',
                 'project_address' => 'Jl. Transportasi No. 18',
@@ -178,7 +178,7 @@ class SubmissionSeeder extends Seeder
                 'status'        => 'rejected',
             ],
             [
-                'user_id'       => 19,
+                'user_id'       => 2,
                 'company_name'  => 'PT. Karya Bersama',
                 'project_name'  => 'Pembangunan Pusat Perbelanjaan',
                 'project_address' => 'Jl. Belanja No. 19',
@@ -187,7 +187,7 @@ class SubmissionSeeder extends Seeder
                 'status'        => 'submitted',
             ],
             [
-                'user_id'       => 20,
+                'user_id'       => 3,
                 'company_name'  => 'PT. Maju Bersama',
                 'project_name'  => 'Pembangunan Pusat Kebudayaan',
                 'project_address' => 'Jl. Budaya No. 20',
