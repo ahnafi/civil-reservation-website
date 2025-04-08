@@ -103,6 +103,7 @@ export interface Pagination<T> {
 
 export interface SubmissionSchedule {
     id: number;
+    code: string;
     company_name: string;
     test_submission_date: string;
     status: string;
