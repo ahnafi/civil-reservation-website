@@ -8,12 +8,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class Submission extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
+        "code",
         "user_id",
         "company_name",
         "project_name",
@@ -25,6 +27,17 @@ class Submission extends Model
         "note",
         "approval_date"
     ];
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::created(function ($submission) {
+            $submission->code = 'SBM' . $submission->user_id . $submission->id;
+            $submission->saveQuietly();
+        });
+    }
+
 
     protected function casts(): array
     {
@@ -74,9 +87,11 @@ class Submission extends Model
             ->leftJoin('submission_package', 'submissions.id', '=', 'submission_package.submission_id')
             ->leftJoin('tests', 'submission_test.test_id', '=', 'tests.id')
             ->leftJoin('packages', 'submission_package.package_id', '=', 'packages.id')
-            ->leftJoin('laboratories', 'tests.laboratory_id', '=', 'laboratories.id')
+            ->leftJoin('laboratories as test_labs', 'tests.laboratory_id', '=', 'test_labs.id')
+            ->leftJoin('laboratories as package_labs', 'packages.laboratory_id', '=', 'package_labs.id')
             ->select(
                 'submissions.id',
+                'submissions.code',
                 'submissions.company_name',
                 'submissions.test_submission_date',
                 'submissions.status',
@@ -84,12 +99,14 @@ class Submission extends Model
                 'submission_package.package_id',
                 'tests.name as test_name',
                 'packages.name as package_name',
-                'laboratories.id as lab_id',
-                'laboratories.code as lab_code',
-                'laboratories.name as lab_name',
+                DB::raw('COALESCE(test_labs.id, package_labs.id) as lab_id'),
+                DB::raw('COALESCE(test_labs.code, package_labs.code) as lab_code'),
+                DB::raw('COALESCE(test_labs.name, package_labs.name) as lab_name'),
             )
             ->orderBy('submissions.test_submission_date', 'desc');
     }
+
+
 
 
 }
