@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('testings', function (Blueprint $table) {
             $table->id();
+            $table->string("code")->unique()->nullable();
             $table->enum("status", ["testing", "completed"]);
             $table->text("note")->nullable();
             $table->text("documents")->nullable();
