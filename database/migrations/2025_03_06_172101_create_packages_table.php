@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->unsignedInteger("price")->default(0);
             $table->text("images")->nullable();
             $table->text("description")->nullable();
+            $table->foreignId("laboratory_id")->constrained()->cascadeOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });
