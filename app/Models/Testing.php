@@ -13,6 +13,7 @@ class Testing extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        "code",
         "status",
         "note",
         "test_date",
@@ -20,6 +21,16 @@ class Testing extends Model
         "documents",
         "submission_id"
     ];
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::created(function ($testing) {
+            $testing->code = 'UJI' . $testing->id . $testing->test_date;
+            $testing->saveQuietly();
+        });
+    }
 
     protected $casts = [
         "documents" => "array",
