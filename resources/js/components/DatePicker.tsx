@@ -15,18 +15,26 @@ import {
 
 interface DatePickerProps {
     placeholder?: string;
+    value?: Date | undefined; // renamed from defaultDate
     onDateSelect?: (date: Date | undefined) => void;
 }
 
-export function DatePicker({placeholder = "Pick a date", onDateSelect}:DatePickerProps) {
-    const [date, setDate] = React.useState<Date>()
+export function DatePicker({
+                               placeholder = "Pick a date",
+                               value,
+                               onDateSelect,
+                           }: DatePickerProps) {
+    const [date, setDate] = React.useState<Date | undefined>(value);
+
+    // Sync internal state when external value changes
+    React.useEffect(() => {
+        setDate(value);
+    }, [value]);
 
     const handleDateSelect = (selectedDate: Date | undefined) => {
-        setDate(selectedDate)
-        if(onDateSelect) {
-            onDateSelect(selectedDate)
-        }
-    }
+        setDate(selectedDate);
+        onDateSelect?.(selectedDate);
+    };
 
     return (
         <Popover>
@@ -34,11 +42,11 @@ export function DatePicker({placeholder = "Pick a date", onDateSelect}:DatePicke
                 <Button
                     variant={"outline"}
                     className={cn(
-                        "w-[240px] justify-start text-left font-normal",
+                        "w-[11rem] justify-start text-left font-normal",
                         !date && "text-muted-foreground"
                     )}
                 >
-                    <CalendarIcon />
+                    <CalendarIcon className="mr-2 h-4 w-4" />
                     {date ? format(date, "PPP") : <span>{placeholder}</span>}
                 </Button>
             </PopoverTrigger>
@@ -51,5 +59,5 @@ export function DatePicker({placeholder = "Pick a date", onDateSelect}:DatePicke
                 />
             </PopoverContent>
         </Popover>
-    )
+    );
 }
