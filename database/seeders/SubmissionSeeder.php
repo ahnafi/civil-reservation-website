@@ -21,7 +21,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Jembatan',
                 'project_address' => 'Jl. Raya No. 1',
                 'total_cost'    => 1000000,
-                'test_submission_date' => '2023-10-01',
+                'test_submission_date' => '2025-4-01',
                 'status'        => 'submitted',
             ],
             [
@@ -30,7 +30,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Gedung Perkantoran',
                 'project_address' => 'Jl. Merdeka No. 2',
                 'total_cost'    => 2000000,
-                'test_submission_date' => '2023-10-02',
+                'test_submission_date' => '2025-4-02',
                 'status'        => 'approved',
             ],
             [
@@ -39,7 +39,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Rumah Sakit',
                 'project_address' => 'Jl. Sehat No. 3',
                 'total_cost'    => 3000000,
-                'test_submission_date' => '2023-10-03',
+                'test_submission_date' => '2025-4-03',
                 'status'        => 'rejected',
             ],
             [
@@ -48,7 +48,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Sekolah',
                 'project_address' => 'Jl. Pendidikan No. 4',
                 'total_cost'    => 4000000,
-                'test_submission_date' => '2023-10-04',
+                'test_submission_date' => '2025-4-04',
                 'status'        => 'submitted',
             ],
             [
@@ -57,7 +57,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Mall',
                 'project_address' => 'Jl. Belanja No. 5',
                 'total_cost'    => 5000000,
-                'test_submission_date' => '2023-10-05',
+                'test_submission_date' => '2025-4-05',
                 'status'        => 'approved',
             ],
             [
@@ -66,7 +66,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Hotel',
                 'project_address' => 'Jl. Wisata No. 6',
                 'total_cost'    => 6000000,
-                'test_submission_date' => '2023-10-06',
+                'test_submission_date' => '2025-4-06',
                 'status'        => 'rejected',
             ],
             [
@@ -75,7 +75,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Apartemen',
                 'project_address' => 'Jl. Hunian No. 7',
                 'total_cost'    => 7000000,
-                'test_submission_date' => '2023-10-07',
+                'test_submission_date' => '2025-4-07',
                 'status'        => 'submitted',
             ],
             [
@@ -84,7 +84,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Pabrik',
                 'project_address' => 'Jl. Industri No. 8',
                 'total_cost'    => 8000000,
-                'test_submission_date' => '2023-10-08',
+                'test_submission_date' => '2025-4-08',
                 'status'        => 'approved',
             ],
             [
@@ -93,7 +93,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Gudang',
                 'project_address' => 'Jl. Logistik No. 9',
                 'total_cost'    => 9000000,
-                'test_submission_date' => '2023-10-09',
+                'test_submission_date' => '2025-4-09',
                 'status'        => 'rejected',
             ],
             [
@@ -102,7 +102,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Stadion',
                 'project_address' => 'Jl. Olahraga No. 10',
                 'total_cost'    => 10000000,
-                'test_submission_date' => '2023-10-10',
+                'test_submission_date' => '2025-4-10',
                 'status'        => 'submitted',
             ],
             [
@@ -111,7 +111,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Pelabuhan',
                 'project_address' => 'Jl. Laut No. 11',
                 'total_cost'    => 11000000,
-                'test_submission_date' => '2023-10-11',
+                'test_submission_date' => '2025-4-11',
                 'status'        => 'approved',
             ],
             [
@@ -120,7 +120,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Bandara',
                 'project_address' => 'Jl. Udara No. 12',
                 'total_cost'    => 12000000,
-                'test_submission_date' => '2023-10-12',
+                'test_submission_date' => '2025-4-12',
                 'status'        => 'rejected',
             ],
             [
@@ -129,7 +129,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Jalan Tol',
                 'project_address' => 'Jl. Tol No. 13',
                 'total_cost'    => 13000000,
-                'test_submission_date' => '2023-10-13',
+                'test_submission_date' => '2025-4-13',
                 'status'        => 'submitted',
             ],
             [
@@ -138,7 +138,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Bendungan',
                 'project_address' => 'Jl. Air No. 14',
                 'total_cost'    => 14000000,
-                'test_submission_date' => '2023-10-14',
+                'test_submission_date' => '2025-4-14',
                 'status'        => 'approved',
             ],
             [
@@ -147,7 +147,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Taman',
                 'project_address' => 'Jl. Hijau No. 15',
                 'total_cost'    => 15000000,
-                'test_submission_date' => '2023-10-15',
+                'test_submission_date' => '2025-4-15',
                 'status'        => 'rejected',
             ],
             [
@@ -156,7 +156,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Perumahan',
                 'project_address' => 'Jl. Rumah No. 16',
                 'total_cost'    => 16000000,
-                'test_submission_date' => '2023-10-16',
+                'test_submission_date' => '2025-4-16',
                 'status'        => 'submitted',
             ],
             [
@@ -165,7 +165,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Pasar',
                 'project_address' => 'Jl. Pasar No. 17',
                 'total_cost'    => 17000000,
-                'test_submission_date' => '2023-10-17',
+                'test_submission_date' => '2025-4-17',
                 'status'        => 'approved',
             ],
             [
@@ -174,7 +174,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Terminal',
                 'project_address' => 'Jl. Transportasi No. 18',
                 'total_cost'    => 18000000,
-                'test_submission_date' => '2023-10-18',
+                'test_submission_date' => '2025-4-18',
                 'status'        => 'rejected',
             ],
             [
@@ -183,7 +183,7 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Pusat Perbelanjaan',
                 'project_address' => 'Jl. Belanja No. 19',
                 'total_cost'    => 19000000,
-                'test_submission_date' => '2023-10-19',
+                'test_submission_date' => '2025-4-19',
                 'status'        => 'submitted',
             ],
             [
@@ -192,7 +192,16 @@ class SubmissionSeeder extends Seeder
                 'project_name'  => 'Pembangunan Pusat Kebudayaan',
                 'project_address' => 'Jl. Budaya No. 20',
                 'total_cost'    => 20000000,
-                'test_submission_date' => '2023-10-20',
+                'test_submission_date' => '2025-4-20',
+                'status'        => 'approved',
+            ],
+            [
+                'user_id'       => 3,
+                'company_name'  => 'PT. Bangun Jaya',
+                'project_name'  => 'Pembangunan Pabrik',
+                'project_address' => 'Jl. Pabrik No. 9',
+                'total_cost'    => 10000000,
+                'test_submission_date' => '2025-4-10',
                 'status'        => 'approved',
             ],
         ];
@@ -262,6 +271,11 @@ class SubmissionSeeder extends Seeder
                 'submission_id' => 19,
                 'test_id' => 13,
                 'quantity' => 3,
+            ],
+            [
+                'submission_id' => 21,
+                'test_id' => 6,
+                'quantity' => 2,
             ],
         ];
 
