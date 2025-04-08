@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
@@ -17,7 +18,8 @@ class Package extends Model
         "slug",
         "price",
         "images",
-        "description"
+        "description",
+        "laboratory_id"
     ];
 
     protected $casts = [
@@ -53,6 +55,11 @@ class Package extends Model
     public function submissionPackages(): HasMany
     {
         return $this->hasMany(SubmissionPackage::class);
+    }
+
+    public function laboratory(): BelongsTo
+    {
+        return $this->belongsTo(Laboratory::class);
     }
 
 }

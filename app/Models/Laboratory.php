@@ -20,4 +20,9 @@ class Laboratory extends Model
     {
         return $this->hasMany(Test::class);
     }
+
+    public function packages(): HasMany
+    {
+        return $this->hasMany(Package::class);
+    }
 }
