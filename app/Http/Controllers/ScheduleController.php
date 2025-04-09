@@ -16,7 +16,8 @@ class ScheduleController extends Controller
       $submissions = Submission::withScheduleJoin()->get();
       $tests = Test::select(['id', 'name'])->get();
       $packages = Package::select(['id', 'name'])->get();
-      $laboratories = laboratory::select(['id', 'code', 'name'])->get();
+      $laboratories = Laboratory::select(['id', 'code', 'name'])->get();
+
 
       return Inertia::render("schedule/index", [
           'submissions' => $submissions,
