@@ -2,12 +2,48 @@ import { ScheduleTable } from '@/components/dashboard/schedule-table';
 
 ('use-client');
 
+import  * as React from "react"
+import {useEffect, useState} from "react";
+import {
+    ColumnFiltersState,
+    SortingState,
+    VisibilityState,
+    flexRender,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useReactTable,
+} from "@tanstack/react-table"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
 import { Card } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
+import {type SubmissionSchedule, SimpleOption, Laboratory_Simple} from "@/types";
+import {columns} from "./tableConfig";
+import {Button} from "@/components/ui/button";
+import SearchableSelect from "@/components/ui/SearchableSelect";
+import {Check, ChevronDown, FlaskConical, HardHat, X} from "lucide-react";
+import DropdownSelect from "@/components/ui/DropdownSelect";
+import {DatePicker} from "@/components/DatePicker";
+import {columnLabels, statusOptions} from "@/pages/schedule";
+import {Input} from "@/components/ui/input";
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 
 const chartData = [
     { month: 'January', desktop: 186, mobile: 80 },
@@ -29,13 +65,89 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
-export default function MainDashboard() {
+export default function MainDashboard({ userSubmissions, tests, packages, laboratories}: { userSubmissions: SubmissionSchedule[], tests: SimpleOption[], packages: SimpleOption[],  laboratories: Laboratory_Simple[] }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
             href: '/dashboard',
         },
     ];
+
+    // Table State
+    const [sorting, setSorting] = React.useState<SortingState>([])
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
+    const [rowSelection, setRowSelection] = React.useState({})
+    const [rows, setRows] = useState<number>(10);
+
+    // Filter State
+    const [selectedLab, setSelectedLab] = useState<Laboratory_Simple | null>(null);
+    const [selectedTest, setSelectedTest] = useState<SimpleOption | null>(null);
+    const [selectedStatus, setSelectedStatus] = useState<SimpleOption | null>(null);
+
+    const now = new Date();
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const [initialDate, setInitialDate] = useState<Date | undefined>(firstDayOfMonth);
+    const [finalDate, setFinalDate] = useState<Date | undefined>(lastDayOfMonth);
+
+    const [finalDateKey, setFinalDateKey] = useState<number>(Date.now());
+
+    // Alert State
+    const [alertMessage, setAlertMessage] = useState<string | null>(null);
+
+    // Merged Test and Package Options
+    const mergedTestPackage: SimpleOption[] = [...packages, ...tests];
+
+    // Initial Date Select Handlers
+    const handleInitialDateSelect = (date: Date | undefined) => {
+        const selected = date ?? new Date();
+        setInitialDate(selected);
+
+        // If finalDate is undefined or was previously the same as initialDate, update it too
+        if (!finalDate || (initialDate && finalDate.getTime() === initialDate.getTime())) {
+            setFinalDate(selected);
+        }
+    };
+
+    // Final Date Select Handlers
+    const handleFinalDateSelect = (date: Date | undefined) => {
+        if (!initialDate || !date) {
+            // handle the case when either date is missing
+            setFinalDate(date);
+            return;
+        }
+
+        if (date.getTime() === initialDate.getTime()) {
+            setFinalDate(date);
+        } else if (date.getTime() < initialDate.getTime()) {
+            setAlertMessage("Tanggal akhir tidak boleh lebih kecil dari tanggal awal");
+            setFinalDate(initialDate);
+            setFinalDateKey(Date.now());
+        } else {
+            setFinalDate(date);
+            setAlertMessage(null);
+        }
+    };
+
+    const submissionTable = useReactTable<SubmissionSchedule>({
+        data: userSubmissions,
+        columns,
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        onColumnVisibilityChange: setColumnVisibility,
+        onRowSelectionChange: setRowSelection,
+        state: {
+            sorting,
+            columnFilters,
+            columnVisibility,
+            rowSelection,
+        },
+    })
 
     const formatRupiah = (value: number, currency = 'IDR') => {
         return new Intl.NumberFormat('id-ID', {
@@ -117,9 +229,222 @@ export default function MainDashboard() {
                         <h2 className="font-semibold">Jadwal Reservasi Anda</h2>
                         <ScheduleTable />
                     </div>
-                    <div className="col-span-full space-y-2">
-                        <h2 className="font-semibold">Jadwal Peminjaman Laboratorium</h2>
-                        <ScheduleTable />
+
+                    <div className="submission col-span-full space-y-2">
+                        <h2 className="font-semibold">Daftar Pengajuan Pengujian</h2>
+                        <div className="submission-table-filters flex justify-between space-x-5 mx-10 mt-6">
+                            <div className="test-type">
+                                <SearchableSelect
+                                    label="Jenis Pengujian"
+                                    options={mergedTestPackage}
+                                    selectedOption={selectedTest}
+                                    setSelectedOption={setSelectedTest}
+                                    placeholder="Filter Jenis Pengujian..."
+                                    searchIcon={<HardHat size={18} />}
+                                />
+                            </div>
+
+                            <div className="Lab-type">
+                                <DropdownSelect
+                                    label="Laboratorium"
+                                    options={laboratories}
+                                    selectedOption={selectedLab}
+                                    setSelectedOption={setSelectedLab}
+                                    placeholder="Filter Laboratorium"
+                                    icon={<FlaskConical size={18} />}
+                                />
+                            </div>
+
+                            <div className="Status-type">
+                                <DropdownSelect
+                                    label="Status"
+                                    options={statusOptions}
+                                    selectedOption={selectedStatus}
+                                    setSelectedOption={setSelectedStatus}
+                                    placeholder="Filter Status"
+                                    icon={<Check size={18} />}
+                                />
+                            </div>
+
+                            <div className="date-range-picker flex flex-col gap-1">
+                                <div className="flex gap-3">
+                                    <div className="initial-date flex flex-col text-sm">
+                                        <span>Tanggal Awal:</span>
+                                        <DatePicker
+                                            value={initialDate}
+                                            placeholder="Pilih Tanggal Awal"
+                                            onDateSelect={handleInitialDateSelect}
+                                        />
+                                    </div>
+                                    <div className="flex justify-center items-center text-sm pt-5">
+                                        -
+                                    </div>
+                                    <div className="final-date flex flex-col text-sm">
+                                        <span>Tanggal Akhir:</span>
+                                        <DatePicker
+                                            key={finalDateKey}
+                                            value={finalDate}
+                                            placeholder="Pilih Tanggal Akhir"
+                                            onDateSelect={handleFinalDateSelect}
+                                        />
+                                    </div>
+                                </div>
+
+                                { (initialDate || finalDate) && (
+                                    <div className="clear-date-button flex justify-end text-right">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={ () => {
+                                                setInitialDate(undefined);
+                                                setFinalDate(undefined);
+                                            }}
+                                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                                        >
+                                            <X size={12} />
+                                            Hapus Filter Tanggal
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <div className="submission-table-main mt-6">
+                            <div className="submission-table-option flex justify-between">
+                            <div className="Code-Search">
+                                <Input
+                                    placeholder="Cari Kode Pengajuan..."
+                                    value={(submissionTable.getColumn("code")?.getFilterValue() as string) ?? ""}
+                                    onChange={(e) =>
+                                        submissionTable.getColumn("code")?.setFilterValue(e.target.value)
+                                    }
+                                    className="max-w-sm"
+                                />
+                            </div>
+                            <div className="flex space-x-2">
+                                <div className="table-column-filter mb-2">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="outline" className="ml-auto">
+                                                Kolom <ChevronDown />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            {submissionTable
+                                                .getAllColumns()
+                                                .filter((column) => column.getCanHide())
+                                                .map((column) => {
+                                                    return (
+                                                        <DropdownMenuCheckboxItem
+                                                            key={column.id}
+                                                            className="capitalize"
+                                                            checked={column.getIsVisible()}
+                                                            onCheckedChange={(value) =>
+                                                                column.toggleVisibility(!!value)
+                                                            }
+                                                        >
+                                                            {columnLabels[column.id] ?? column.id}
+                                                        </DropdownMenuCheckboxItem>
+                                                    )
+                                                })}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+                                <div className="pagination-rows-selector mb-2">
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="outline" className="ml-auto">
+                                                Tampilkan {rows} Baris <ChevronDown className="ml-1 h-4 w-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end" >
+                                            {[10, 25, 50, 100].map((size) => (
+                                                <DropdownMenuCheckboxItem
+                                                    key={size}
+                                                    checked={rows === size}
+                                                    onCheckedChange={() => setRows(size)}
+                                                    className="text-sm "
+                                                >
+                                                    {size} baris
+                                                </DropdownMenuCheckboxItem>
+                                            ))}
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </div>
+                            </div>
+                        </div>
+                            <div className="submission-table-body">
+                            <div className="rounded-md border">
+                                <Table>
+                                    <TableHeader>
+                                        {submissionTable.getHeaderGroups().map((headerGroup) => (
+                                            <TableRow key={headerGroup.id}>
+                                                {headerGroup.headers.map((header) => {
+                                                    return (
+                                                        <TableHead key={header.id}>
+                                                            {header.isPlaceholder
+                                                                ? null
+                                                                : flexRender(
+                                                                    header.column.columnDef.header,
+                                                                    header.getContext()
+                                                                )}
+                                                        </TableHead>
+                                                    )
+                                                })}
+                                            </TableRow>
+                                        ))}
+                                    </TableHeader>
+                                    <TableBody>
+                                        {submissionTable.getRowModel().rows?.length ? (
+                                            submissionTable.getRowModel().rows.map((row) => (
+                                                <TableRow
+                                                    key={row.id}
+                                                >
+                                                    {row.getVisibleCells().map((cell) => (
+                                                        <TableCell key={cell.id}>
+                                                            {flexRender(
+                                                                cell.column.columnDef.cell,
+                                                                cell.getContext()
+                                                            )}
+                                                        </TableCell>
+                                                    ))}
+                                                </TableRow>
+                                            ))
+                                        ) : (
+                                            <TableRow>
+                                                <TableCell
+                                                    colSpan={columns.length}
+                                                    className="h-24 text-center"
+                                                >
+                                                    No results.
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                            <div className="flex items-center justify-end space-x-2 py-4">
+
+                                <div className="space-x-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => submissionTable.previousPage()}
+                                        disabled={!submissionTable.getCanPreviousPage()}
+                                    >
+                                        Previous
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => submissionTable.nextPage()}
+                                        disabled={!submissionTable.getCanNextPage()}
+                                    >
+                                        Next
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
                     </div>
                 </div>
             </div>
