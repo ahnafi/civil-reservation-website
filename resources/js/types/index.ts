@@ -101,6 +101,7 @@ export interface Pagination<T> {
     data: T[];
 }
 
+// Submission Type
 export interface SubmissionSchedule {
     id: number;
     code: string;
@@ -126,6 +127,50 @@ export interface Laboratory_Simple {
     code: string;
     name: string;
 }
+
+// Transaction Types
+export type TransactionStatus = "pending" | "success" | "failed";
+export type PaymentMethod =
+    | "BANK JATENG"
+    | "BANK MANDIRI"
+    | "BANK BNI"
+    | "BANK BRI"
+    | "BANK BSI"
+    | "BANK BTN";
+
+export interface Transaction {
+    id: number;
+    code: string;
+    amount: number;
+    payment_method?: PaymentMethod | null;
+    note?: string | null;
+    status: TransactionStatus;
+    payment_invoice_file?: string | null;
+    payment_receipt_image?: string | null;
+    payment_date?: string | null;
+    submission_id: number;
+    created_at: string;
+    updated_at: string;
+    deleted_at?: string | null;
+}
+
+// Testing Types
+export type TestingStatus = "testing" | "completed";
+
+export interface Testing {
+    id: number;
+    code?: string | null;
+    status: TestingStatus;
+    note?: string | null;
+    documents?: string[] | null;
+    test_date?: string | null;
+    completed_at?: string | null;
+    submission_id: number;
+    created_at: string;
+    updated_at: string;
+    deleted_at?: string | null;
+}
+
 
 export type PaginatedTests = Pagination<Test>;
 export type PaginatedPackage = Pagination<Package>;
