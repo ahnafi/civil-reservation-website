@@ -106,6 +106,33 @@ class Submission extends Model
             ->orderBy('submissions.test_submission_date', 'desc');
     }
 
+    public function scopeWithUserScheduleJoin($query)
+    {
+        return $query
+            ->leftJoin('submission_test', 'submissions.id', '=', 'submission_test.submission_id')
+            ->leftJoin('submission_package', 'submissions.id', '=', 'submission_package.submission_id')
+            ->leftJoin('tests', 'submission_test.test_id', '=', 'tests.id')
+            ->leftJoin('packages', 'submission_package.package_id', '=', 'packages.id')
+            ->leftJoin('laboratories as test_labs', 'tests.laboratory_id', '=', 'test_labs.id')
+            ->leftJoin('laboratories as package_labs', 'packages.laboratory_id', '=', 'package_labs.id')
+            ->select(
+                'submissions.id',
+                'submissions.code',
+                'submissions.company_name',
+                'submissions.test_submission_date',
+                'submissions.status',
+                'submission_test.test_id',
+                'submission_package.package_id',
+                'tests.name as test_name',
+                'packages.name as package_name',
+                DB::raw('COALESCE(test_labs.id, package_labs.id) as lab_id'),
+                DB::raw('COALESCE(test_labs.code, package_labs.code) as lab_code'),
+                DB::raw('COALESCE(test_labs.name, package_labs.name) as lab_name'),
+            )
+            ->where('submissions.user_id', auth()->user()->id)
+            ->orderBy('submissions.test_submission_date', 'desc');
+    }
+
 
 
 
