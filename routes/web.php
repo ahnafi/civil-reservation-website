@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
@@ -11,9 +12,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard/index');
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, "index"])->name('dashboard');
     Route::get('schedule', [ScheduleController::class, "index"])->name("schedule");
     Route::get('laboratories', function () {
         return Inertia::render('laboratories/index');
