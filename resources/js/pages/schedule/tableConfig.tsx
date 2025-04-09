@@ -1,8 +1,25 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { type SubmissionSchedule } from "@/types";
+import { type SubmissionSchedule, SimpleOption } from "@/types";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import * as React from "react";
+
+// Column Labels
+export const columnLabels: Record<string, string> = {
+    code: "Kode Pengajuan",
+    test_submission_date: "Tanggal",
+    company_name: "Perusahaan",
+    lab_code: "Lab",
+    test_name: "Jenis Pengujian",
+    status: "Status",
+};
+
+// Status Options
+export const statusOptions: SimpleOption[] = [
+    { id: 1, name: "Approved" },
+    { id: 2, name: "Rejected" },
+    { id: 3, name: "Submitted" },
+];
 
 // Table Columns Definition
 export const columns: ColumnDef<SubmissionSchedule>[] = [
