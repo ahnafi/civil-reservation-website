@@ -147,6 +147,7 @@ export interface Transaction {
     status: TransactionStatus;
     payment_invoice_file?: string | null;
     payment_receipt_image?: string | null;
+    payment_deadline: string;
     payment_date?: string | null;
     submission_id: number;
     created_at: string;
