@@ -19,7 +19,8 @@ class DatabaseSeeder extends Seeder
             PackagesSeeder::class,
             PackageTestSeeder::class,
             SubmissionSeeder::class,
-            TransactionSeeder::class
+            TransactionSeeder::class,
+            TestingSeeder::class,
         ]);
     }
 }
