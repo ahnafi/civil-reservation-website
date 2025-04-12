@@ -2,6 +2,7 @@
 
 import  * as React from "react"
 import {useEffect, useState} from "react";
+import type { Table as TanStackTable } from "@tanstack/react-table";
 import {
     ColumnFiltersState,
     SortingState,
@@ -30,8 +31,8 @@ import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
 import {type SubmissionSchedule, Transaction, Testing, SimpleOption, Laboratory_Simple} from "@/types";
 import {
     submissionColumns, submissionColumnLabels, submissionStatusOptions,
-    transactionColumns,
-    testingColumns
+    transactionColumns, transactionColumnLabels, transactionStatusOptions,
+    testingColumns, testingColumnLabels, testingStatusOptions
 } from "./tableConfig";
 import {Button} from "@/components/ui/button";
 import SearchableSelect from "@/components/ui/SearchableSelect";
@@ -83,24 +84,52 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
         },
     ];
 
-    // Table State
-    const [sorting, setSorting] = React.useState<SortingState>([])
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-    const [rowSelection, setRowSelection] = React.useState({})
-    const [rows, setRows] = useState<number>(10);
-
-    // Filter State
-    const [selectedLab, setSelectedLab] = useState<Laboratory_Simple | null>(null);
-    const [selectedTest, setSelectedTest] = useState<SimpleOption | null>(null);
-    const [selectedStatus, setSelectedStatus] = useState<SimpleOption | null>(null);
-
+    // To Hide the Chart
     const [showChart, setShowChart] = useState(false);
 
-    const [initialDate, setInitialDate] = useState<Date | undefined>();
-    const [finalDate, setFinalDate] = useState<Date | undefined>();
+    // Submission Table State
+    const [submissionSorting, setSubmissionSorting] = useState<SortingState>([]);
+    const [submissionFilters, setSubmissionFilters] = useState<ColumnFiltersState>([]);
+    const [submissionVisibility, setSubmissionVisibility] = useState<VisibilityState>({});
+    const [submissionSelection, setSubmissionSelection] = useState({});
+    const [submissionRows, setSubmissionRows] = useState<number>(10);
 
-    const [finalDateKey, setFinalDateKey] = useState<number>(Date.now());
+    // Transaction Table State
+    const [transactionSorting, setTransactionSorting] = useState<SortingState>([]);
+    const [transactionFilters, setTransactionFilters] = useState<ColumnFiltersState>([]);
+    const [transactionVisibility, setTransactionVisibility] = useState<VisibilityState>({});
+    const [transactionSelection, setTransactionSelection] = useState({});
+    const [transactionRows, setTransactionRows] = useState<number>(10);
+
+    // Testing Table State
+    const [testingSorting, setTestingSorting] = useState<SortingState>([]);
+    const [testingFilters, setTestingFilters] = useState<ColumnFiltersState>([]);
+    const [testingVisibility, setTestingVisibility] = useState<VisibilityState>({});
+    const [testingSelection, setTestingSelection] = useState({});
+    const [testingRows, setTestingRows] = useState<number>(10);
+
+    // Submission Table Filter State
+    const [submissionSelectedLab, setSubmissionSelectedLab] = useState<Laboratory_Simple | null>(null);
+    const [submissionSelectedTest, setSubmissionSelectedTest] = useState<SimpleOption | null>(null);
+    const [submissionSelectedStatus, setSubmissionSelectedStatus] = useState<SimpleOption | null>(null);
+
+    const [submissionInitialDate, setSubmissionInitialDate] = useState<Date | undefined>();
+    const [submissionFinalDate, setSubmissionFinalDate] = useState<Date | undefined>();
+    const [submissionFinalDateKey, setSubmissionFinalDateKey] = useState<number>(Date.now());
+
+    // Transaction Table Filter State
+    const [transactionSelectedStatus, setTransactionSelectedStatus] = useState<SimpleOption | null>(null);
+
+    const [transactionInitialDate, setTransactionInitialDate] = useState<Date | undefined>();
+    const [transactionFinalDate, setTransactionFinalDate] = useState<Date | undefined>();
+    const [transactionFinalDateKey, setTransactionFinalDateKey] = useState<number>(Date.now());
+
+    // Testing Table Filter State
+    const [testingSelectedStatus, setTestingSelectedStatus] = useState<SimpleOption | null>(null);
+
+    const [testingInitialDate, setTestingInitialDate] = useState<Date | undefined>();
+    const [testingFinalDate, setTestingFinalDate] = useState<Date | undefined>();
+    const [testingFinalDateKey, setTestingFinalDateKey] = useState<number>(Date.now());
 
     // Alert State
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
@@ -109,19 +138,43 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
     const mergedTestPackage: SimpleOption[] = [...packages, ...tests];
 
     // Initial Date Select Handlers
-    const handleInitialDateSelect = (date: Date | undefined) => {
+    const handleInitialDateSelect = (
+        date: Date | undefined,
+        setInitialDate: (date: Date | undefined) => void,
+        setFinalDate: (date: Date | undefined) => void,
+        finalDate: Date | undefined
+    ) => {
         const selected = date ?? new Date();
         setInitialDate(selected);
 
-        if (!finalDate || (initialDate && finalDate.getTime() === initialDate.getTime())) {
+        if (!finalDate || (date && finalDate.getTime() === selected.getTime())) {
             setFinalDate(selected);
+        } else if (selected.getTime() > finalDate.getTime()) {
+            setAlertMessage("Tanggal awal tidak boleh lebih besar dari tanggal akhir");
+            setFinalDate(selected);
+        } else {
+            setAlertMessage(null);
         }
     };
 
     // Final Date Select Handlers
-    const handleFinalDateSelect = (date: Date | undefined) => {
+    const handleFinalDateSelect = (
+        date: Date | undefined,
+        initialDate: Date | undefined,
+        setInitialDate: (date: Date | undefined) => void,
+        setFinalDate: (date: Date | undefined) => void,
+        setAlertMessage: (msg: string | null) => void,
+        setFinalDateKey: (key: number) => void
+    ) => {
         if (!initialDate || !date) {
             setFinalDate(date);
+            return;
+        }
+
+        if (!initialDate) {
+            setInitialDate(date);
+            setFinalDate(date);
+            setAlertMessage(null);
             return;
         }
 
@@ -137,23 +190,22 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
         }
     };
 
-    // Submission Table Definition
     const submissionTable = useReactTable<SubmissionSchedule>({
         data: userSubmissions,
         columns: submissionColumns,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
+        onSortingChange: setSubmissionSorting,
+        onColumnFiltersChange: setSubmissionFilters,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
+        onColumnVisibilityChange: setSubmissionVisibility,
+        onRowSelectionChange: setSubmissionSelection,
         state: {
-            sorting,
-            columnFilters,
-            columnVisibility,
-            rowSelection,
+            sorting: submissionSorting,
+            columnFilters: submissionFilters,
+            columnVisibility: submissionVisibility,
+            rowSelection: submissionSelection,
         },
     })
 
@@ -161,19 +213,19 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
     const transactionTable = useReactTable<Transaction>({
         data: userTransactions,
         columns: transactionColumns,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
+        onSortingChange: setTransactionSorting,
+        onColumnFiltersChange: setTransactionFilters,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
+        onColumnVisibilityChange: setTransactionVisibility,
+        onRowSelectionChange: setTransactionSelection,
         state: {
-            sorting,
-            columnFilters,
-            columnVisibility,
-            rowSelection,
+            sorting: transactionSorting,
+            columnFilters:  transactionFilters,
+            columnVisibility: transactionVisibility,
+            rowSelection: transactionSelection,
         },
     })
 
@@ -181,64 +233,116 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
     const testingTable = useReactTable<Testing>({
         data: userTestings,
         columns: testingColumns,
-        onSortingChange: setSorting,
-        onColumnFiltersChange: setColumnFilters,
+        onSortingChange: setTestingSorting,
+        onColumnFiltersChange: setTestingFilters,
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
-        onColumnVisibilityChange: setColumnVisibility,
-        onRowSelectionChange: setRowSelection,
+        onColumnVisibilityChange: setTestingVisibility,
+        onRowSelectionChange: setTestingSelection,
         state: {
-            sorting,
-            columnFilters,
-            columnVisibility,
-            rowSelection,
+            sorting: testingSorting,
+            columnFilters: testingFilters,
+            columnVisibility: testingVisibility,
+            rowSelection: testingSelection,
         },
     })
 
     // Column Filter Update
-    const updateColumnFilter = (id: string, value: any) => {
-        setColumnFilters((prevFilters) => {
-            const otherFilters = prevFilters.filter((f) => f.id !== id);
+    const updateColumnFilter = (
+        setFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>,
+        columnId: string,
+        value: any
+    ) => {
+        setFilters((prevFilters) => {
+            const otherFilters = prevFilters.filter((f) => f.id !== columnId);
             if (value === undefined || value === null || value === "") {
                 return otherFilters;
             }
-            return [...otherFilters, { id, value }];
+            return [...otherFilters, { id: columnId, value }];
         });
     };
 
-    // Lab Column Filter
+    // Submission Date Column Filter Effect
     useEffect(() => {
-        if(selectedLab?.name) {
-            updateColumnFilter("lab_code", selectedLab.code);
+        if (submissionInitialDate) {
+            updateColumnFilter(setSubmissionFilters, "test_submission_date", {
+                start: submissionInitialDate,
+                end: submissionFinalDate ?? submissionInitialDate,
+            })
         } else {
-            updateColumnFilter("lab_code", undefined);
+            updateColumnFilter(setSubmissionFilters, "test_submission_date", undefined);
         }
-    }, [selectedLab]);
+    }, [submissionInitialDate, submissionFinalDate]);
 
-    // Test Column Filter
+    // Reusable Column Filter Effect
+    const useColumnFilterEffect = (
+        selectedOption: SimpleOption | null,
+        setFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>,
+        columnId: string
+    ) => {
+        useEffect(() => {
+            if (selectedOption?.name) {
+                updateColumnFilter(setFilters, columnId, selectedOption.name);
+            } else {
+                updateColumnFilter(setFilters, columnId, undefined);
+            }
+        }, [selectedOption, columnId, setFilters]);
+    };
+
+    // Submission Lab Column Filter Effect
     useEffect(() => {
-        if (selectedTest?.name) {
-            updateColumnFilter("test_name", selectedTest.name);
+        if(submissionSelectedLab?.name) {
+            updateColumnFilter(setSubmissionFilters, "lab_code", submissionSelectedLab.code);
         } else {
-            updateColumnFilter("test_name", undefined);
+            updateColumnFilter(setSubmissionFilters,"lab_code", undefined);
         }
-    }, [selectedTest]);
+    }, [submissionSelectedLab]);
 
-    // Status Column Filter
-    useEffect(() => {
-        if (selectedStatus?.name) {
-            updateColumnFilter("status", selectedStatus.name);
-        } else {
-            updateColumnFilter("status", undefined);
-        }
-    }, [selectedStatus]);
+    // Submission Test Column Filter Effect
+    useColumnFilterEffect(
+        submissionSelectedTest,
+        setSubmissionFilters,
+        "test_name"
+    );
 
-    // Row Pagination
-    useEffect(() => {
-        submissionTable.setPageSize(rows);
-    }, [rows, submissionTable]);
+    // Submission Status Column Filter Effect
+    useColumnFilterEffect(
+        submissionSelectedStatus,
+        setSubmissionFilters,
+        "status"
+    );
+
+    // Transaction Status Column Filter Effect
+    useColumnFilterEffect(
+        transactionSelectedStatus,
+        setTransactionFilters,
+        "status"
+    );
+
+    // Testing Status Column Filter Effect
+    useColumnFilterEffect(
+        testingSelectedStatus,
+        setTestingFilters,
+        "status"
+    );
+
+    // Row Pagination Effect
+    const usePageSizeEffect = <T,>(table: TanStackTable<T>, rows: number) => {
+        useEffect(() => {
+            table.setPageSize(rows);
+        }, [rows, table]);
+    };
+
+    // Submission Table Row Pagination Effect
+    usePageSizeEffect(submissionTable, submissionRows);
+
+    // Transaction Table Row Pagination Effect
+    usePageSizeEffect(transactionTable, transactionRows);
+
+    // Testing Table Row Pagination Effect
+    usePageSizeEffect(testingTable, testingRows);
 
     // Alert Message
     useEffect(() => {
@@ -349,8 +453,8 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                 <SearchableSelect
                                     label="Jenis Pengujian"
                                     options={mergedTestPackage}
-                                    selectedOption={selectedTest}
-                                    setSelectedOption={setSelectedTest}
+                                    selectedOption={submissionSelectedTest}
+                                    setSelectedOption={setSubmissionSelectedTest}
                                     placeholder="Filter Jenis Pengujian..."
                                     searchIcon={<HardHat size={18} />}
                                 />
@@ -360,8 +464,8 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                 <DropdownSelect
                                     label="Laboratorium"
                                     options={laboratories}
-                                    selectedOption={selectedLab}
-                                    setSelectedOption={setSelectedLab}
+                                    selectedOption={submissionSelectedLab}
+                                    setSelectedOption={setSubmissionSelectedLab}
                                     placeholder="Filter Laboratorium"
                                     icon={<FlaskConical size={18} />}
                                 />
@@ -371,8 +475,8 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                 <DropdownSelect
                                     label="Status"
                                     options={submissionStatusOptions}
-                                    selectedOption={selectedStatus}
-                                    setSelectedOption={setSelectedStatus}
+                                    selectedOption={submissionSelectedStatus}
+                                    setSelectedOption={setSubmissionSelectedStatus}
                                     placeholder="Filter Status"
                                     icon={<Check size={18} />}
                                 />
@@ -383,9 +487,11 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                     <div className="initial-date flex flex-col text-sm">
                                         <span>Tanggal Awal:</span>
                                         <DatePicker
-                                            value={initialDate}
+                                            value={submissionInitialDate}
                                             placeholder="Pilih Tanggal Awal"
-                                            onDateSelect={handleInitialDateSelect}
+                                            onDateSelect={(date) =>
+                                                handleInitialDateSelect(date, setSubmissionInitialDate, setSubmissionFinalDate, submissionFinalDate)
+                                            }
                                         />
                                     </div>
                                     <div className="flex justify-center items-center text-sm pt-5">
@@ -394,23 +500,27 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                     <div className="final-date flex flex-col text-sm">
                                         <span>Tanggal Akhir:</span>
                                         <DatePicker
-                                            key={finalDateKey}
-                                            value={finalDate}
+                                            key={submissionFinalDateKey}
+                                            value={submissionInitialDate}
                                             placeholder="Pilih Tanggal Akhir"
-                                            onDateSelect={handleFinalDateSelect}
+                                            onDateSelect={(date) =>
+                                                handleFinalDateSelect(date, submissionInitialDate,setSubmissionInitialDate, setSubmissionFinalDate, setAlertMessage, setSubmissionFinalDateKey)
+                                            }
                                         />
                                     </div>
                                 </div>
 
-                                { (initialDate || finalDate) && (
+                                { (submissionInitialDate || submissionFinalDate) && (
                                     <div className="clear-date-button flex justify-end text-right">
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            onClick={ () => {
-                                                setInitialDate(undefined);
-                                                setFinalDate(undefined);
+                                            onClick={() => {
+                                                setSubmissionInitialDate(undefined);
+                                                setSubmissionFinalDate(undefined);
+                                                setSubmissionFilters((prev) => prev.filter((f) => f.id !== "test_submission_date"));
                                             }}
+
                                             className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
                                         >
                                             <X size={12} />
@@ -465,15 +575,15 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="outline" className="ml-auto">
-                                                    Tampilkan {rows} Baris <ChevronDown className="ml-1 h-4 w-4" />
+                                                    Tampilkan {submissionRows} Baris <ChevronDown className="ml-1 h-4 w-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end" >
                                                 {[10, 25, 50, 100].map((size) => (
                                                     <DropdownMenuCheckboxItem
                                                         key={size}
-                                                        checked={rows === size}
-                                                        onCheckedChange={() => setRows(size)}
+                                                        checked={submissionRows === size}
+                                                        onCheckedChange={() => setSubmissionRows(size)}
                                                         className="text-sm "
                                                     >
                                                         {size} baris
@@ -559,464 +669,441 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                         </div>
                     </div>
 
-                    <div className="transaction col-span-full space-y-2">
-                        <h2 className="title font-semibold">Daftar Transaksi</h2>
-                        <div className="transaction-table-cards-summary flex justify-evenly">
-                            <div className="total-transaction-card">
+                    {/*<div className="transaction col-span-full space-y-2">*/}
+                    {/*    <h2 className="title font-semibold">Daftar Transaksi</h2>*/}
+                    {/*    <div className="transaction-table-cards-summary flex justify-evenly">*/}
+                    {/*        <div className="total-transaction-card">*/}
 
-                            </div>
-                            <div className="pending-transaction-card">
+                    {/*        </div>*/}
+                    {/*        <div className="pending-transaction-card">*/}
 
-                            </div>
-                            <div className="success-transaction-card">
+                    {/*        </div>*/}
+                    {/*        <div className="success-transaction-card">*/}
 
-                            </div>
-                            <div className="failed-transaction-card">
+                    {/*        </div>*/}
+                    {/*        <div className="failed-transaction-card">*/}
 
-                            </div>
-                        </div>
-                        <div className="transaction-table-filters flex justify-between space-x-5 mx-10 mt-6">
-                            <div className="test-type">
-                                <SearchableSelect
-                                    label="Jenis Pengujian"
-                                    options={mergedTestPackage}
-                                    selectedOption={selectedTest}
-                                    setSelectedOption={setSelectedTest}
-                                    placeholder="Filter Jenis Pengujian..."
-                                    searchIcon={<HardHat size={18} />}
-                                />
-                            </div>
+                    {/*        </div>*/}
+                    {/*    </div>*/}
+                    {/*    <div className="transaction-table-filters flex justify-between space-x-5 mx-10 mt-6">*/}
+                    {/*        <div className="Status-type">*/}
+                    {/*            <DropdownSelect*/}
+                    {/*                label="Status"*/}
+                    {/*                options={transactionStatusOptions}*/}
+                    {/*                selectedOption={selectedStatus}*/}
+                    {/*                setSelectedOption={setSelectedStatus}*/}
+                    {/*                placeholder="Filter Status"*/}
+                    {/*                icon={<Check size={18} />}*/}
+                    {/*            />*/}
+                    {/*        </div>*/}
 
-                            <div className="Lab-type">
-                                <DropdownSelect
-                                    label="Laboratorium"
-                                    options={laboratories}
-                                    selectedOption={selectedLab}
-                                    setSelectedOption={setSelectedLab}
-                                    placeholder="Filter Laboratorium"
-                                    icon={<FlaskConical size={18} />}
-                                />
-                            </div>
+                    {/*        <div className="date-range-picker flex flex-col gap-1">*/}
+                    {/*            <div className="flex gap-3">*/}
+                    {/*                <div className="initial-date flex flex-col text-sm">*/}
+                    {/*                    <span>Tanggal Awal:</span>*/}
+                    {/*                    <DatePicker*/}
+                    {/*                        value={initialDate}*/}
+                    {/*                        placeholder="Pilih Tanggal Awal"*/}
+                    {/*                        onDateSelect={handleInitialDateSelect}*/}
+                    {/*                    />*/}
+                    {/*                </div>*/}
+                    {/*                <div className="flex justify-center items-center text-sm pt-5">*/}
+                    {/*                    -*/}
+                    {/*                </div>*/}
+                    {/*                <div className="final-date flex flex-col text-sm">*/}
+                    {/*                    <span>Tanggal Akhir:</span>*/}
+                    {/*                    <DatePicker*/}
+                    {/*                        key={finalDateKey}*/}
+                    {/*                        value={finalDate}*/}
+                    {/*                        placeholder="Pilih Tanggal Akhir"*/}
+                    {/*                        onDateSelect={handleFinalDateSelect}*/}
+                    {/*                    />*/}
+                    {/*                </div>*/}
+                    {/*            </div>*/}
 
-                            <div className="Status-type">
-                                <DropdownSelect
-                                    label="Status"
-                                    options={submissionStatusOptions}
-                                    selectedOption={selectedStatus}
-                                    setSelectedOption={setSelectedStatus}
-                                    placeholder="Filter Status"
-                                    icon={<Check size={18} />}
-                                />
-                            </div>
+                    {/*            { (initialDate || finalDate) && (*/}
+                    {/*                <div className="clear-date-button flex justify-end text-right">*/}
+                    {/*                    <Button*/}
+                    {/*                        variant="ghost"*/}
+                    {/*                        size="sm"*/}
+                    {/*                        onClick={ () => {*/}
+                    {/*                            setInitialDate(undefined);*/}
+                    {/*                            setFinalDate(undefined);*/}
+                    {/*                        }}*/}
+                    {/*                        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"*/}
+                    {/*                    >*/}
+                    {/*                        <X size={12} />*/}
+                    {/*                        Hapus Filter Tanggal*/}
+                    {/*                    </Button>*/}
+                    {/*                </div>*/}
+                    {/*            )}*/}
+                    {/*        </div>*/}
+                    {/*    </div>*/}
+                    {/*    <div className="transaction-table-main mt-6">*/}
+                    {/*        <div className="transaction-table-option flex justify-between">*/}
+                    {/*        <div className="Code-Search">*/}
+                    {/*            <Input*/}
+                    {/*                placeholder="Cari Kode Transaksi..."*/}
+                    {/*                value={(transactionTable.getColumn("code")?.getFilterValue() as string) ?? ""}*/}
+                    {/*                onChange={(e) =>*/}
+                    {/*                    transactionTable.getColumn("code")?.setFilterValue(e.target.value)*/}
+                    {/*                }*/}
+                    {/*                className="max-w-sm"*/}
+                    {/*            />*/}
+                    {/*        </div>*/}
+                    {/*        <div className="flex space-x-2">*/}
+                    {/*            <div className="table-column-filter mb-2">*/}
+                    {/*                <DropdownMenu>*/}
+                    {/*                    <DropdownMenuTrigger asChild>*/}
+                    {/*                        <Button variant="outline" className="ml-auto">*/}
+                    {/*                            Kolom <ChevronDown />*/}
+                    {/*                        </Button>*/}
+                    {/*                    </DropdownMenuTrigger>*/}
+                    {/*                    <DropdownMenuContent align="end">*/}
+                    {/*                        {transactionTable*/}
+                    {/*                            .getAllColumns()*/}
+                    {/*                            .filter((column) => column.getCanHide())*/}
+                    {/*                            .map((column) => {*/}
+                    {/*                                return (*/}
+                    {/*                                    <DropdownMenuCheckboxItem*/}
+                    {/*                                        key={column.id}*/}
+                    {/*                                        className="capitalize"*/}
+                    {/*                                        checked={column.getIsVisible()}*/}
+                    {/*                                        onCheckedChange={(value) =>*/}
+                    {/*                                            column.toggleVisibility(!!value)*/}
+                    {/*                                        }*/}
+                    {/*                                    >*/}
+                    {/*                                        {transactionColumnLabels[column.id] ?? column.id}*/}
+                    {/*                                    </DropdownMenuCheckboxItem>*/}
+                    {/*                                )*/}
+                    {/*                            })}*/}
+                    {/*                    </DropdownMenuContent>*/}
+                    {/*                </DropdownMenu>*/}
+                    {/*            </div>*/}
+                    {/*            <div className="pagination-rows-selector mb-2">*/}
+                    {/*                <DropdownMenu>*/}
+                    {/*                    <DropdownMenuTrigger asChild>*/}
+                    {/*                        <Button variant="outline" className="ml-auto">*/}
+                    {/*                            Tampilkan {rows} Baris <ChevronDown className="ml-1 h-4 w-4" />*/}
+                    {/*                        </Button>*/}
+                    {/*                    </DropdownMenuTrigger>*/}
+                    {/*                    <DropdownMenuContent align="end" >*/}
+                    {/*                        {[10, 25, 50, 100].map((size) => (*/}
+                    {/*                            <DropdownMenuCheckboxItem*/}
+                    {/*                                key={size}*/}
+                    {/*                                checked={rows === size}*/}
+                    {/*                                onCheckedChange={() => setRows(size)}*/}
+                    {/*                                className="text-sm "*/}
+                    {/*                            >*/}
+                    {/*                                {size} baris*/}
+                    {/*                            </DropdownMenuCheckboxItem>*/}
+                    {/*                        ))}*/}
+                    {/*                    </DropdownMenuContent>*/}
+                    {/*                </DropdownMenu>*/}
+                    {/*            </div>*/}
+                    {/*        </div>*/}
+                    {/*    </div>*/}
+                    {/*        <div className="transaction-table-body">*/}
+                    {/*        <div className="rounded-md border">*/}
+                    {/*            <Table>*/}
+                    {/*                <TableHeader>*/}
+                    {/*                    {transactionTable.getHeaderGroups().map((headerGroup) => (*/}
+                    {/*                        <TableRow key={headerGroup.id}>*/}
+                    {/*                            {headerGroup.headers.map((header) => {*/}
+                    {/*                                return (*/}
+                    {/*                                    <TableHead key={header.id}>*/}
+                    {/*                                        {header.isPlaceholder*/}
+                    {/*                                            ? null*/}
+                    {/*                                            : flexRender(*/}
+                    {/*                                                header.column.columnDef.header,*/}
+                    {/*                                                header.getContext()*/}
+                    {/*                                            )}*/}
+                    {/*                                    </TableHead>*/}
+                    {/*                                )*/}
+                    {/*                            })}*/}
+                    {/*                        </TableRow>*/}
+                    {/*                    ))}*/}
+                    {/*                </TableHeader>*/}
+                    {/*                <TableBody>*/}
+                    {/*                    {transactionTable.getRowModel().rows?.length ? (*/}
+                    {/*                        transactionTable.getRowModel().rows.map((row) => (*/}
+                    {/*                            <TableRow*/}
+                    {/*                                key={row.id}*/}
+                    {/*                            >*/}
+                    {/*                                {row.getVisibleCells().map((cell) => (*/}
+                    {/*                                    <TableCell key={cell.id}>*/}
+                    {/*                                        {flexRender(*/}
+                    {/*                                            cell.column.columnDef.cell,*/}
+                    {/*                                            cell.getContext()*/}
+                    {/*                                        )}*/}
+                    {/*                                    </TableCell>*/}
+                    {/*                                ))}*/}
+                    {/*                            </TableRow>*/}
+                    {/*                        ))*/}
+                    {/*                    ) : (*/}
+                    {/*                        <TableRow>*/}
+                    {/*                            <TableCell*/}
+                    {/*                                colSpan={transactionColumns.length}*/}
+                    {/*                                className="h-24 text-center"*/}
+                    {/*                            >*/}
+                    {/*                                No results.*/}
+                    {/*                            </TableCell>*/}
+                    {/*                        </TableRow>*/}
+                    {/*                    )}*/}
+                    {/*                </TableBody>*/}
+                    {/*            </Table>*/}
+                    {/*        </div>*/}
+                    {/*        <div className="flex items-center justify-end space-x-2 py-4">*/}
+                    {/*            <div className="space-x-2">*/}
+                    {/*                <Button*/}
+                    {/*                    variant="outline"*/}
+                    {/*                    size="sm"*/}
+                    {/*                    onClick={() => transactionTable.previousPage()}*/}
+                    {/*                    disabled={!transactionTable.getCanPreviousPage()}*/}
+                    {/*                >*/}
+                    {/*                    Previous*/}
+                    {/*                </Button>*/}
+                    {/*                <Button*/}
+                    {/*                    variant="outline"*/}
+                    {/*                    size="sm"*/}
+                    {/*                    onClick={() => transactionTable.nextPage()}*/}
+                    {/*                    disabled={!transactionTable.getCanNextPage()}*/}
+                    {/*                >*/}
+                    {/*                    Next*/}
+                    {/*                </Button>*/}
+                    {/*            </div>*/}
+                    {/*        </div>*/}
+                    {/*    </div>*/}
+                    {/*    </div>*/}
+                    {/*</div>*/}
 
-                            <div className="date-range-picker flex flex-col gap-1">
-                                <div className="flex gap-3">
-                                    <div className="initial-date flex flex-col text-sm">
-                                        <span>Tanggal Awal:</span>
-                                        <DatePicker
-                                            value={initialDate}
-                                            placeholder="Pilih Tanggal Awal"
-                                            onDateSelect={handleInitialDateSelect}
-                                        />
-                                    </div>
-                                    <div className="flex justify-center items-center text-sm pt-5">
-                                        -
-                                    </div>
-                                    <div className="final-date flex flex-col text-sm">
-                                        <span>Tanggal Akhir:</span>
-                                        <DatePicker
-                                            key={finalDateKey}
-                                            value={finalDate}
-                                            placeholder="Pilih Tanggal Akhir"
-                                            onDateSelect={handleFinalDateSelect}
-                                        />
-                                    </div>
-                                </div>
+                    {/*<div className="testing col-span-full space-y-2">*/}
+                    {/*    <h2 className="title font-semibold">Daftar Pengujian</h2>*/}
+                    {/*    <div className="testing-table-cards-summary flex justify-evenly">*/}
+                    {/*        <div className="total-testing-card">*/}
 
-                                { (initialDate || finalDate) && (
-                                    <div className="clear-date-button flex justify-end text-right">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={ () => {
-                                                setInitialDate(undefined);
-                                                setFinalDate(undefined);
-                                            }}
-                                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                                        >
-                                            <X size={12} />
-                                            Hapus Filter Tanggal
-                                        </Button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        <div className="transaction-table-main mt-6">
-                            <div className="transaction-table-option flex justify-between">
-                            <div className="Code-Search">
-                                <Input
-                                    placeholder="Cari Kode Pengajuan..."
-                                    value={(submissionTable.getColumn("code")?.getFilterValue() as string) ?? ""}
-                                    onChange={(e) =>
-                                        submissionTable.getColumn("code")?.setFilterValue(e.target.value)
-                                    }
-                                    className="max-w-sm"
-                                />
-                            </div>
-                            <div className="flex space-x-2">
-                                <div className="table-column-filter mb-2">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="outline" className="ml-auto">
-                                                Kolom <ChevronDown />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            {submissionTable
-                                                .getAllColumns()
-                                                .filter((column) => column.getCanHide())
-                                                .map((column) => {
-                                                    return (
-                                                        <DropdownMenuCheckboxItem
-                                                            key={column.id}
-                                                            className="capitalize"
-                                                            checked={column.getIsVisible()}
-                                                            onCheckedChange={(value) =>
-                                                                column.toggleVisibility(!!value)
-                                                            }
-                                                        >
-                                                            {submissionColumnLabels[column.id] ?? column.id}
-                                                        </DropdownMenuCheckboxItem>
-                                                    )
-                                                })}
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </div>
-                                <div className="pagination-rows-selector mb-2">
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="outline" className="ml-auto">
-                                                Tampilkan {rows} Baris <ChevronDown className="ml-1 h-4 w-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end" >
-                                            {[10, 25, 50, 100].map((size) => (
-                                                <DropdownMenuCheckboxItem
-                                                    key={size}
-                                                    checked={rows === size}
-                                                    onCheckedChange={() => setRows(size)}
-                                                    className="text-sm "
-                                                >
-                                                    {size} baris
-                                                </DropdownMenuCheckboxItem>
-                                            ))}
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </div>
-                            </div>
-                        </div>
-                            <div className="transaction-table-body">
-                            <div className="rounded-md border">
-                                <Table>
-                                    <TableHeader>
-                                        {transactionTable.getHeaderGroups().map((headerGroup) => (
-                                            <TableRow key={headerGroup.id}>
-                                                {headerGroup.headers.map((header) => {
-                                                    return (
-                                                        <TableHead key={header.id}>
-                                                            {header.isPlaceholder
-                                                                ? null
-                                                                : flexRender(
-                                                                    header.column.columnDef.header,
-                                                                    header.getContext()
-                                                                )}
-                                                        </TableHead>
-                                                    )
-                                                })}
-                                            </TableRow>
-                                        ))}
-                                    </TableHeader>
-                                    <TableBody>
-                                        {transactionTable.getRowModel().rows?.length ? (
-                                            transactionTable.getRowModel().rows.map((row) => (
-                                                <TableRow
-                                                    key={row.id}
-                                                >
-                                                    {row.getVisibleCells().map((cell) => (
-                                                        <TableCell key={cell.id}>
-                                                            {flexRender(
-                                                                cell.column.columnDef.cell,
-                                                                cell.getContext()
-                                                            )}
-                                                        </TableCell>
-                                                    ))}
-                                                </TableRow>
-                                            ))
-                                        ) : (
-                                            <TableRow>
-                                                <TableCell
-                                                    colSpan={transactionColumns.length}
-                                                    className="h-24 text-center"
-                                                >
-                                                    No results.
-                                                </TableCell>
-                                            </TableRow>
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            </div>
-                            <div className="flex items-center justify-end space-x-2 py-4">
+                    {/*        </div>*/}
+                    {/*        <div className="testing-testing-card">*/}
 
-                                <div className="space-x-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => submissionTable.previousPage()}
-                                        disabled={!submissionTable.getCanPreviousPage()}
-                                    >
-                                        Previous
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        onClick={() => submissionTable.nextPage()}
-                                        disabled={!submissionTable.getCanNextPage()}
-                                    >
-                                        Next
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-                        </div>
-                    </div>
+                    {/*        </div>*/}
+                    {/*        <div className="completed-testing-card">*/}
 
-                    <div className="testing col-span-full space-y-2">
-                        <h2 className="title font-semibold">Daftar Pengujian</h2>
-                        <div className="testing-table-cards-summary flex justify-evenly">
-                            <div className="total-testing-card">
+                    {/*        </div>*/}
+                    {/*    </div>*/}
+                    {/*    <div className="testing-table-filters flex justify-between space-x-5 mx-10 mt-6">*/}
+                    {/*        <div className="test-type">*/}
+                    {/*            <SearchableSelect*/}
+                    {/*                label="Jenis Pengujian"*/}
+                    {/*                options={mergedTestPackage}*/}
+                    {/*                selectedOption={submissionSelectedTest}*/}
+                    {/*                setSelectedOption={setSubmissionSelectedTest}*/}
+                    {/*                placeholder="Filter Jenis Pengujian..."*/}
+                    {/*                searchIcon={<HardHat size={18} />}*/}
+                    {/*            />*/}
+                    {/*        </div>*/}
 
-                            </div>
-                            <div className="testing-testing-card">
+                    {/*        <div className="Lab-type">*/}
+                    {/*            <DropdownSelect*/}
+                    {/*                label="Laboratorium"*/}
+                    {/*                options={laboratories}*/}
+                    {/*                selectedOption={submissionSelectedLab}*/}
+                    {/*                setSelectedOption={setSubmissionSelectedLab}*/}
+                    {/*                placeholder="Filter Laboratorium"*/}
+                    {/*                icon={<FlaskConical size={18} />}*/}
+                    {/*            />*/}
+                    {/*        </div>*/}
 
-                            </div>
-                            <div className="completed-testing-card">
+                    {/*        <div className="Status-type">*/}
+                    {/*            <DropdownSelect*/}
+                    {/*                label="Status"*/}
+                    {/*                options={submissionStatusOptions}*/}
+                    {/*                selectedOption={selectedStatus}*/}
+                    {/*                setSelectedOption={setSelectedStatus}*/}
+                    {/*                placeholder="Filter Status"*/}
+                    {/*                icon={<Check size={18} />}*/}
+                    {/*            />*/}
+                    {/*        </div>*/}
 
-                            </div>
-                        </div>
-                        <div className="testing-table-filters flex justify-between space-x-5 mx-10 mt-6">
-                            <div className="test-type">
-                                <SearchableSelect
-                                    label="Jenis Pengujian"
-                                    options={mergedTestPackage}
-                                    selectedOption={selectedTest}
-                                    setSelectedOption={setSelectedTest}
-                                    placeholder="Filter Jenis Pengujian..."
-                                    searchIcon={<HardHat size={18} />}
-                                />
-                            </div>
+                    {/*        <div className="date-range-picker flex flex-col gap-1">*/}
+                    {/*            <div className="flex gap-3">*/}
+                    {/*                <div className="initial-date flex flex-col text-sm">*/}
+                    {/*                    <span>Tanggal Awal:</span>*/}
+                    {/*                    <DatePicker*/}
+                    {/*                        value={initialDate}*/}
+                    {/*                        placeholder="Pilih Tanggal Awal"*/}
+                    {/*                        onDateSelect={handleInitialDateSelect}*/}
+                    {/*                    />*/}
+                    {/*                </div>*/}
+                    {/*                <div className="flex justify-center items-center text-sm pt-5">*/}
+                    {/*                    -*/}
+                    {/*                </div>*/}
+                    {/*                <div className="final-date flex flex-col text-sm">*/}
+                    {/*                    <span>Tanggal Akhir:</span>*/}
+                    {/*                    <DatePicker*/}
+                    {/*                        key={finalDateKey}*/}
+                    {/*                        value={finalDate}*/}
+                    {/*                        placeholder="Pilih Tanggal Akhir"*/}
+                    {/*                        onDateSelect={handleFinalDateSelect}*/}
+                    {/*                    />*/}
+                    {/*                </div>*/}
+                    {/*            </div>*/}
 
-                            <div className="Lab-type">
-                                <DropdownSelect
-                                    label="Laboratorium"
-                                    options={laboratories}
-                                    selectedOption={selectedLab}
-                                    setSelectedOption={setSelectedLab}
-                                    placeholder="Filter Laboratorium"
-                                    icon={<FlaskConical size={18} />}
-                                />
-                            </div>
+                    {/*            { (initialDate || finalDate) && (*/}
+                    {/*                <div className="clear-date-button flex justify-end text-right">*/}
+                    {/*                    <Button*/}
+                    {/*                        variant="ghost"*/}
+                    {/*                        size="sm"*/}
+                    {/*                        onClick={ () => {*/}
+                    {/*                            setInitialDate(undefined);*/}
+                    {/*                            setFinalDate(undefined);*/}
+                    {/*                        }}*/}
+                    {/*                        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"*/}
+                    {/*                    >*/}
+                    {/*                        <X size={12} />*/}
+                    {/*                        Hapus Filter Tanggal*/}
+                    {/*                    </Button>*/}
+                    {/*                </div>*/}
+                    {/*            )}*/}
+                    {/*        </div>*/}
+                    {/*    </div>*/}
+                    {/*    <div className="testing-table-main mt-6">*/}
+                    {/*        <div className="testing-table-option flex justify-between">*/}
+                    {/*            <div className="Code-Search">*/}
+                    {/*                <Input*/}
+                    {/*                    placeholder="Cari Kode Pengajuan..."*/}
+                    {/*                    value={(submissionTable.getColumn("code")?.getFilterValue() as string) ?? ""}*/}
+                    {/*                    onChange={(e) =>*/}
+                    {/*                        submissionTable.getColumn("code")?.setFilterValue(e.target.value)*/}
+                    {/*                    }*/}
+                    {/*                    className="max-w-sm"*/}
+                    {/*                />*/}
+                    {/*            </div>*/}
+                    {/*            <div className="flex space-x-2">*/}
+                    {/*                <div className="table-column-filter mb-2">*/}
+                    {/*                    <DropdownMenu>*/}
+                    {/*                        <DropdownMenuTrigger asChild>*/}
+                    {/*                            <Button variant="outline" className="ml-auto">*/}
+                    {/*                                Kolom <ChevronDown />*/}
+                    {/*                            </Button>*/}
+                    {/*                        </DropdownMenuTrigger>*/}
+                    {/*                        <DropdownMenuContent align="end">*/}
+                    {/*                            {testingTable*/}
+                    {/*                                .getAllColumns()*/}
+                    {/*                                .filter((column) => column.getCanHide())*/}
+                    {/*                                .map((column) => {*/}
+                    {/*                                    return (*/}
+                    {/*                                        <DropdownMenuCheckboxItem*/}
+                    {/*                                            key={column.id}*/}
+                    {/*                                            className="capitalize"*/}
+                    {/*                                            checked={column.getIsVisible()}*/}
+                    {/*                                            onCheckedChange={(value) =>*/}
+                    {/*                                                column.toggleVisibility(!!value)*/}
+                    {/*                                            }*/}
+                    {/*                                        >*/}
+                    {/*                                            {testingColumnLabels[column.id] ?? column.id}*/}
+                    {/*                                        </DropdownMenuCheckboxItem>*/}
+                    {/*                                    )*/}
+                    {/*                                })}*/}
+                    {/*                        </DropdownMenuContent>*/}
+                    {/*                    </DropdownMenu>*/}
+                    {/*                </div>*/}
+                    {/*                <div className="pagination-rows-selector mb-2">*/}
+                    {/*                    <DropdownMenu>*/}
+                    {/*                        <DropdownMenuTrigger asChild>*/}
+                    {/*                            <Button variant="outline" className="ml-auto">*/}
+                    {/*                                Tampilkan {rows} Baris <ChevronDown className="ml-1 h-4 w-4" />*/}
+                    {/*                            </Button>*/}
+                    {/*                        </DropdownMenuTrigger>*/}
+                    {/*                        <DropdownMenuContent align="end" >*/}
+                    {/*                            {[10, 25, 50, 100].map((size) => (*/}
+                    {/*                                <DropdownMenuCheckboxItem*/}
+                    {/*                                    key={size}*/}
+                    {/*                                    checked={rows === size}*/}
+                    {/*                                    onCheckedChange={() => setRows(size)}*/}
+                    {/*                                    className="text-sm "*/}
+                    {/*                                >*/}
+                    {/*                                    {size} baris*/}
+                    {/*                                </DropdownMenuCheckboxItem>*/}
+                    {/*                            ))}*/}
+                    {/*                        </DropdownMenuContent>*/}
+                    {/*                    </DropdownMenu>*/}
+                    {/*                </div>*/}
+                    {/*            </div>*/}
+                    {/*        </div>*/}
+                    {/*        <div className="testing-table-body">*/}
+                    {/*            <div className="rounded-md border">*/}
+                    {/*                <Table>*/}
+                    {/*                    <TableHeader>*/}
+                    {/*                        {submissionTable.getHeaderGroups().map((headerGroup) => (*/}
+                    {/*                            <TableRow key={headerGroup.id}>*/}
+                    {/*                                {headerGroup.headers.map((header) => {*/}
+                    {/*                                    return (*/}
+                    {/*                                        <TableHead key={header.id}>*/}
+                    {/*                                            {header.isPlaceholder*/}
+                    {/*                                                ? null*/}
+                    {/*                                                : flexRender(*/}
+                    {/*                                                    header.column.columnDef.header,*/}
+                    {/*                                                    header.getContext()*/}
+                    {/*                                                )}*/}
+                    {/*                                        </TableHead>*/}
+                    {/*                                    )*/}
+                    {/*                                })}*/}
+                    {/*                            </TableRow>*/}
+                    {/*                        ))}*/}
+                    {/*                    </TableHeader>*/}
+                    {/*                    <TableBody>*/}
+                    {/*                        {submissionTable.getRowModel().rows?.length ? (*/}
+                    {/*                            submissionTable.getRowModel().rows.map((row) => (*/}
+                    {/*                                <TableRow*/}
+                    {/*                                    key={row.id}*/}
+                    {/*                                >*/}
+                    {/*                                    {row.getVisibleCells().map((cell) => (*/}
+                    {/*                                        <TableCell key={cell.id}>*/}
+                    {/*                                            {flexRender(*/}
+                    {/*                                                cell.column.columnDef.cell,*/}
+                    {/*                                                cell.getContext()*/}
+                    {/*                                            )}*/}
+                    {/*                                        </TableCell>*/}
+                    {/*                                    ))}*/}
+                    {/*                                </TableRow>*/}
+                    {/*                            ))*/}
+                    {/*                        ) : (*/}
+                    {/*                            <TableRow>*/}
+                    {/*                                <TableCell*/}
+                    {/*                                    colSpan={submissionColumns.length}*/}
+                    {/*                                    className="h-24 text-center"*/}
+                    {/*                                >*/}
+                    {/*                                    No results.*/}
+                    {/*                                </TableCell>*/}
+                    {/*                            </TableRow>*/}
+                    {/*                        )}*/}
+                    {/*                    </TableBody>*/}
+                    {/*                </Table>*/}
+                    {/*            </div>*/}
+                    {/*            <div className="flex items-center justify-end space-x-2 py-4">*/}
 
-                            <div className="Status-type">
-                                <DropdownSelect
-                                    label="Status"
-                                    options={submissionStatusOptions}
-                                    selectedOption={selectedStatus}
-                                    setSelectedOption={setSelectedStatus}
-                                    placeholder="Filter Status"
-                                    icon={<Check size={18} />}
-                                />
-                            </div>
-
-                            <div className="date-range-picker flex flex-col gap-1">
-                                <div className="flex gap-3">
-                                    <div className="initial-date flex flex-col text-sm">
-                                        <span>Tanggal Awal:</span>
-                                        <DatePicker
-                                            value={initialDate}
-                                            placeholder="Pilih Tanggal Awal"
-                                            onDateSelect={handleInitialDateSelect}
-                                        />
-                                    </div>
-                                    <div className="flex justify-center items-center text-sm pt-5">
-                                        -
-                                    </div>
-                                    <div className="final-date flex flex-col text-sm">
-                                        <span>Tanggal Akhir:</span>
-                                        <DatePicker
-                                            key={finalDateKey}
-                                            value={finalDate}
-                                            placeholder="Pilih Tanggal Akhir"
-                                            onDateSelect={handleFinalDateSelect}
-                                        />
-                                    </div>
-                                </div>
-
-                                { (initialDate || finalDate) && (
-                                    <div className="clear-date-button flex justify-end text-right">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={ () => {
-                                                setInitialDate(undefined);
-                                                setFinalDate(undefined);
-                                            }}
-                                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                                        >
-                                            <X size={12} />
-                                            Hapus Filter Tanggal
-                                        </Button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        <div className="testing-table-main mt-6">
-                            <div className="testing-table-option flex justify-between">
-                                <div className="Code-Search">
-                                    <Input
-                                        placeholder="Cari Kode Pengajuan..."
-                                        value={(submissionTable.getColumn("code")?.getFilterValue() as string) ?? ""}
-                                        onChange={(e) =>
-                                            submissionTable.getColumn("code")?.setFilterValue(e.target.value)
-                                        }
-                                        className="max-w-sm"
-                                    />
-                                </div>
-                                <div className="flex space-x-2">
-                                    <div className="table-column-filter mb-2">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="outline" className="ml-auto">
-                                                    Kolom <ChevronDown />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                {submissionTable
-                                                    .getAllColumns()
-                                                    .filter((column) => column.getCanHide())
-                                                    .map((column) => {
-                                                        return (
-                                                            <DropdownMenuCheckboxItem
-                                                                key={column.id}
-                                                                className="capitalize"
-                                                                checked={column.getIsVisible()}
-                                                                onCheckedChange={(value) =>
-                                                                    column.toggleVisibility(!!value)
-                                                                }
-                                                            >
-                                                                {submissionColumnLabels[column.id] ?? column.id}
-                                                            </DropdownMenuCheckboxItem>
-                                                        )
-                                                    })}
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </div>
-                                    <div className="pagination-rows-selector mb-2">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                                <Button variant="outline" className="ml-auto">
-                                                    Tampilkan {rows} Baris <ChevronDown className="ml-1 h-4 w-4" />
-                                                </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" >
-                                                {[10, 25, 50, 100].map((size) => (
-                                                    <DropdownMenuCheckboxItem
-                                                        key={size}
-                                                        checked={rows === size}
-                                                        onCheckedChange={() => setRows(size)}
-                                                        className="text-sm "
-                                                    >
-                                                        {size} baris
-                                                    </DropdownMenuCheckboxItem>
-                                                ))}
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="testing-table-body">
-                                <div className="rounded-md border">
-                                    <Table>
-                                        <TableHeader>
-                                            {submissionTable.getHeaderGroups().map((headerGroup) => (
-                                                <TableRow key={headerGroup.id}>
-                                                    {headerGroup.headers.map((header) => {
-                                                        return (
-                                                            <TableHead key={header.id}>
-                                                                {header.isPlaceholder
-                                                                    ? null
-                                                                    : flexRender(
-                                                                        header.column.columnDef.header,
-                                                                        header.getContext()
-                                                                    )}
-                                                            </TableHead>
-                                                        )
-                                                    })}
-                                                </TableRow>
-                                            ))}
-                                        </TableHeader>
-                                        <TableBody>
-                                            {submissionTable.getRowModel().rows?.length ? (
-                                                submissionTable.getRowModel().rows.map((row) => (
-                                                    <TableRow
-                                                        key={row.id}
-                                                    >
-                                                        {row.getVisibleCells().map((cell) => (
-                                                            <TableCell key={cell.id}>
-                                                                {flexRender(
-                                                                    cell.column.columnDef.cell,
-                                                                    cell.getContext()
-                                                                )}
-                                                            </TableCell>
-                                                        ))}
-                                                    </TableRow>
-                                                ))
-                                            ) : (
-                                                <TableRow>
-                                                    <TableCell
-                                                        colSpan={submissionColumns.length}
-                                                        className="h-24 text-center"
-                                                    >
-                                                        No results.
-                                                    </TableCell>
-                                                </TableRow>
-                                            )}
-                                        </TableBody>
-                                    </Table>
-                                </div>
-                                <div className="flex items-center justify-end space-x-2 py-4">
-
-                                    <div className="space-x-2">
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => submissionTable.previousPage()}
-                                            disabled={!submissionTable.getCanPreviousPage()}
-                                        >
-                                            Previous
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            size="sm"
-                                            onClick={() => submissionTable.nextPage()}
-                                            disabled={!submissionTable.getCanNextPage()}
-                                        >
-                                            Next
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    {/*                <div className="space-x-2">*/}
+                    {/*                    <Button*/}
+                    {/*                        variant="outline"*/}
+                    {/*                        size="sm"*/}
+                    {/*                        onClick={() => submissionTable.previousPage()}*/}
+                    {/*                        disabled={!submissionTable.getCanPreviousPage()}*/}
+                    {/*                    >*/}
+                    {/*                        Previous*/}
+                    {/*                    </Button>*/}
+                    {/*                    <Button*/}
+                    {/*                        variant="outline"*/}
+                    {/*                        size="sm"*/}
+                    {/*                        onClick={() => submissionTable.nextPage()}*/}
+                    {/*                        disabled={!submissionTable.getCanNextPage()}*/}
+                    {/*                    >*/}
+                    {/*                        Next*/}
+                    {/*                    </Button>*/}
+                    {/*                </div>*/}
+                    {/*            </div>*/}
+                    {/*        </div>*/}
+                    {/*    </div>*/}
+                    {/*</div>*/}
                 </div>
             </div>
 
