@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class Submission extends Model
 {
@@ -33,9 +34,14 @@ class Submission extends Model
         parent::boot();
 
         static::created(function ($submission) {
-            $submission->code = 'SBM' . $submission->user_id . $submission->id;
+            $paddedUserId = str_pad($submission->user_id, 3, '0', STR_PAD_LEFT);
+            $paddedId = str_pad($submission->id, 3, '0', STR_PAD_LEFT);
+            $date = Carbon::parse($submission->test_submission_date)->format('Ymd');
+
+            $submission->code = 'SBM-' . $paddedUserId . $paddedId;
             $submission->saveQuietly();
         });
+
     }
 
 
