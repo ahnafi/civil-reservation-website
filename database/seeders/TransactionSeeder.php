@@ -30,7 +30,7 @@ class TransactionSeeder extends Seeder
                 "payment_receipt_image" => "bukti_bayar.jpg",
                 "payment_method" => "BANK JATENG",
                 "payment_date" => now(),
-            ],
+            ], // 2 success 5
             [
                 "submission_id" => 8,
                 "status" => "failed",
@@ -51,7 +51,7 @@ class TransactionSeeder extends Seeder
                 "payment_receipt_image" => "bukti_bayar.jpg",
                 "payment_method" => "BANK MANDIRI",
                 "payment_date" => now(),
-            ],
+            ], // 5 success 14
             [
                 "submission_id" => 17,
                 "status" => "failed",
@@ -66,7 +66,7 @@ class TransactionSeeder extends Seeder
                 "payment_receipt_image" => "bukti_bayar.jpg",
                 "payment_method" => "BANK BNI",
                 "payment_date" => now(),
-            ],
+            ], // 7 success 20
             [
                 "submission_id" => 21,
                 "status" => "success",
@@ -75,7 +75,7 @@ class TransactionSeeder extends Seeder
                 "payment_receipt_image" => "bukti_bayar.jpg",
                 "payment_method" => "BANK BRI",
                 "payment_date" => now(),
-            ],
+            ], // 8 success 21
             [
                 "submission_id" => 22,
                 "status" => "failed",
@@ -114,7 +114,7 @@ class TransactionSeeder extends Seeder
                 "payment_receipt_image" => "bukti_bayar.jpg",
                 "payment_method" => "BANK BRI",
                 "payment_date" => now(),
-            ],
+            ], // 14 success 27
             [
                 "submission_id" => 28,
                 "status" => "success",
@@ -123,7 +123,7 @@ class TransactionSeeder extends Seeder
                 "payment_receipt_image" => "bukti_bayar.jpg",
                 "payment_method" => "BANK BSI",
                 "payment_date" => now(),
-            ],
+            ], // 15 success 28
             [
                 "submission_id" => 29,
                 "status" => "success",
@@ -132,7 +132,7 @@ class TransactionSeeder extends Seeder
                 "payment_receipt_image" => "bukti_bayar.jpg",
                 "payment_method" => "BANK BTN",
                 "payment_date" => now(),
-            ],
+            ], // 16 success 29
             [
                 "submission_id" => 30,
                 "status" => "success",
@@ -141,7 +141,7 @@ class TransactionSeeder extends Seeder
                 "payment_receipt_image" => "bukti_bayar.jpg",
                 "payment_method" => "BANK JATENG",
                 "payment_date" => now(),
-            ],
+            ], // 17 success 30
             [
                 "submission_id" => 31,
                 "status" => "success",
@@ -150,7 +150,7 @@ class TransactionSeeder extends Seeder
                 "payment_receipt_image" => "bukti_bayar.jpg",
                 "payment_method" => "BANK MANDIRI",
                 "payment_date" => now(),
-            ],
+            ], // 18 success 31
             [
                 "submission_id" => 36,
                 "status" => "success",
@@ -159,7 +159,7 @@ class TransactionSeeder extends Seeder
                 "payment_receipt_image" => "bukti_bayar.jpg",
                 "payment_method" => "BANK BNI",
                 "payment_date" => now(),
-            ],
+            ], // 19 success 36
             [
                 "submission_id" => 37,
                 "status" => "success",
@@ -168,7 +168,7 @@ class TransactionSeeder extends Seeder
                 "payment_receipt_image" => "bukti_bayar.jpg",
                 "payment_method" => "BANK BRI",
                 "payment_date" => now(),
-            ],
+            ], // 20 success 37
             [
                 "submission_id" => 38,
                 "status" => "success",
@@ -177,7 +177,7 @@ class TransactionSeeder extends Seeder
                 "payment_receipt_image" => "bukti_bayar.jpg",
                 "payment_method" => "BANK BSI",
                 "payment_date" => now(),
-            ],
+            ], // 21 success 38
             [
                 "submission_id" => 39,
                 "status" => "success",
@@ -186,7 +186,7 @@ class TransactionSeeder extends Seeder
                 "payment_receipt_image" => "bukti_bayar.jpg",
                 "payment_method" => "BANK BTN",
                 "payment_date" => now(),
-            ],
+            ], // 22 success 39
             [
                 "submission_id" => 40,
                 "status" => "pending",
