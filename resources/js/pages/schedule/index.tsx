@@ -195,17 +195,29 @@ export default function DataTable({ submissions, tests, packages, laboratories}:
         const selected = date ?? new Date();
         setInitialDate(selected);
 
-        // If finalDate is undefined or was previously the same as initialDate, update it too
-        if (!finalDate || (initialDate && finalDate.getTime() === initialDate.getTime())) {
+        if (!finalDate || finalDate.getTime() === selected.getTime()) {
             setFinalDate(selected);
+            setAlertMessage(null);
+        } else if (selected.getTime() > finalDate.getTime()) {
+            setAlertMessage("Tanggal awal tidak boleh lebih besar dari tanggal akhir");
+            setFinalDate(selected);
+        } else {
+            setAlertMessage(null);
         }
     };
 
+
     // Final Date Select Handlers
     const handleFinalDateSelect = (date: Date | undefined) => {
-        if (!initialDate || !date) {
-            // handle the case when either date is missing
+        if (!date) {
+            setFinalDate(undefined);
+            return;
+        }
+
+        if (!initialDate) {
+            setInitialDate(date);
             setFinalDate(date);
+            setAlertMessage(null);
             return;
         }
 
@@ -214,7 +226,7 @@ export default function DataTable({ submissions, tests, packages, laboratories}:
         } else if (date.getTime() < initialDate.getTime()) {
             setAlertMessage("Tanggal akhir tidak boleh lebih kecil dari tanggal awal");
             setFinalDate(initialDate);
-            setFinalDateKey(Date.now());
+            setFinalDateKey(Date.now()); // Force re-render if needed
         } else {
             setFinalDate(date);
             setAlertMessage(null);
