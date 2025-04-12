@@ -719,7 +719,7 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                             <div className="rounded-md border">
                                 <Table>
                                     <TableHeader>
-                                        {submissionTable.getHeaderGroups().map((headerGroup) => (
+                                        {transactionTable.getHeaderGroups().map((headerGroup) => (
                                             <TableRow key={headerGroup.id}>
                                                 {headerGroup.headers.map((header) => {
                                                     return (
@@ -737,8 +737,8 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                         ))}
                                     </TableHeader>
                                     <TableBody>
-                                        {submissionTable.getRowModel().rows?.length ? (
-                                            submissionTable.getRowModel().rows.map((row) => (
+                                        {transactionTable.getRowModel().rows?.length ? (
+                                            transactionTable.getRowModel().rows.map((row) => (
                                                 <TableRow
                                                     key={row.id}
                                                 >
@@ -755,7 +755,7 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                         ) : (
                                             <TableRow>
                                                 <TableCell
-                                                    colSpan={submissionColumns.length}
+                                                    colSpan={transactionColumns.length}
                                                     className="h-24 text-center"
                                                 >
                                                     No results.
