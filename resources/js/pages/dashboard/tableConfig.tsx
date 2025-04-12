@@ -31,6 +31,12 @@ export const transactionStatusOptions: SimpleOption[] = [
     { id: 3, name: "Failed" },
 ];
 
+// Testing Status Options
+export const testingStatusOptions: SimpleOption[] = [
+    { id: 1, name: "Testing" },
+    { id: 2, name: "Completed" },
+];
+
 // Transaction Payment Method Options
 export const paymentMethodOptions: SimpleOption[] = [
     { id: 1, name: "BANK JATENG" },
@@ -48,6 +54,14 @@ export const transactionColumnLabels: Record<string, string> = {
     amount: "Jumlah",
     payment_invoice_file: "Invoice",
     status: "Status Pembayaran",
+    detail: "Detail",
+};
+
+// Testing Column Labels
+export const testingColumnLabels: Record<string, string> = {
+    code: "Kode Pengujian",
+    test_date: "Tanggal Pengujian",
+    status: "Status Pengujian",
     detail: "Detail",
 };
 
