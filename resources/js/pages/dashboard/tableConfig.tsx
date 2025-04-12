@@ -3,6 +3,8 @@ import { type SubmissionSchedule, Transaction, Testing, SimpleOption } from "@/t
 import * as React from "react";
 import {Button} from "@/components/ui/button";
 import {ArrowUpDown} from "lucide-react";
+import { format, parseISO } from "date-fns";
+import { id } from "date-fns/locale";
 
 // Submission Column Labels
 export const submissionColumnLabels: Record<string, string> = {
@@ -21,6 +23,43 @@ export const submissionStatusOptions: SimpleOption[] = [
     { id: 2, name: "Rejected" },
     { id: 3, name: "Submitted" },
 ];
+
+// Transaction Status Options
+export const transactionStatusOptions: SimpleOption[] = [
+    { id: 1, name: "Pending" },
+    { id: 2, name: "Success" },
+    { id: 3, name: "Failed" },
+];
+
+// Transaction Payment Method Options
+export const paymentMethodOptions: SimpleOption[] = [
+    { id: 1, name: "BANK JATENG" },
+    { id: 2, name: "BANK MANDIRI" },
+    { id: 3, name: "BANK BNI" },
+    { id: 4, name: "BANK BRI" },
+    { id: 5, name: "BANK BSI" },
+    { id: 6, name: "BANK BTN" },
+];
+
+// Tranction Column Labels
+export const transactionColumnLabels: Record<string, string> = {
+    code: "Kode Transaksi",
+    created_at: "Tanggal Dibuat",
+    amount: "Jumlah",
+    payment_invoice_file: "Invoice",
+    status: "Status Pembayaran",
+    detail: "Detail",
+};
+
+// Format Rupiah  Function
+const formatRupiah = (value: number, currency = 'IDR') => {
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: currency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+    }).format(value);
+};
 
 // Submission Columns Definition
 export const submissionColumns: ColumnDef<SubmissionSchedule>[] = [
@@ -101,7 +140,7 @@ export const submissionColumns: ColumnDef<SubmissionSchedule>[] = [
                         : "bg-yellow-500"
 
             return (
-                <div className={`capitalize text-center items-center rounded-2xl py-1  font-medium ${statusColor}`}>
+                <div className={`capitalize text-center items-center rounded-2xl py-1  font-semibold ${statusColor}`}>
                     {row.getValue("status")}
                 </div>
             )
@@ -123,16 +162,6 @@ export const submissionColumns: ColumnDef<SubmissionSchedule>[] = [
     },
 ];
 
-// Format Rupiah  Function
-const formatRupiah = (value: number, currency = 'IDR') => {
-    return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: currency,
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-    }).format(value);
-};
-
 // Transaction Column Definition
 export const transactionColumns: ColumnDef<Transaction>[] = [
     {
@@ -147,6 +176,17 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
         ),
     },
     {
+        accessorKey: "created_at",
+        header: () => <div className="text-center">Tanggal Waktu Dibuat</div>,
+        cell: ({ row }) => {
+            const createdAtRaw = row.getValue("created_at") as string;
+            const createdAt = parseISO(createdAtRaw);
+            const formatted = format(createdAt, "dd MMMM yyyy, HH:mm", { locale: id });
+
+            return <div className="text-center">{formatted}</div>;
+        }
+    },
+    {
         accessorKey: "amount",
         header: () => <div className="text-center">Jumlah</div>,
         cell: ({ row }) => {
@@ -156,7 +196,7 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
     },
     {
         accessorKey: "status",
-        header: () => <div className="text-center">Status Pembayaran</div>,
+        header: () => <div className="w-full text-center">Status Pembayaran</div>,
         cell: ({ row }) => {
             const status = row.getValue("status") as string;
             const statusColor =
@@ -167,11 +207,13 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
                         : "bg-red-500";
 
             return (
-                <div className={`capitalize text-center items-center rounded-2xl py-1  font-medium ${statusColor}`}>
-                    {row.getValue("status")}
+                <div className="w-full flex justify-center">
+                    <div className={`capitalize text-white text-center text-md rounded-2xl py-1 px-5 font-semibold ${statusColor}`}>
+                        {status}
+                    </div>
                 </div>
             );
-        }
+        },
     },
     {
         id: "detail",
