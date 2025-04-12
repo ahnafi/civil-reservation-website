@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -27,9 +28,14 @@ class Testing extends Model
         parent::boot();
 
         static::created(function ($testing) {
-            $testing->code = 'UJI' . $testing->id . $testing->test_date;
+            $date = Carbon::parse($testing->test_date)->format('Ymd');
+            $submissionId = str_pad($testing->submission_id ?? 0, 3, '0', STR_PAD_LEFT);
+            $testingId = str_pad($testing->id ?? 0, 3, '0', STR_PAD_LEFT);
+
+            $testing->code = 'UJI-' . $date . '-' . $submissionId . $testingId;
             $testing->saveQuietly();
         });
+
     }
 
     protected $casts = [
