@@ -18,6 +18,7 @@ class Transaction extends Model
         "amount",
         "payment_method",
         "status",
+        "payment_deadline",
         "payment_date",
         "submission_id",
         "note"
@@ -28,12 +29,18 @@ class Transaction extends Model
         parent::boot();
 
         static::creating(function ($transaction) {
+
+            // Generate a unique code for the transaction
             $submission = $transaction->submission;
             $submissionId = $submission?->id ?? '000';
             $userId = $submission?->user_id ?? '000';
             $transactionCount = $submission ? $submission->transactions()->count() + 1 : 1;
-
             $transaction->code = 'CVL-' . now()->format('Ymd') . $submissionId . $userId . $transactionCount;
+
+            // Set the payment deadline to 1 day from now
+            if (is_null($transaction->payment_deadline)) {
+                $transaction->payment_deadline = now()->addDay();
+            }
         });
     }
 
