@@ -164,7 +164,7 @@ export interface Testing {
     status: TestingStatus;
     note?: string | null;
     documents?: string | null;
-    test_date?: string;
+    test_date: string;
     completed_at?: string | null;
     submission_id: number;
     created_at: string;
