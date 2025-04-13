@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->enum("status", ["testing", "completed"]);
             $table->text("note")->nullable();
             $table->text("documents")->nullable();
-            $table->dateTime("test_date")->nullable();
+            $table->date("test_date")->nullable();
             $table->dateTime("completed_at")->nullable();
             $table->foreignId("submission_id")->constrained()->cascadeOnDelete();
             $table->timestamps();
