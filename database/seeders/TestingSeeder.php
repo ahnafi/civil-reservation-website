@@ -42,21 +42,21 @@ class TestingSeeder extends Seeder
             ],
             [
                 "submission_id" => 28,
-                "status" => "completed",
+                "status" => "testing",
                 "documents" => "hasil_uji.pdf",
                 "test_date" => Submission::find(28)->test_submission_date,
                 "completed_at" => Carbon::parse(Submission::find(28)->test_submission_date)->addDays(7),
             ],
             [
                 "submission_id" => 29,
-                "status" => "completed",
+                "status" => "testing",
                 "documents" => "hasil_uji.pdf",
                 "test_date" => Submission::find(29)->test_submission_date,
                 "completed_at" => Carbon::parse(Submission::find(29)->test_submission_date)->addDays(7)
             ],
             [
                 "submission_id" => 30,
-                "status" => "completed",
+                "status" => "testing",
                 "documents" => "hasil_uji.pdf",
                 "test_date" => Submission::find(30)->test_submission_date,
                 "completed_at" => Carbon::parse(Submission::find(30)->test_submission_date)->addDays(7),
