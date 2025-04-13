@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { type SubmissionSchedule, Transaction, Testing, SimpleOption } from "@/types";
 import * as React from "react";
 import {Button} from "@/components/ui/button";
-import {ArrowUpDown} from "lucide-react";
+import {ArrowUpDown, Download} from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { id } from "date-fns/locale";
 
@@ -220,6 +220,41 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
         cell: ({ row }) => {
             const amount = row.getValue("amount") as number;
             return <div className="text-center">{formatRupiah(amount)}</div>;
+        },
+    },
+    {
+        accessorKey: "payment_invoice_file",
+        header: () => <div className="text-center">Invoice</div>,
+        cell: ({ row }) => {
+            const invoice = row.getValue("payment_invoice_file") as string | null;
+
+            const handleDownload = () => {
+                if (invoice) {
+                    const url =`/storage/payment_invoice/${invoice}`;
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.target="_blank";
+                    link.download = invoice;
+                    console.log(url);
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            };
+
+            return (
+                <div className="flex justify-center">
+                    {invoice ? (
+                        <Button onClick={handleDownload} size="sm"
+                                className="cursor-pointer gap-1">
+                            <Download size={14} />
+                            Download
+                        </Button>
+                    ) : (
+                        "-"
+                    )}
+                </div>
+            );
         },
     },
     {
