@@ -112,11 +112,13 @@ export const submissionColumns: ColumnDef<SubmissionSchedule>[] = [
                 <ArrowUpDown />
             </Button>
         ),
-        cell: ({ row }) => (
-            <div className="capitalize flex justify-center text-center w-[5rem]">
-                {row.getValue("test_submission_date")}
-            </div>
-        ),
+        cell: ({ row }) => {
+            const testDateRaw = row.getValue("test_submission_date") as string;
+            const testDate = parseISO(testDateRaw);
+            const formatted = format(testDate, "dd-MM-yyyy");
+
+            return <div className="capitalize flex justify-center text-center w-[5rem]">{formatted}</div>;
+        }
     },
     {
         accessorKey: "company_name",
@@ -192,10 +194,22 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
     {
         accessorKey: "created_at",
         header: () => <div className="text-center">Tanggal Waktu Dibuat</div>,
+        enableColumnFilter: true,
+        filterFn: (row, columnId, filterValue) => {
+            const rowDate = new Date(row.getValue(columnId));
+            const start = new Date(filterValue.start);
+            const end = filterValue.end ? new Date(filterValue.end) : start;
+
+            start.setHours(0, 0, 0, 0);
+            end.setHours(23, 59, 59, 999);
+            rowDate.setHours(12, 0, 0, 0);
+
+            return rowDate >= start && rowDate <= end;
+        },
         cell: ({ row }) => {
             const createdAtRaw = row.getValue("created_at") as string;
             const createdAt = parseISO(createdAtRaw);
-            const formatted = format(createdAt, "dd MMMM yyyy, HH:mm", { locale: id });
+            const formatted = format(createdAt, "dd-MM-yyyy, HH:mm", { locale: id });
 
             return <div className="text-center">{formatted}</div>;
         }
@@ -259,11 +273,26 @@ export const testingColumns: ColumnDef<Testing>[] = [
         ),
     },
     {
-         accessorKey: "test_date",
-         header: () => <div className="text-center">Tanggal Pengujian</div>,
+        accessorKey: "test_date",
+        header: () => <div className="text-center">Tanggal Pengujian</div>,
+        enableColumnFilter: true,
+        filterFn: (row, columnId, filterValue) => {
+            const rowDate = new Date(row.getValue(columnId));
+            const start = new Date(filterValue.start);
+            const end = filterValue.end ? new Date(filterValue.end) : start;
+
+            start.setHours(0, 0, 0, 0);
+            end.setHours(23, 59, 59, 999);
+            rowDate.setHours(12, 0, 0, 0);
+
+            return rowDate >= start && rowDate <= end;
+        },
          cell: ({ row }) => {
-             const testDate = row.getValue("test_date") as string;
-             return <div className="text-center">{testDate}</div>;
+             const testDateRaw = row.getValue("test_date") as string;
+             const testDate = parseISO(testDateRaw);
+             const formatted = format(testDate, "dd-MM-yyyy");
+
+             return <div className="text-center">{formatted}</div>;
          }
     },
     {
@@ -279,8 +308,10 @@ export const testingColumns: ColumnDef<Testing>[] = [
                         : "bg-red-500";
 
             return (
-                <div className={`capitalize text-center items-center rounded-2xl py-1  font-medium ${statusColor}`}>
-                    {row.getValue("status")}
+                <div className="w-full flex justify-center">
+                    <div className={`capitalize text-center items-center rounded-2xl py-1 px-5 font-medium ${statusColor}`}>
+                        {row.getValue("status")}
+                    </div>
                 </div>
             );
         }
