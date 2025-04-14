@@ -27,7 +27,7 @@ class TransactionSeeder extends Seeder
                 "status" => "success",
                 "amount" => Submission::find(5)->total_cost,
                 "payment_invoice_file" => "invoice.pdf",
-                "payment_receipt_image" => "bukti_bayar.jpg",
+                "payment_receipt_image" => "bukti_bayar.jpeg",
                 "payment_method" => "BANK JATENG",
                 "payment_date" => now(),
             ], // 2 success 5
@@ -48,7 +48,7 @@ class TransactionSeeder extends Seeder
                 "status" => "success",
                 "amount" => Submission::find(14)->total_cost,
                 "payment_invoice_file" => "invoice.pdf",
-                "payment_receipt_image" => "bukti_bayar.jpg",
+                "payment_receipt_image" => "bukti_bayar.jpeg",
                 "payment_method" => "BANK MANDIRI",
                 "payment_date" => now(),
             ], // 5 success 14
@@ -63,7 +63,7 @@ class TransactionSeeder extends Seeder
                 "status" => "success",
                 "amount" => Submission::find(20)->total_cost,
                 "payment_invoice_file" => "invoice.pdf",
-                "payment_receipt_image" => "bukti_bayar.jpg",
+                "payment_receipt_image" => "bukti_bayar.jpeg",
                 "payment_method" => "BANK BNI",
                 "payment_date" => now(),
             ], // 7 success 20
@@ -72,7 +72,7 @@ class TransactionSeeder extends Seeder
                 "status" => "success",
                 "amount" => Submission::find(21)->total_cost,
                 "payment_invoice_file" => "invoice.pdf",
-                "payment_receipt_image" => "bukti_bayar.jpg",
+                "payment_receipt_image" => "bukti_bayar.jpeg",
                 "payment_method" => "BANK BRI",
                 "payment_date" => now(),
             ], // 8 success 21
@@ -111,7 +111,7 @@ class TransactionSeeder extends Seeder
                 "status" => "success",
                 "amount" => Submission::find(27)->total_cost,
                 "payment_invoice_file" => "invoice.pdf",
-                "payment_receipt_image" => "bukti_bayar.jpg",
+                "payment_receipt_image" => "bukti_bayar.jpeg",
                 "payment_method" => "BANK BRI",
                 "payment_date" => now(),
             ], // 14 success 27
@@ -120,7 +120,7 @@ class TransactionSeeder extends Seeder
                 "status" => "success",
                 "amount" => Submission::find(28)->total_cost,
                 "payment_invoice_file" => "invoice.pdf",
-                "payment_receipt_image" => "bukti_bayar.jpg",
+                "payment_receipt_image" => "bukti_bayar.jpeg",
                 "payment_method" => "BANK BSI",
                 "payment_date" => now(),
             ], // 15 success 28
@@ -129,7 +129,7 @@ class TransactionSeeder extends Seeder
                 "status" => "success",
                 "amount" => Submission::find(29)->total_cost,
                 "payment_invoice_file" => "invoice.pdf",
-                "payment_receipt_image" => "bukti_bayar.jpg",
+                "payment_receipt_image" => "bukti_bayar.jpeg",
                 "payment_method" => "BANK BTN",
                 "payment_date" => now(),
             ], // 16 success 29
@@ -138,7 +138,7 @@ class TransactionSeeder extends Seeder
                 "status" => "success",
                 "amount" => Submission::find(30)->total_cost,
                 "payment_invoice_file" => "invoice.pdf",
-                "payment_receipt_image" => "bukti_bayar.jpg",
+                "payment_receipt_image" => "bukti_bayar.jpeg",
                 "payment_method" => "BANK JATENG",
                 "payment_date" => now(),
             ], // 17 success 30
@@ -147,7 +147,7 @@ class TransactionSeeder extends Seeder
                 "status" => "success",
                 "amount" => Submission::find(31)->total_cost,
                 "payment_invoice_file" => "invoice.pdf",
-                "payment_receipt_image" => "bukti_bayar.jpg",
+                "payment_receipt_image" => "bukti_bayar.jpeg",
                 "payment_method" => "BANK MANDIRI",
                 "payment_date" => now(),
             ], // 18 success 31
@@ -156,7 +156,7 @@ class TransactionSeeder extends Seeder
                 "status" => "success",
                 "amount" => Submission::find(36)->total_cost,
                 "payment_invoice_file" => "invoice.pdf",
-                "payment_receipt_image" => "bukti_bayar.jpg",
+                "payment_receipt_image" => "bukti_bayar.jpeg",
                 "payment_method" => "BANK BNI",
                 "payment_date" => now(),
             ], // 19 success 36
@@ -165,7 +165,7 @@ class TransactionSeeder extends Seeder
                 "status" => "success",
                 "amount" => Submission::find(37)->total_cost,
                 "payment_invoice_file" => "invoice.pdf",
-                "payment_receipt_image" => "bukti_bayar.jpg",
+                "payment_receipt_image" => "bukti_bayar.jpeg",
                 "payment_method" => "BANK BRI",
                 "payment_date" => now(),
             ], // 20 success 37
@@ -174,7 +174,7 @@ class TransactionSeeder extends Seeder
                 "status" => "success",
                 "amount" => Submission::find(38)->total_cost,
                 "payment_invoice_file" => "invoice.pdf",
-                "payment_receipt_image" => "bukti_bayar.jpg",
+                "payment_receipt_image" => "bukti_bayar.jpeg",
                 "payment_method" => "BANK BSI",
                 "payment_date" => now(),
             ], // 21 success 38
@@ -183,7 +183,7 @@ class TransactionSeeder extends Seeder
                 "status" => "success",
                 "amount" => Submission::find(39)->total_cost,
                 "payment_invoice_file" => "invoice.pdf",
-                "payment_receipt_image" => "bukti_bayar.jpg",
+                "payment_receipt_image" => "bukti_bayar.jpeg",
                 "payment_method" => "BANK BTN",
                 "payment_date" => now(),
             ], // 22 success 39
