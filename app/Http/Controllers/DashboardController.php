@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Laboratory;
 use App\Models\Package;
 use App\Models\Submission;
@@ -39,6 +40,24 @@ class DashboardController extends Controller
             'userSubmissions' => $userSubmissions,
             'userTransactions' => $userTransactions,
             'userTestings' => $userTestings,
+            'tests' => $tests,
+            'packages' => $packages,
+            'laboratories' => $laboratories,
+        ]);
+    }
+
+    public function submissionsHistory(): Response
+    {
+        $userSubmissions = Submission::withUserScheduleJoin()
+            ->where('submissions.user_id', auth()->id())
+            ->get();
+
+        $tests = Test::select(['id', 'name'])->get();
+        $packages = Package::select(['id', 'name'])->get();
+        $laboratories = Laboratory::select(['id', 'code', 'name'])->get();
+
+        return Inertia::render('history/submissions', [
+            'userSubmissions' => $userSubmissions,
             'tests' => $tests,
             'packages' => $packages,
             'laboratories' => $laboratories,

@@ -1,52 +1,45 @@
 ('use-client');
 
-import  * as React from "react"
-import {useEffect, useState} from "react";
-import type { Table as TanStackTable } from "@tanstack/react-table";
+import { DatePicker } from '@/components/DatePicker';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { ChartConfig, ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import DropdownSelect from '@/components/ui/DropdownSelect';
+import { Input } from '@/components/ui/input';
+import SearchableSelect from '@/components/ui/SearchableSelect';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem, LaboratorySimple, SimpleOption, type SubmissionSchedule, Testing, Transaction } from '@/types';
+import { Head } from '@inertiajs/react';
+import type { Table as TanStackTable } from '@tanstack/react-table';
 import {
     ColumnFiltersState,
-    SortingState,
-    VisibilityState,
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
     getPaginationRowModel,
     getSortedRowModel,
+    SortingState,
     useReactTable,
-} from "@tanstack/react-table"
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
-import { Card } from '@/components/ui/card';
-import { ChartConfig, ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+    VisibilityState,
+} from '@tanstack/react-table';
+import { Check, ChevronDown, FlaskConical, HardHat, X } from 'lucide-react';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts';
-import {type SubmissionSchedule, Transaction, Testing, SimpleOption, Laboratory_Simple} from "@/types";
 import {
-    submissionColumns, submissionColumnLabels, submissionStatusOptions,
-    transactionColumns, transactionColumnLabels, transactionStatusOptions,
-    testingColumns, testingColumnLabels, testingStatusOptions
-} from "./tableConfig";
-import {Button} from "@/components/ui/button";
-import SearchableSelect from "@/components/ui/SearchableSelect";
-import {Check, ChevronDown, FlaskConical, HardHat, X} from "lucide-react";
-import DropdownSelect from "@/components/ui/DropdownSelect";
-import {DatePicker} from "@/components/DatePicker";
-import {Input} from "@/components/ui/input";
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import {toast, ToastContainer} from "react-toastify";
+    submissionColumnLabels,
+    submissionColumns,
+    submissionStatusOptions,
+    testingColumnLabels,
+    testingColumns,
+    testingStatusOptions,
+    transactionColumnLabels,
+    transactionColumns,
+    transactionStatusOptions,
+} from './tableConfig';
 
 const chartData = [
     { month: 'January', desktop: 186, mobile: 80 },
@@ -68,15 +61,21 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
-export default function MainDashboard({ userSubmissions, userTransactions, userTestings, tests, packages, laboratories}: {
-    userSubmissions: SubmissionSchedule[],
-    userTransactions: Transaction[],
-    userTestings: Testing[],
-    tests: SimpleOption[],
-    packages: SimpleOption[],
-    laboratories: Laboratory_Simple[] })
-{
-
+export default function MainDashboard({
+    userSubmissions,
+    userTransactions,
+    userTestings,
+    tests,
+    packages,
+    laboratories,
+}: {
+    userSubmissions: SubmissionSchedule[];
+    userTransactions: Transaction[];
+    userTestings: Testing[];
+    tests: SimpleOption[];
+    packages: SimpleOption[];
+    laboratories: LaboratorySimple[];
+}) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Dashboard',
@@ -109,7 +108,7 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
     const [testingRows, setTestingRows] = useState<number>(10);
 
     // Submission Table Filter State
-    const [submissionSelectedLab, setSubmissionSelectedLab] = useState<Laboratory_Simple | null>(null);
+    const [submissionSelectedLab, setSubmissionSelectedLab] = useState<LaboratorySimple | null>(null);
     const [submissionSelectedTest, setSubmissionSelectedTest] = useState<SimpleOption | null>(null);
     const [submissionSelectedStatus, setSubmissionSelectedStatus] = useState<SimpleOption | null>(null);
 
@@ -142,7 +141,7 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
         date: Date | undefined,
         setInitialDate: (date: Date | undefined) => void,
         setFinalDate: (date: Date | undefined) => void,
-        finalDate: Date | undefined
+        finalDate: Date | undefined,
     ) => {
         const selected = date ?? new Date();
         setInitialDate(selected);
@@ -150,7 +149,7 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
         if (!finalDate || (date && finalDate.getTime() === selected.getTime())) {
             setFinalDate(selected);
         } else if (selected.getTime() > finalDate.getTime()) {
-            setAlertMessage("Tanggal awal tidak boleh lebih besar dari tanggal akhir");
+            setAlertMessage('Tanggal awal tidak boleh lebih besar dari tanggal akhir');
             setFinalDate(selected);
         } else {
             setAlertMessage(null);
@@ -164,7 +163,7 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
         setInitialDate: (date: Date | undefined) => void,
         setFinalDate: (date: Date | undefined) => void,
         setAlertMessage: (msg: string | null) => void,
-        setFinalDateKey: (key: number) => void
+        setFinalDateKey: (key: number) => void,
     ) => {
         if (!initialDate || !date) {
             setFinalDate(date);
@@ -181,7 +180,7 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
         if (date.getTime() === initialDate.getTime()) {
             setFinalDate(date);
         } else if (date.getTime() < initialDate.getTime()) {
-            setAlertMessage("Tanggal akhir tidak boleh lebih kecil dari tanggal awal");
+            setAlertMessage('Tanggal akhir tidak boleh lebih kecil dari tanggal awal');
             setFinalDate(initialDate);
             setFinalDateKey(Date.now());
         } else {
@@ -207,7 +206,7 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
             columnVisibility: submissionVisibility,
             rowSelection: submissionSelection,
         },
-    })
+    });
 
     // Transaction Table Definition
     const transactionTable = useReactTable<Transaction>({
@@ -223,11 +222,11 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
         onRowSelectionChange: setTransactionSelection,
         state: {
             sorting: transactionSorting,
-            columnFilters:  transactionFilters,
+            columnFilters: transactionFilters,
             columnVisibility: transactionVisibility,
             rowSelection: transactionSelection,
         },
-    })
+    });
 
     // Testing Table Definition
     const testingTable = useReactTable<Testing>({
@@ -247,17 +246,13 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
             columnVisibility: testingVisibility,
             rowSelection: testingSelection,
         },
-    })
+    });
 
     // Column Filter Update
-    const updateColumnFilter = (
-        setFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>,
-        columnId: string,
-        value: any
-    ) => {
+    const updateColumnFilter = (setFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>, columnId: string, value: any) => {
         setFilters((prevFilters) => {
             const otherFilters = prevFilters.filter((f) => f.id !== columnId);
-            if (value === undefined || value === null || value === "") {
+            if (value === undefined || value === null || value === '') {
                 return otherFilters;
             }
             return [...otherFilters, { id: columnId, value }];
@@ -267,36 +262,36 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
     // Submission Date Column Filter Effect
     useEffect(() => {
         if (submissionInitialDate) {
-            updateColumnFilter(setSubmissionFilters, "test_submission_date", {
+            updateColumnFilter(setSubmissionFilters, 'test_submission_date', {
                 start: submissionInitialDate,
                 end: submissionFinalDate ?? submissionInitialDate,
-            })
+            });
         } else {
-            updateColumnFilter(setSubmissionFilters, "test_submission_date", undefined);
+            updateColumnFilter(setSubmissionFilters, 'test_submission_date', undefined);
         }
     }, [submissionInitialDate, submissionFinalDate]);
 
     // Transaction Date Column Filter Effect
     useEffect(() => {
         if (transactionInitialDate) {
-            updateColumnFilter(setTransactionFilters, "created_at", {
+            updateColumnFilter(setTransactionFilters, 'created_at', {
                 start: transactionInitialDate,
                 end: transactionFinalDate ?? transactionInitialDate,
-            })
+            });
         } else {
-            updateColumnFilter(setTransactionFilters, "created_at", undefined);
+            updateColumnFilter(setTransactionFilters, 'created_at', undefined);
         }
     }, [transactionInitialDate, transactionFinalDate]);
 
     // Testing Date Column Filter Effect
     useEffect(() => {
         if (testingInitialDate) {
-            updateColumnFilter(setTestingFilters, "test_date", {
+            updateColumnFilter(setTestingFilters, 'test_date', {
                 start: testingInitialDate,
                 end: testingFinalDate ?? testingInitialDate,
-            })
+            });
         } else {
-            updateColumnFilter(setTestingFilters, "test_date", undefined);
+            updateColumnFilter(setTestingFilters, 'test_date', undefined);
         }
     }, [testingInitialDate, testingFinalDate]);
 
@@ -304,7 +299,7 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
     const useColumnFilterEffect = (
         selectedOption: SimpleOption | null,
         setFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>,
-        columnId: string
+        columnId: string,
     ) => {
         useEffect(() => {
             if (selectedOption?.name) {
@@ -317,40 +312,24 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
 
     // Submission Lab Column Filter Effect
     useEffect(() => {
-        if(submissionSelectedLab?.name) {
-            updateColumnFilter(setSubmissionFilters, "lab_code", submissionSelectedLab.code);
+        if (submissionSelectedLab?.name) {
+            updateColumnFilter(setSubmissionFilters, 'lab_code', submissionSelectedLab.code);
         } else {
-            updateColumnFilter(setSubmissionFilters,"lab_code", undefined);
+            updateColumnFilter(setSubmissionFilters, 'lab_code', undefined);
         }
     }, [submissionSelectedLab]);
 
     // Submission Test Column Filter Effect
-    useColumnFilterEffect(
-        submissionSelectedTest,
-        setSubmissionFilters,
-        "test_name"
-    );
+    useColumnFilterEffect(submissionSelectedTest, setSubmissionFilters, 'test_name');
 
     // Submission Status Column Filter Effect
-    useColumnFilterEffect(
-        submissionSelectedStatus,
-        setSubmissionFilters,
-        "status"
-    );
+    useColumnFilterEffect(submissionSelectedStatus, setSubmissionFilters, 'status');
 
     // Transaction Status Column Filter Effect
-    useColumnFilterEffect(
-        transactionSelectedStatus,
-        setTransactionFilters,
-        "status"
-    );
+    useColumnFilterEffect(transactionSelectedStatus, setTransactionFilters, 'status');
 
     // Testing Status Column Filter Effect
-    useColumnFilterEffect(
-        testingSelectedStatus,
-        setTestingFilters,
-        "status"
-    );
+    useColumnFilterEffect(testingSelectedStatus, setTestingFilters, 'status');
 
     // Row Pagination Effect
     const usePageSizeEffect = <T,>(table: TanStackTable<T>, rows: number) => {
@@ -372,7 +351,7 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
     useEffect(() => {
         if (alertMessage) {
             toast.error(alertMessage, {
-                position: "top-center",
+                position: 'top-center',
                 autoClose: 5000,
                 hideProgressBar: false,
                 closeOnClick: true,
@@ -398,7 +377,7 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                     <path d="M0 64C0 46.3 14.3 32 32 32l80 0c79.5 0 144 64.5 144 144c0 58.8-35.2 109.3-85.7 131.7l51.4 128.4c6.6 16.4-1.4 35-17.8 41.6s-35-1.4-41.6-17.8L106.3 320 64 320l0 128c0 17.7-14.3 32-32 32s-32-14.3-32-32L0 288 0 64zM64 256l48 0c44.2 0 80-35.8 80-80s-35.8-80-80-80L64 96l0 160zm256-96l80 0c61.9 0 112 50.1 112 112s-50.1 112-112 112l-48 0 0 96c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-128 0-160c0-17.7 14.3-32 32-32zm80 160c26.5 0 48-21.5 48-48s-21.5-48-48-48l-48 0 0 96 48 0z" />
                                 </svg>
                             </div>
-                            <p className="text-3xl font-semibold">{(50000)}</p>
+                            <p className="text-3xl font-semibold">{50000}</p>
                             <small className="text-muted-foreground">+20.1% from last month</small>
                         </Card>
                         <Card className="gap-2 p-4">
@@ -408,7 +387,7 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                     <path d="M0 64C0 46.3 14.3 32 32 32l80 0c79.5 0 144 64.5 144 144c0 58.8-35.2 109.3-85.7 131.7l51.4 128.4c6.6 16.4-1.4 35-17.8 41.6s-35-1.4-41.6-17.8L106.3 320 64 320l0 128c0 17.7-14.3 32-32 32s-32-14.3-32-32L0 288 0 64zM64 256l48 0c44.2 0 80-35.8 80-80s-35.8-80-80-80L64 96l0 160zm256-96l80 0c61.9 0 112 50.1 112 112s-50.1 112-112 112l-48 0 0 96c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-128 0-160c0-17.7 14.3-32 32-32zm80 160c26.5 0 48-21.5 48-48s-21.5-48-48-48l-48 0 0 96 48 0z" />
                                 </svg>
                             </div>
-                            <p className="text-3xl font-semibold">{(50000)}</p>
+                            <p className="text-3xl font-semibold">{50000}</p>
                             <small className="text-muted-foreground">+20.1% from last month</small>
                         </Card>
                         <Card className="gap-2 p-4">
@@ -418,7 +397,7 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                     <path d="M0 64C0 46.3 14.3 32 32 32l80 0c79.5 0 144 64.5 144 144c0 58.8-35.2 109.3-85.7 131.7l51.4 128.4c6.6 16.4-1.4 35-17.8 41.6s-35-1.4-41.6-17.8L106.3 320 64 320l0 128c0 17.7-14.3 32-32 32s-32-14.3-32-32L0 288 0 64zM64 256l48 0c44.2 0 80-35.8 80-80s-35.8-80-80-80L64 96l0 160zm256-96l80 0c61.9 0 112 50.1 112 112s-50.1 112-112 112l-48 0 0 96c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-128 0-160c0-17.7 14.3-32 32-32zm80 160c26.5 0 48-21.5 48-48s-21.5-48-48-48l-48 0 0 96 48 0z" />
                                 </svg>
                             </div>
-                            <p className="text-3xl font-semibold">{(50000)}</p>
+                            <p className="text-3xl font-semibold">{50000}</p>
                             <small className="text-muted-foreground">+20.1% from last month</small>
                         </Card>
                         <Card className="gap-2 p-4">
@@ -428,51 +407,42 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                     <path d="M0 64C0 46.3 14.3 32 32 32l80 0c79.5 0 144 64.5 144 144c0 58.8-35.2 109.3-85.7 131.7l51.4 128.4c6.6 16.4-1.4 35-17.8 41.6s-35-1.4-41.6-17.8L106.3 320 64 320l0 128c0 17.7-14.3 32-32 32s-32-14.3-32-32L0 288 0 64zM64 256l48 0c44.2 0 80-35.8 80-80s-35.8-80-80-80L64 96l0 160zm256-96l80 0c61.9 0 112 50.1 112 112s-50.1 112-112 112l-48 0 0 96c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-128 0-160c0-17.7 14.3-32 32-32zm80 160c26.5 0 48-21.5 48-48s-21.5-48-48-48l-48 0 0 96 48 0z" />
                                 </svg>
                             </div>
-                            <p className="text-3xl font-semibold">{(50000)}</p>
+                            <p className="text-3xl font-semibold">{50000}</p>
                             <small className="text-muted-foreground">+20.1% from last month</small>
                         </Card>
                     </div>
 
-                    { showChart && (
+                    {showChart && (
                         <div className="col-span-full space-y-2">
-                        <h2 className="font-semibold">Grafik Bulanan Laboratorium</h2>
-                        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-                            <BarChart accessibilityLayer data={chartData}>
-                                <CartesianGrid vertical={false} />
-                                <XAxis
-                                    dataKey="month"
-                                    tickLine={false}
-                                    tickMargin={10}
-                                    axisLine={false}
-                                    tickFormatter={(value) => value.slice(0, 3)}
-                                />
-                                <ChartTooltip content={<ChartTooltipContent />} />
-                                <ChartLegend content={<ChartLegendContent />} />
-                                <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-                                <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
-                            </BarChart>
-                        </ChartContainer>
-                    </div>
-                        )
-                    }
+                            <h2 className="font-semibold">Grafik Bulanan Laboratorium</h2>
+                            <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+                                <BarChart accessibilityLayer data={chartData}>
+                                    <CartesianGrid vertical={false} />
+                                    <XAxis
+                                        dataKey="month"
+                                        tickLine={false}
+                                        tickMargin={10}
+                                        axisLine={false}
+                                        tickFormatter={(value) => value.slice(0, 3)}
+                                    />
+                                    <ChartTooltip content={<ChartTooltipContent />} />
+                                    <ChartLegend content={<ChartLegendContent />} />
+                                    <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
+                                    <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
+                                </BarChart>
+                            </ChartContainer>
+                        </div>
+                    )}
 
                     <div className="submission col-span-full space-y-2">
                         <h2 className="title font-semibold">Daftar Pengajuan Pengujian</h2>
                         <div className="submission-table-cards-summary flex justify-evenly">
-                            <div className="total-submission-card">
-
-                            </div>
-                            <div className="submitted-submission-card">
-
-                            </div>
-                            <div className="approved-submission-card">
-
-                            </div>
-                            <div className="rejected-submission-card">
-
-                            </div>
+                            <div className="total-submission-card"></div>
+                            <div className="submitted-submission-card"></div>
+                            <div className="approved-submission-card"></div>
+                            <div className="rejected-submission-card"></div>
                         </div>
-                        <div className="submission-table-filters flex justify-between space-x-5 mx-10 mt-6">
+                        <div className="submission-table-filters mx-10 mt-6 flex justify-between space-x-5">
                             <div className="test-type">
                                 <SearchableSelect
                                     label="Jenis Pengujian"
@@ -518,9 +488,7 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                             }
                                         />
                                     </div>
-                                    <div className="flex justify-center items-center text-sm pt-5">
-                                        -
-                                    </div>
+                                    <div className="flex items-center justify-center pt-5 text-sm">-</div>
                                     <div className="final-date flex flex-col text-sm">
                                         <span>Tanggal Akhir:</span>
                                         <DatePicker
@@ -528,13 +496,20 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                             value={submissionInitialDate}
                                             placeholder="Pilih Tanggal Akhir"
                                             onDateSelect={(date) =>
-                                                handleFinalDateSelect(date, submissionInitialDate,setSubmissionInitialDate, setSubmissionFinalDate, setAlertMessage, setSubmissionFinalDateKey)
+                                                handleFinalDateSelect(
+                                                    date,
+                                                    submissionInitialDate,
+                                                    setSubmissionInitialDate,
+                                                    setSubmissionFinalDate,
+                                                    setAlertMessage,
+                                                    setSubmissionFinalDateKey,
+                                                )
                                             }
                                         />
                                     </div>
                                 </div>
 
-                                { (submissionInitialDate || submissionFinalDate) && (
+                                {(submissionInitialDate || submissionFinalDate) && (
                                     <div className="clear-date-button flex justify-end text-right">
                                         <Button
                                             variant="ghost"
@@ -542,10 +517,9 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                             onClick={() => {
                                                 setSubmissionInitialDate(undefined);
                                                 setSubmissionFinalDate(undefined);
-                                                setSubmissionFilters((prev) => prev.filter((f) => f.id !== "test_submission_date"));
+                                                setSubmissionFilters((prev) => prev.filter((f) => f.id !== 'test_submission_date'));
                                             }}
-
-                                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                                            className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs"
                                         >
                                             <X size={12} />
                                             Hapus Filter Tanggal
@@ -559,10 +533,8 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                 <div className="Code-Search">
                                     <Input
                                         placeholder="Cari Kode Pengajuan..."
-                                        value={(submissionTable.getColumn("code")?.getFilterValue() as string) ?? ""}
-                                        onChange={(e) =>
-                                            submissionTable.getColumn("code")?.setFilterValue(e.target.value)
-                                        }
+                                        value={(submissionTable.getColumn('code')?.getFilterValue() as string) ?? ''}
+                                        onChange={(e) => submissionTable.getColumn('code')?.setFilterValue(e.target.value)}
                                         className="max-w-sm"
                                     />
                                 </div>
@@ -584,13 +556,11 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                                                 key={column.id}
                                                                 className="capitalize"
                                                                 checked={column.getIsVisible()}
-                                                                onCheckedChange={(value) =>
-                                                                    column.toggleVisibility(!!value)
-                                                                }
+                                                                onCheckedChange={(value) => column.toggleVisibility(!!value)}
                                                             >
                                                                 {submissionColumnLabels[column.id] ?? column.id}
                                                             </DropdownMenuCheckboxItem>
-                                                        )
+                                                        );
                                                     })}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
@@ -602,13 +572,13 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                                     Tampilkan {submissionRows} Baris <ChevronDown className="ml-1 h-4 w-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" >
+                                            <DropdownMenuContent align="end">
                                                 {[10, 25, 50, 100].map((size) => (
                                                     <DropdownMenuCheckboxItem
                                                         key={size}
                                                         checked={submissionRows === size}
                                                         onCheckedChange={() => setSubmissionRows(size)}
-                                                        className="text-sm "
+                                                        className="text-sm"
                                                     >
                                                         {size} baris
                                                     </DropdownMenuCheckboxItem>
@@ -629,12 +599,9 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                                             <TableHead key={header.id}>
                                                                 {header.isPlaceholder
                                                                     ? null
-                                                                    : flexRender(
-                                                                        header.column.columnDef.header,
-                                                                        header.getContext()
-                                                                    )}
+                                                                    : flexRender(header.column.columnDef.header, header.getContext())}
                                                             </TableHead>
-                                                        )
+                                                        );
                                                     })}
                                                 </TableRow>
                                             ))}
@@ -642,25 +609,17 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                         <TableBody>
                                             {submissionTable.getRowModel().rows?.length ? (
                                                 submissionTable.getRowModel().rows.map((row) => (
-                                                    <TableRow
-                                                        key={row.id}
-                                                    >
+                                                    <TableRow key={row.id}>
                                                         {row.getVisibleCells().map((cell) => (
                                                             <TableCell key={cell.id}>
-                                                                {flexRender(
-                                                                    cell.column.columnDef.cell,
-                                                                    cell.getContext()
-                                                                )}
+                                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                                             </TableCell>
                                                         ))}
                                                     </TableRow>
                                                 ))
                                             ) : (
                                                 <TableRow>
-                                                    <TableCell
-                                                        colSpan={submissionColumns.length}
-                                                        className="h-24 text-center"
-                                                    >
+                                                    <TableCell colSpan={submissionColumns.length} className="h-24 text-center">
                                                         No results.
                                                     </TableCell>
                                                 </TableRow>
@@ -669,7 +628,6 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                     </Table>
                                 </div>
                                 <div className="flex items-center justify-end space-x-2 py-4">
-
                                     <div className="space-x-2">
                                         <Button
                                             variant="outline"
@@ -696,20 +654,12 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                     <div className="transaction col-span-full space-y-2">
                         <h2 className="title font-semibold">Daftar Transaksi</h2>
                         <div className="transaction-table-cards-summary flex justify-evenly">
-                            <div className="total-transaction-card">
-
-                            </div>
-                            <div className="pending-transaction-card">
-
-                            </div>
-                            <div className="success-transaction-card">
-
-                            </div>
-                            <div className="failed-transaction-card">
-
-                            </div>
+                            <div className="total-transaction-card"></div>
+                            <div className="pending-transaction-card"></div>
+                            <div className="success-transaction-card"></div>
+                            <div className="failed-transaction-card"></div>
                         </div>
-                        <div className="transaction-table-filters flex justify-between space-x-5 mx-10 mt-6">
+                        <div className="transaction-table-filters mx-10 mt-6 flex justify-between space-x-5">
                             <div className="Status-type">
                                 <DropdownSelect
                                     label="Status"
@@ -729,13 +679,16 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                             value={transactionInitialDate}
                                             placeholder="Pilih Tanggal Awal"
                                             onDateSelect={(date) =>
-                                                handleInitialDateSelect(date, setTransactionInitialDate, setTransactionFinalDate, transactionFinalDate)
+                                                handleInitialDateSelect(
+                                                    date,
+                                                    setTransactionInitialDate,
+                                                    setTransactionFinalDate,
+                                                    transactionFinalDate,
+                                                )
                                             }
                                         />
                                     </div>
-                                    <div className="flex justify-center items-center text-sm pt-5">
-                                        -
-                                    </div>
+                                    <div className="flex items-center justify-center pt-5 text-sm">-</div>
                                     <div className="final-date flex flex-col text-sm">
                                         <span>Tanggal Akhir:</span>
                                         <DatePicker
@@ -743,22 +696,29 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                             value={transactionFinalDate}
                                             placeholder="Pilih Tanggal Akhir"
                                             onDateSelect={(date) =>
-                                                handleFinalDateSelect(date, transactionInitialDate,setTransactionInitialDate, setTransactionFinalDate, setAlertMessage, setTransactionFinalDateKey)
+                                                handleFinalDateSelect(
+                                                    date,
+                                                    transactionInitialDate,
+                                                    setTransactionInitialDate,
+                                                    setTransactionFinalDate,
+                                                    setAlertMessage,
+                                                    setTransactionFinalDateKey,
+                                                )
                                             }
                                         />
                                     </div>
                                 </div>
 
-                                { (transactionInitialDate || transactionFinalDate) && (
+                                {(transactionInitialDate || transactionFinalDate) && (
                                     <div className="clear-date-button flex justify-end text-right">
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            onClick={ () => {
+                                            onClick={() => {
                                                 setTransactionInitialDate(undefined);
                                                 setTransactionFinalDate(undefined);
                                             }}
-                                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                                            className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs"
                                         >
                                             <X size={12} />
                                             Hapus Filter Tanggal
@@ -772,10 +732,8 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                 <div className="Code-Search">
                                     <Input
                                         placeholder="Cari Kode Transaksi..."
-                                        value={(transactionTable.getColumn("code")?.getFilterValue() as string) ?? ""}
-                                        onChange={(e) =>
-                                            transactionTable.getColumn("code")?.setFilterValue(e.target.value)
-                                        }
+                                        value={(transactionTable.getColumn('code')?.getFilterValue() as string) ?? ''}
+                                        onChange={(e) => transactionTable.getColumn('code')?.setFilterValue(e.target.value)}
                                         className="max-w-sm"
                                     />
                                 </div>
@@ -797,13 +755,11 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                                                 key={column.id}
                                                                 className="capitalize"
                                                                 checked={column.getIsVisible()}
-                                                                onCheckedChange={(value) =>
-                                                                    column.toggleVisibility(!!value)
-                                                                }
+                                                                onCheckedChange={(value) => column.toggleVisibility(!!value)}
                                                             >
                                                                 {transactionColumnLabels[column.id] ?? column.id}
                                                             </DropdownMenuCheckboxItem>
-                                                        )
+                                                        );
                                                     })}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
@@ -815,13 +771,13 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                                     Tampilkan {transactionRows} Baris <ChevronDown className="ml-1 h-4 w-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" >
+                                            <DropdownMenuContent align="end">
                                                 {[10, 25, 50, 100].map((size) => (
                                                     <DropdownMenuCheckboxItem
                                                         key={size}
                                                         checked={transactionRows === size}
                                                         onCheckedChange={() => setTransactionRows(size)}
-                                                        className="text-sm "
+                                                        className="text-sm"
                                                     >
                                                         {size} baris
                                                     </DropdownMenuCheckboxItem>
@@ -842,12 +798,9 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                                             <TableHead key={header.id}>
                                                                 {header.isPlaceholder
                                                                     ? null
-                                                                    : flexRender(
-                                                                        header.column.columnDef.header,
-                                                                        header.getContext()
-                                                                    )}
+                                                                    : flexRender(header.column.columnDef.header, header.getContext())}
                                                             </TableHead>
-                                                        )
+                                                        );
                                                     })}
                                                 </TableRow>
                                             ))}
@@ -855,25 +808,17 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                         <TableBody>
                                             {transactionTable.getRowModel().rows?.length ? (
                                                 transactionTable.getRowModel().rows.map((row) => (
-                                                    <TableRow
-                                                        key={row.id}
-                                                    >
+                                                    <TableRow key={row.id}>
                                                         {row.getVisibleCells().map((cell) => (
                                                             <TableCell key={cell.id}>
-                                                                {flexRender(
-                                                                    cell.column.columnDef.cell,
-                                                                    cell.getContext()
-                                                                )}
+                                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                                             </TableCell>
                                                         ))}
                                                     </TableRow>
                                                 ))
                                             ) : (
                                                 <TableRow>
-                                                    <TableCell
-                                                        colSpan={transactionColumns.length}
-                                                        className="h-24 text-center"
-                                                    >
+                                                    <TableCell colSpan={transactionColumns.length} className="h-24 text-center">
                                                         No results.
                                                     </TableCell>
                                                 </TableRow>
@@ -908,17 +853,11 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                     <div className="testing col-span-full space-y-2">
                         <h2 className="title font-semibold">Daftar Pengujian</h2>
                         <div className="testing-table-cards-summary flex justify-evenly">
-                            <div className="total-testing-card">
-
-                            </div>
-                            <div className="testing-testing-card">
-
-                            </div>
-                            <div className="completed-testing-card">
-
-                            </div>
+                            <div className="total-testing-card"></div>
+                            <div className="testing-testing-card"></div>
+                            <div className="completed-testing-card"></div>
                         </div>
-                        <div className="testing-table-filters flex justify-between space-x-5 mx-10 mt-6">
+                        <div className="testing-table-filters mx-10 mt-6 flex justify-between space-x-5">
                             <div className="Status-type">
                                 <DropdownSelect
                                     label="Status"
@@ -942,9 +881,7 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                             }
                                         />
                                     </div>
-                                    <div className="flex justify-center items-center text-sm pt-5">
-                                        -
-                                    </div>
+                                    <div className="flex items-center justify-center pt-5 text-sm">-</div>
                                     <div className="final-date flex flex-col text-sm">
                                         <span>Tanggal Akhir:</span>
                                         <DatePicker
@@ -952,22 +889,29 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                             value={testingFinalDate}
                                             placeholder="Pilih Tanggal Akhir"
                                             onDateSelect={(date) =>
-                                                handleFinalDateSelect(date, testingInitialDate,setTestingInitialDate, setTestingFinalDate, setAlertMessage, setTestingFinalDateKey)
+                                                handleFinalDateSelect(
+                                                    date,
+                                                    testingInitialDate,
+                                                    setTestingInitialDate,
+                                                    setTestingFinalDate,
+                                                    setAlertMessage,
+                                                    setTestingFinalDateKey,
+                                                )
                                             }
                                         />
                                     </div>
                                 </div>
 
-                                { (testingInitialDate || testingFinalDate) && (
+                                {(testingInitialDate || testingFinalDate) && (
                                     <div className="clear-date-button flex justify-end text-right">
                                         <Button
                                             variant="ghost"
                                             size="sm"
-                                            onClick={ () => {
+                                            onClick={() => {
                                                 setTestingInitialDate(undefined);
                                                 setTestingFinalDate(undefined);
                                             }}
-                                            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                                            className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs"
                                         >
                                             <X size={12} />
                                             Hapus Filter Tanggal
@@ -981,10 +925,8 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                 <div className="Code-Search">
                                     <Input
                                         placeholder="Cari Kode Pengajuan..."
-                                        value={(submissionTable.getColumn("code")?.getFilterValue() as string) ?? ""}
-                                        onChange={(e) =>
-                                            submissionTable.getColumn("code")?.setFilterValue(e.target.value)
-                                        }
+                                        value={(submissionTable.getColumn('code')?.getFilterValue() as string) ?? ''}
+                                        onChange={(e) => submissionTable.getColumn('code')?.setFilterValue(e.target.value)}
                                         className="max-w-sm"
                                     />
                                 </div>
@@ -1006,13 +948,11 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                                                 key={column.id}
                                                                 className="capitalize"
                                                                 checked={column.getIsVisible()}
-                                                                onCheckedChange={(value) =>
-                                                                    column.toggleVisibility(!!value)
-                                                                }
+                                                                onCheckedChange={(value) => column.toggleVisibility(!!value)}
                                                             >
                                                                 {testingColumnLabels[column.id] ?? column.id}
                                                             </DropdownMenuCheckboxItem>
-                                                        )
+                                                        );
                                                     })}
                                             </DropdownMenuContent>
                                         </DropdownMenu>
@@ -1024,13 +964,13 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                                     Tampilkan {testingRows} Baris <ChevronDown className="ml-1 h-4 w-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end" >
+                                            <DropdownMenuContent align="end">
                                                 {[10, 25, 50, 100].map((size) => (
                                                     <DropdownMenuCheckboxItem
                                                         key={size}
                                                         checked={testingRows === size}
                                                         onCheckedChange={() => setTestingRows(size)}
-                                                        className="text-sm "
+                                                        className="text-sm"
                                                     >
                                                         {size} baris
                                                     </DropdownMenuCheckboxItem>
@@ -1051,12 +991,9 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                                             <TableHead key={header.id}>
                                                                 {header.isPlaceholder
                                                                     ? null
-                                                                    : flexRender(
-                                                                        header.column.columnDef.header,
-                                                                        header.getContext()
-                                                                    )}
+                                                                    : flexRender(header.column.columnDef.header, header.getContext())}
                                                             </TableHead>
-                                                        )
+                                                        );
                                                     })}
                                                 </TableRow>
                                             ))}
@@ -1064,25 +1001,17 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                         <TableBody>
                                             {testingTable.getRowModel().rows?.length ? (
                                                 testingTable.getRowModel().rows.map((row) => (
-                                                    <TableRow
-                                                        key={row.id}
-                                                    >
+                                                    <TableRow key={row.id}>
                                                         {row.getVisibleCells().map((cell) => (
                                                             <TableCell key={cell.id}>
-                                                                {flexRender(
-                                                                    cell.column.columnDef.cell,
-                                                                    cell.getContext()
-                                                                )}
+                                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                                             </TableCell>
                                                         ))}
                                                     </TableRow>
                                                 ))
                                             ) : (
                                                 <TableRow>
-                                                    <TableCell
-                                                        colSpan={testingColumns.length}
-                                                        className="h-24 text-center"
-                                                    >
+                                                    <TableCell colSpan={testingColumns.length} className="h-24 text-center">
                                                         No results.
                                                     </TableCell>
                                                 </TableRow>
@@ -1091,7 +1020,6 @@ export default function MainDashboard({ userSubmissions, userTransactions, userT
                                     </Table>
                                 </div>
                                 <div className="flex items-center justify-end space-x-2 py-4">
-
                                     <div className="space-x-2">
                                         <Button
                                             variant="outline"

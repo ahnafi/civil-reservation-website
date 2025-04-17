@@ -16,7 +16,6 @@ const dummyData: {
     room: string;
     dailySlots: number;
     status: string;
-    price: number;
     link: string;
     image: string;
 }[] = [
@@ -26,7 +25,6 @@ const dummyData: {
         room: 'Lab 1',
         dailySlots: 10,
         status: 'Buka',
-        price: 500000,
         link: '/laboratories/example',
         image: '/img/tests/laboratory-1.jpg',
     },
@@ -36,7 +34,6 @@ const dummyData: {
         room: 'Lab 2',
         dailySlots: 5,
         status: 'Tutup',
-        price: 1000000,
         link: '/laboratories/example',
         image: '/img/tests/laboratory-1.jpg',
     },
@@ -46,7 +43,6 @@ const dummyData: {
         room: 'Lab 3',
         dailySlots: 15,
         status: 'Buka',
-        price: 750000,
         link: '/laboratories/example',
         image: '/img/tests/laboratory-1.jpg',
     },
@@ -56,22 +52,12 @@ const dummyData: {
         room: 'Lab 4',
         dailySlots: 20,
         status: 'Buka',
-        price: 250000,
         link: '/laboratories/example',
         image: '/img/tests/laboratory-1.jpg',
     },
-]
+];
 
 export default function Laboratories() {
-    const formatRupiah = (value: number, currency = 'IDR') => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
-            currency: currency,
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(value);
-    };
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Pengujian" />
@@ -90,7 +76,7 @@ export default function Laboratories() {
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="px-0">
-                                <CardDescription className="mb-4 space-y-2">
+                                <CardDescription className="space-y-2">
                                     <p className="truncate-2-lines">{data.description}</p>
                                     <div className="flex flex-wrap items-center gap-2">
                                         <div
@@ -111,12 +97,13 @@ export default function Laboratories() {
                                             className="text-light-base bg-lime-base flex items-center gap-1 rounded-md px-2 py-1"
                                             title="Laboratorium"
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                 viewBox="0 0 320 512"
-                                                 fill="currentColor"
-                                                 className="h-4 w-4 md:h-5 md:w-5">
-                                                <path
-                                                    d="M112 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm40 304l0 128c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-223.1L59.4 304.5c-9.1 15.1-28.8 20-43.9 10.9s-20-28.8-10.9-43.9l58.3-97c17.4-28.9 48.6-46.6 82.3-46.6l29.7 0c33.7 0 64.9 17.7 82.3 46.6l58.3 97c9.1 15.1 4.2 34.8-10.9 43.9s-34.8 4.2-43.9-10.9L232 256.9 232 480c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-128-16 0z"/>
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 320 512"
+                                                fill="currentColor"
+                                                className="h-4 w-4 md:h-5 md:w-5"
+                                            >
+                                                <path d="M112 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm40 304l0 128c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-223.1L59.4 304.5c-9.1 15.1-28.8 20-43.9 10.9s-20-28.8-10.9-43.9l58.3-97c17.4-28.9 48.6-46.6 82.3-46.6l29.7 0c33.7 0 64.9 17.7 82.3 46.6l58.3 97c9.1 15.1 4.2 34.8-10.9 43.9s-34.8 4.2-43.9-10.9L232 256.9 232 480c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-128-16 0z" />
                                             </svg>
                                             <span className="small-font-size">{data.dailySlots}</span>
                                         </div>
@@ -124,41 +111,18 @@ export default function Laboratories() {
                                             className="text-light-base bg-cyan-base flex items-center gap-1 rounded-md px-2 py-1"
                                             title="Laboratorium"
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                 viewBox="0 0 512 512"
-                                                 fill="currentColor"
-                                                 className="h-4 w-4 md:h-5 md:w-5">
-                                                <path
-                                                    d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z"/>
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 512 512"
+                                                fill="currentColor"
+                                                className="h-4 w-4 md:h-5 md:w-5"
+                                            >
+                                                <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z" />
                                             </svg>
                                             <span className="small-font-size">{data.status}</span>
                                         </div>
                                     </div>
                                 </CardDescription>
-                                <div className="flex flex-wrap items-center justify-between">
-                                    <h4 className="font-semibold">{formatRupiah(data.price)}</h4>
-                                    <Link
-                                        href={data.link}
-                                        className="bg-blue-base text-light-base flex items-center justify-between gap-1 rounded-md px-3 py-2"
-                                    >
-                                    <svg
-                                            className="h-4 w-4 md:h-5 md:w-5"
-                                            aria-hidden="true"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                stroke="currentColor"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth="2"
-                                                d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6"
-                                            ></path>
-                                        </svg>
-                                        <span className="small-font-size">Tambah ke Keranjang</span>
-                                    </Link>
-                                </div>
                             </CardContent>
                         </Card>
                     ))}

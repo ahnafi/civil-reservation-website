@@ -1,6 +1,6 @@
 import { useState, useMemo, ReactNode } from "react";
 import { Search, X } from "lucide-react";
-import { Laboratory_Simple, SimpleOption } from "@/types";
+// import { Laboratory_Simple, SimpleOption } from "@/types";
 
 type OptionType = {
     id: number | string;
@@ -41,15 +41,15 @@ export default function SearchableSelect<T extends OptionType>({
     };
 
     return (
-        <div className="w-full max-w-xs space-y-1">
-            <label className="text-sm font-medium text-foreground">{label}</label>
+        <div className="w-full max-w-xs space-y-1 small-font-size">
+            <label className="font-medium text-foreground">{label}</label>
             <div className="relative">
         <span className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground">
           {searchIcon}
         </span>
                 <input
                     type="text"
-                    className="w-full pl-8 pr-3 py-1.5 text-sm shadow-sm rounded-md border border-muted bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="w-full pl-8 pr-3 py-2 shadow-sm rounded-md border border-muted bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                     placeholder={placeholder}
                     value={query}
                     onChange={(e) => {
@@ -64,14 +64,14 @@ export default function SearchableSelect<T extends OptionType>({
                             filteredOptions.map((option) => (
                                 <div
                                     key={option.id}
-                                    className="px-3 py-1.5 hover:bg-muted cursor-pointer text-sm"
+                                    className="px-3 py-1.5 hover:bg-muted cursor-pointer "
                                     onClick={() => handleSelect(option)}
                                 >
                                     {option.name}
                                 </div>
                             ))
                         ) : (
-                            <div className="px-3 py-2 text-muted-foreground text-sm">
+                            <div className="px-3 py-2 text-muted-foreground ">
                                 Tidak ditemukan
                             </div>
                         )}
@@ -81,7 +81,7 @@ export default function SearchableSelect<T extends OptionType>({
 
             {/* Dipilih + Clear Button */}
             {selectedOption && (
-                <div className="flex items-center gap-1 text-sm text-muted-foreground mt-1">
+                <div className="flex items-center gap-1 text-muted-foreground mt-1">
           <span>
             Dipilih: <strong>{selectedOption.name}</strong>
           </span>

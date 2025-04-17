@@ -28,11 +28,11 @@ export default function DropdownSelect<T extends OptionType>({
     icon?: ReactNode;
 }) {
     return (
-        <div className="w-full max-w-xs space-y-1">
-            <label className="text-sm font-medium text-foreground">{label}</label>
+        <div className="w-full max-w-xs space-y-1 small-font-size">
+            <label className="font-medium text-foreground">{label}</label>
 
             <DropdownMenu>
-                <DropdownMenuTrigger className="w-full flex items-center justify-between px-4 py-2 border rounded-md bg-background text-foreground text-sm shadow-sm hover:bg-muted focus:outline-none">
+                <DropdownMenuTrigger className="w-full flex items-center justify-between px-4 py-2 border rounded-md bg-background text-foreground shadow-sm hover:bg-muted focus:outline-none">
                     <div className="flex items-center gap-2 pe-1">
                         {icon}
                         <span>{selectedOption ? selectedOption.name : placeholder}</span>
@@ -45,7 +45,7 @@ export default function DropdownSelect<T extends OptionType>({
                         <DropdownMenuItem
                             key={option.id}
                             onClick={() => setSelectedOption(option)}
-                            className="text-sm cursor-pointer"
+                            className="cursor-pointer"
                         >
                             {option.name}
                         </DropdownMenuItem>
@@ -58,7 +58,7 @@ export default function DropdownSelect<T extends OptionType>({
                 <button
                     type="button"
                     onClick={() => setSelectedOption(null)}
-                    className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 mt-1"
+                    className="text-muted-foreground hover:text-foreground flex items-center gap-1 mt-1"
                 >
                     <X size={14} />
                     Kosongkan pilihan

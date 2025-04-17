@@ -122,7 +122,7 @@ export interface SimpleOption {
     name: string;
 }
 
-export interface Laboratory_Simple {
+export interface LaboratorySimple {
     id: number;
     code: string;
     name: string;

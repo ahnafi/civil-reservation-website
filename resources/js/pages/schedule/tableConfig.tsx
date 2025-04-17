@@ -1,41 +1,38 @@
-import { ColumnDef } from "@tanstack/react-table";
-import { type SubmissionSchedule, SimpleOption } from "@/types";
-import { ArrowUpDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import * as React from "react";
+import { Button } from '@/components/ui/button';
+import { type SubmissionSchedule, SimpleOption } from '@/types';
+import { ColumnDef } from '@tanstack/react-table';
+import { ArrowUpDown } from 'lucide-react';
 
 // Column Labels
 export const columnLabels: Record<string, string> = {
-    code: "Kode Pengajuan",
-    test_submission_date: "Tanggal",
-    company_name: "Perusahaan",
-    lab_code: "Lab",
-    test_name: "Jenis Pengujian",
-    status: "Status",
+    code: 'Kode Pengajuan',
+    test_submission_date: 'Tanggal',
+    company_name: 'Perusahaan',
+    lab_code: 'Lab',
+    test_name: 'Jenis Pengujian',
+    status: 'Status',
 };
 
 // Status Options
 export const statusOptions: SimpleOption[] = [
-    { id: 1, name: "Approved" },
-    { id: 2, name: "Rejected" },
-    { id: 3, name: "Submitted" },
+    { id: 1, name: 'Approved' },
+    { id: 2, name: 'Rejected' },
+    { id: 3, name: 'Submitted' },
 ];
 
 // Table Columns Definition
 export const columns: ColumnDef<SubmissionSchedule>[] = [
     {
-        header: "#",
+        header: '#',
         cell: ({ row }) => row.index + 1,
     },
     {
-        accessorKey: "code",
-        header: () => <div className="flex justify-center text-center w-[5rem]">Kode Pengajuan</div>,
-        cell: ({ row }) => (
-            <div className="capitalize flex justify-center text-center w-[5rem]">{row.getValue("code")}</div>
-        ),
+        accessorKey: 'code',
+        header: () => <div className="flex w-[5rem] justify-center text-center">Kode Pengajuan</div>,
+        cell: ({ row }) => <div className="flex w-[5rem] justify-center text-center capitalize">{row.getValue('code')}</div>,
     },
     {
-        accessorKey: "test_submission_date",
+        accessorKey: 'test_submission_date',
         enableColumnFilter: true,
         filterFn: (row, columnId, filterValue) => {
             const rowDate = new Date(row.getValue(columnId));
@@ -51,60 +48,45 @@ export const columns: ColumnDef<SubmissionSchedule>[] = [
         header: ({ column }) => (
             <Button
                 variant="ghost"
-                onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                className="flex justify-center text-center w-[5rem]"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                className="flex w-[5rem] justify-center text-center"
             >
                 Tanggal
                 <ArrowUpDown />
             </Button>
         ),
-        cell: ({ row }) => (
-            <div className="capitalize flex justify-center text-center w-[5rem]">
-                {row.getValue("test_submission_date")}
-            </div>
-        ),
+        cell: ({ row }) => <div className="flex w-[5rem] justify-center text-center capitalize">{row.getValue('test_submission_date')}</div>,
     },
     {
-        accessorKey: "company_name",
+        accessorKey: 'company_name',
         header: () => <div className="w-[5rem]">Perusahaan</div>,
-        cell: ({ row }) => <div className="w-[7rem]">{row.getValue("company_name")}</div>,
+        cell: ({ row }) => <div className="w-[7rem]">{row.getValue('company_name')}</div>,
     },
     {
-        accessorKey: "lab_code",
+        accessorKey: 'lab_code',
         enableColumnFilter: true,
-        header: () => <div className="flex justify-center w-[4rem]">Lab</div>,
-        cell: ({ row }) =>
-            <div className="flex justify-center w-[4rem]">{row.getValue("lab_code")}</div>,
+        header: () => <div className="flex w-[4rem] justify-center">Lab</div>,
+        cell: ({ row }) => <div className="flex w-[4rem] justify-center">{row.getValue('lab_code')}</div>,
     },
     {
-        accessorKey: "test_name",
+        accessorKey: 'test_name',
         enableColumnFilter: true,
         header: () => <div className="text-center">Jenis Pengujian</div>,
         cell: ({ row }) => {
-            const test = row.getValue("test_name") as string | null;
+            const test = row.getValue('test_name') as string | null;
             const pkg = row.original.package_name as string | null;
-            return <div>{test || pkg || "-"}</div>;
+            return <div>{test || pkg || '-'}</div>;
         },
     },
     {
-        accessorKey: "status",
+        accessorKey: 'status',
         enableColumnFilter: true,
         header: () => <div className="text-center">Status</div>,
         cell: ({ row }) => {
-            const status = row.getValue("status")
-            const statusColor =
-                status === "approved"
-                    ? "bg-green-500"
-                    : status === "rejected"
-                        ? "bg-red-500"
-                        : "bg-yellow-500"
+            const status = row.getValue('status');
+            const statusColor = status === 'approved' ? 'bg-green-base' : status === 'rejected' ? 'bg-red-base' : 'bg-yellow-base';
 
-            return (
-                <div className={`capitalize text-center items-center rounded-2xl py-1  font-medium ${statusColor}`}>
-                    {row.getValue("status")}
-                </div>
-            )
+            return <span className={`items-center rounded-2xl py-1 px-3 text-center font-medium capitalize text-light-base ${statusColor}`}>{row.getValue('status')}</span>;
         },
-    }
+    },
 ];
-

@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, BookOpenCheck, FileText, CalendarDays, FlaskConical, Folder, HardHat, History, LayoutGrid, Package, ShoppingCart } from 'lucide-react';
+import { BookOpen, FileText, CalendarDays, FlaskConical, Folder, HardHat, History, LayoutGrid, Package, ShoppingCart } from 'lucide-react';
 
 const serviceNavItems: NavItem[] = [
     {
@@ -47,6 +47,24 @@ const orderNavItems: NavItem[] = [
     },
 ];
 
+const historyNavItems: NavItem[] = [
+    {
+        title: 'Pengajuan',
+        url: '/history/submissions',
+        icon: History,
+    },
+    {
+        title: 'Transaksi',
+        url: '/history/payments',
+        icon: History,
+    },
+    {
+        title: 'Pengujian',
+        url: '/history/tests',
+        icon: History,
+    }
+];
+
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
@@ -82,6 +100,7 @@ export function AppSidebar() {
             <SidebarContent>
                 <NavMain label="Layanan" items={serviceNavItems} />
                 <NavMain label="Pesanan" items={orderNavItems} />
+                <NavMain label="Riwayat" items={historyNavItems} />
             </SidebarContent>
 
             <SidebarFooter>

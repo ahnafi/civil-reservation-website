@@ -69,6 +69,7 @@
     --color-green-base: oklch(0.627 0.194 149.214);
     --color-lime-base: oklch(0.648 0.2 131.684);
     --color-cyan-base: oklch(0.609 0.126 221.723);
+    --color-yellow-base: oklch(68.1% 0.162 75.834);
 }
 
 /*
@@ -127,7 +128,7 @@
     }
 
     .normal-font-size {
-        @apply text-xs sm:text-base;
+        @apply text-sm sm:text-base;
     }
 
     .small-font-size {
