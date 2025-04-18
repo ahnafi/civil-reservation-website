@@ -30,7 +30,7 @@ import { submissionColumns, testingColumnLabels, testingColumns, testingStatusOp
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Pengujian',
+        title: 'Daftar Pengujian',
         href: '/history/tests',
     },
 ];

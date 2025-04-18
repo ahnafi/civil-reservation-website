@@ -86,7 +86,13 @@ export const columns: ColumnDef<SubmissionSchedule>[] = [
             const status = row.getValue('status');
             const statusColor = status === 'approved' ? 'bg-green-base' : status === 'rejected' ? 'bg-red-base' : 'bg-yellow-base';
 
-            return <span className={`items-center rounded-2xl py-1 px-3 text-center font-medium capitalize text-light-base ${statusColor}`}>{row.getValue('status')}</span>;
+            return (
+                <div className="flex w-full justify-center">
+                    <span className={`text-light-base items-center rounded-2xl px-2 py-1 text-center font-medium capitalize md:px-3 ${statusColor}`}>
+                        {row.getValue('status')}
+                    </span>
+                </div>
+            );
         },
     },
 ];

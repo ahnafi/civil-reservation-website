@@ -31,8 +31,8 @@ import { submissionColumnLabels, submissionColumns, submissionStatusOptions } fr
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Dashboard',
-        href: '/dashboard',
+        title: 'Daftar Pengajuan',
+        href: '/history/submissions',
     },
 ];
 

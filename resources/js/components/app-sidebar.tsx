@@ -1,10 +1,29 @@
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+} from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, FileText, CalendarDays, FlaskConical, Folder, HardHat, History, LayoutGrid, Package, ShoppingCart } from 'lucide-react';
+import {
+    BookOpen,
+    CalendarDays,
+    FileText,
+    FlaskConical,
+    Folder,
+    HardHat,
+    History,
+    LayoutGrid,
+    Package,
+    ShoppingCart,
+} from 'lucide-react';
 
 const serviceNavItems: NavItem[] = [
     {
@@ -62,7 +81,7 @@ const historyNavItems: NavItem[] = [
         title: 'Pengujian',
         url: '/history/tests',
         icon: History,
-    }
+    },
 ];
 
 const footerNavItems: NavItem[] = [

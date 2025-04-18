@@ -117,6 +117,15 @@ export interface SubmissionSchedule {
     lab_name: string;
 }
 
+// Schedule Type
+export interface GeneralSchedule {
+    test_submission_date: string;
+    company_name: string;
+    lab_code: string;
+    package_name: string;
+    test_name: string;
+}
+
 export interface SimpleOption {
     id: number;
     name: string;
@@ -129,14 +138,8 @@ export interface LaboratorySimple {
 }
 
 // Transaction Types
-export type TransactionStatus = "pending" | "success" | "failed";
-export type PaymentMethod =
-    | "BANK JATENG"
-    | "BANK MANDIRI"
-    | "BANK BNI"
-    | "BANK BRI"
-    | "BANK BSI"
-    | "BANK BTN";
+export type TransactionStatus = 'pending' | 'success' | 'failed';
+export type PaymentMethod = 'BANK JATENG' | 'BANK MANDIRI' | 'BANK BNI' | 'BANK BRI' | 'BANK BSI' | 'BANK BTN';
 
 export interface Transaction {
     id: number;
@@ -156,7 +159,7 @@ export interface Transaction {
 }
 
 // Testing Types
-export type TestingStatus = "testing" | "completed";
+export type TestingStatus = 'testing' | 'completed';
 
 export interface Testing {
     id: number;
@@ -171,7 +174,6 @@ export interface Testing {
     updated_at: string;
     deleted_at?: string | null;
 }
-
 
 export type PaginatedTests = Pagination<Test>;
 export type PaginatedPackage = Pagination<Package>;

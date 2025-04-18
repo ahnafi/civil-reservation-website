@@ -30,7 +30,7 @@ import { transactionColumnLabels, transactionColumns, transactionStatusOptions }
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Transaksi',
+        title: 'Daftar Transaksi',
         href: '/history/transactions',
     },
 ];

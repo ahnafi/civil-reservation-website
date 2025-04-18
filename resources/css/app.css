@@ -135,6 +135,10 @@
         @apply text-xs lg:text-sm;
     }
 
+    .extra-small-font-size {
+        @apply text-xs;
+    }
+
     .truncate-2-lines {
         display: -webkit-box;
         -webkit-line-clamp: 2;

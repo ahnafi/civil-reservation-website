@@ -1,8 +1,11 @@
-"use client"
+'use client';
 
-import  * as React from "react"
-import AppLayout from '@/layouts/app-layout'
+import AppLayout from '@/layouts/app-layout';
+import * as React from 'react';
 
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import {
     ColumnFiltersState,
     SortingState,
@@ -13,75 +16,68 @@ import {
     getPaginationRowModel,
     getSortedRowModel,
     useReactTable,
-} from "@tanstack/react-table"
-import {ArrowUpDown, ChevronDown, HardHat, Search, Check, FlaskConical, X} from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-    DropdownMenuCheckboxItem
-} from "@/components/ui/dropdown-menu";
+} from '@tanstack/react-table';
+import { Check, ChevronDown, FlaskConical, HardHat, X } from 'lucide-react';
 
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
-import type {BreadcrumbItem} from "@/types";
-import {Head} from "@inertiajs/react";
-import {DatePicker} from "@/components/DatePicker";
-import SearchableSelect from "@/components/ui/SearchableSelect";
-import DropdownSelect from "@/components/ui/DropdownSelect";
-import {useEffect, useState} from "react";
-import { type SubmissionSchedule, SimpleOption, Laboratory_Simple} from "@/types";
-import { columns } from "./tableConfig";
+import { DatePicker } from '@/components/DatePicker';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import DropdownSelect from '@/components/ui/DropdownSelect';
+import SearchableSelect from '@/components/ui/SearchableSelect';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import type { BreadcrumbItem } from '@/types';
+import { type SubmissionSchedule, LaboratorySimple, SimpleOption } from '@/types';
+import { Head } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
+import { columns } from './tableConfig';
 
 // Column Labels
 export const columnLabels: Record<string, string> = {
-    code: "Kode Pengajuan",
-    test_submission_date: "Tanggal",
-    company_name: "Perusahaan",
-    lab_code: "Lab",
-    test_name: "Jenis Pengujian",
-    status: "Status",
+    code: 'Kode Pengajuan',
+    test_submission_date: 'Tanggal',
+    company_name: 'Perusahaan',
+    lab_code: 'Lab',
+    test_name: 'Jenis Pengujian',
+    status: 'Status',
 };
 
 // Status Options
 export const statusOptions: SimpleOption[] = [
-    { id: 1, name: "Approved" },
-    { id: 2, name: "Rejected" },
-    { id: 3, name: "Submitted" },
+    { id: 1, name: 'Approved' },
+    { id: 2, name: 'Rejected' },
+    { id: 3, name: 'Submitted' },
+];
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Jadwal Pengujian',
+        href: '/schedule',
+    },
 ];
 
 // Main Component
-export default function DataTable({ submissions, tests, packages, laboratories}: { submissions: SubmissionSchedule[], tests: SimpleOption[], packages: SimpleOption[],  laboratories: Laboratory_Simple[] }) {
-    const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: "Jadwal Pengujian",
-            href: "/experiment",
-        },
-    ];
-
+export default function Schedule({
+    submissions,
+    tests,
+    packages,
+    laboratories,
+}: {
+    submissions: SubmissionSchedule[];
+    tests: SimpleOption[];
+    packages: SimpleOption[];
+    laboratories: LaboratorySimple[];
+}) {
     // Table State
-    const [sorting, setSorting] = React.useState<SortingState>([])
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
-    const [rowSelection, setRowSelection] = React.useState({})
+    const [sorting, setSorting] = React.useState<SortingState>([]);
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+    const [rowSelection, setRowSelection] = React.useState({});
     const [rows, setRows] = useState<number>(10);
 
     // Filter State
-    const [selectedLab, setSelectedLab] = useState<Laboratory_Simple | null>(null);
+    const [selectedLab, setSelectedLab] = useState<LaboratorySimple | null>(null);
     const [selectedTest, setSelectedTest] = useState<SimpleOption | null>(null);
     const [selectedStatus, setSelectedStatus] = useState<SimpleOption | null>(null);
 
@@ -117,13 +113,13 @@ export default function DataTable({ submissions, tests, packages, laboratories}:
             columnVisibility,
             rowSelection,
         },
-    })
+    });
 
     // Column Filter Update
-    const updateColumnFilter = (id: string, value: any) => {
+    const updateColumnFilter = (id: string, value: unknown) => {
         setColumnFilters((prevFilters) => {
             const otherFilters = prevFilters.filter((f) => f.id !== id);
-            if (value === undefined || value === null || value === "") {
+            if (value === undefined || value === null || value === '') {
                 return otherFilters;
             }
             return [...otherFilters, { id, value }];
@@ -133,39 +129,39 @@ export default function DataTable({ submissions, tests, packages, laboratories}:
     // Date Column Filter
     useEffect(() => {
         if (initialDate) {
-            updateColumnFilter("test_submission_date", {
+            updateColumnFilter('test_submission_date', {
                 start: initialDate,
                 end: finalDate ?? initialDate, // default to initialDate
             });
         } else {
-            updateColumnFilter("test_submission_date", undefined);
+            updateColumnFilter('test_submission_date', undefined);
         }
     }, [initialDate, finalDate]);
 
     // Lab Column Filter
     useEffect(() => {
-        if(selectedLab?.name) {
-            updateColumnFilter("lab_code", selectedLab.code);
+        if (selectedLab?.name) {
+            updateColumnFilter('lab_code', selectedLab.code);
         } else {
-            updateColumnFilter("lab_code", undefined);
+            updateColumnFilter('lab_code', undefined);
         }
     }, [selectedLab]);
 
     // Test Column Filter
     useEffect(() => {
         if (selectedTest?.name) {
-            updateColumnFilter("test_name", selectedTest.name);
+            updateColumnFilter('test_name', selectedTest.name);
         } else {
-            updateColumnFilter("test_name", undefined);
+            updateColumnFilter('test_name', undefined);
         }
     }, [selectedTest]);
 
     // Status Column Filter
     useEffect(() => {
         if (selectedStatus?.name) {
-            updateColumnFilter("status", selectedStatus.name);
+            updateColumnFilter('status', selectedStatus.name);
         } else {
-            updateColumnFilter("status", undefined);
+            updateColumnFilter('status', undefined);
         }
     }, [selectedStatus]);
 
@@ -178,7 +174,7 @@ export default function DataTable({ submissions, tests, packages, laboratories}:
     useEffect(() => {
         if (alertMessage) {
             toast.error(alertMessage, {
-                position: "top-center",
+                position: 'top-center',
                 autoClose: 5000,
                 hideProgressBar: false,
                 closeOnClick: true,
@@ -199,13 +195,12 @@ export default function DataTable({ submissions, tests, packages, laboratories}:
             setFinalDate(selected);
             setAlertMessage(null);
         } else if (selected.getTime() > finalDate.getTime()) {
-            setAlertMessage("Tanggal awal tidak boleh lebih besar dari tanggal akhir");
+            setAlertMessage('Tanggal awal tidak boleh lebih besar dari tanggal akhir');
             setFinalDate(selected);
         } else {
             setAlertMessage(null);
         }
     };
-
 
     // Final Date Select Handlers
     const handleFinalDateSelect = (date: Date | undefined) => {
@@ -224,7 +219,7 @@ export default function DataTable({ submissions, tests, packages, laboratories}:
         if (date.getTime() === initialDate.getTime()) {
             setFinalDate(date);
         } else if (date.getTime() < initialDate.getTime()) {
-            setAlertMessage("Tanggal akhir tidak boleh lebih kecil dari tanggal awal");
+            setAlertMessage('Tanggal akhir tidak boleh lebih kecil dari tanggal awal');
             setFinalDate(initialDate);
             setFinalDateKey(Date.now()); // Force re-render if needed
         } else {
@@ -237,241 +232,286 @@ export default function DataTable({ submissions, tests, packages, laboratories}:
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Jadwal Pengujian" />
 
-            <div className="w-[90vw] mx-auto flex flex-col">
-
-                <div className="page-header flex flex-col">
-                    <div className="page-title">
-                        <h1 className="text-4xl items-center justify-center text-center mt-2 font-extrabold">Agenda Pengujian Lab Teknik Sipil</h1>
-                    </div>
-                    <div className="table-filters flex justify-between space-x-5 mx-10 mt-6">
-                        <div className="test-type">
-                            <SearchableSelect
-                                label="Jenis Pengujian"
-                                options={mergedTestPackage}
-                                selectedOption={selectedTest}
-                                setSelectedOption={setSelectedTest}
-                                placeholder="Filter Jenis Pengujian..."
-                                searchIcon={<HardHat size={18} />}
-                            />
-                        </div>
-
-                        <div className="Lab-type">
-                            <DropdownSelect
-                                label="Laboratorium"
-                                options={laboratories}
-                                selectedOption={selectedLab}
-                                setSelectedOption={setSelectedLab}
-                                placeholder="Filter Laboratorium"
-                                icon={<FlaskConical size={18} />}
-                            />
-                        </div>
-
-                        <div className="Status-type">
-                            <DropdownSelect
-                             label="Status"
-                             options={statusOptions}
-                             selectedOption={selectedStatus}
-                             setSelectedOption={setSelectedStatus}
-                             placeholder="Filter Status"
-                             icon={<Check size={18} />}
-                            />
-                        </div>
-
-                        <div className="date-range-picker flex flex-col gap-1">
-                            <div className="flex gap-3">
-                                <div className="initial-date flex flex-col text-sm">
-                                    <span>Tanggal Awal:</span>
-                                    <DatePicker
-                                        value={initialDate}
-                                        placeholder="Pilih Tanggal Awal"
-                                        onDateSelect={handleInitialDateSelect}
-                                    />
-                                </div>
-                                <div className="flex justify-center items-center text-sm pt-5">
-                                    -
-                                </div>
-                                <div className="final-date flex flex-col text-sm">
-                                    <span>Tanggal Akhir:</span>
-                                    <DatePicker
-                                        key={finalDateKey}
-                                        value={finalDate}
-                                        placeholder="Pilih Tanggal Akhir"
-                                        onDateSelect={handleFinalDateSelect}
-                                    />
-                                </div>
+            <div className="flex h-full flex-1 flex-col gap-4 overflow-hidden rounded-xl p-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    <div className="agenda col-span-full space-y-2">
+                        <h1 className="title font-semibold">Jadwal Pengujian Laboratorium</h1>
+                        <div className="agenda-table-filters small-font-size mb-2 flex hidden justify-end gap-4 lg:mb-4 lg:flex lg:flex-wrap">
+                            <div className="test-type">
+                                <SearchableSelect
+                                    label="Jenis Pengujian"
+                                    options={mergedTestPackage}
+                                    selectedOption={selectedTest}
+                                    setSelectedOption={setSelectedTest}
+                                    placeholder="Filter Jenis Pengujian..."
+                                    searchIcon={<HardHat size={18} />}
+                                />
                             </div>
-
-                            { (initialDate || finalDate) && (
-                            <div className="clear-date-button flex justify-end text-right">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={ () => {
-                                        setInitialDate(undefined);
-                                        setFinalDate(undefined);
-                                    }}
-                                    className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
-                                    >
-                                        <X size={12} />
-                                        Hapus Filter Tanggal
-                                </Button>
+                            <div className="lab-type">
+                                <DropdownSelect
+                                    label="Laboratorium"
+                                    options={laboratories}
+                                    selectedOption={selectedLab}
+                                    setSelectedOption={setSelectedLab}
+                                    placeholder="Filter Laboratorium"
+                                    icon={<FlaskConical size={18} />}
+                                />
                             </div>
-                            )}
-                        </div>
-                    </div>
+                            <div className="status-type">
+                                <DropdownSelect
+                                    label="Status"
+                                    options={statusOptions}
+                                    selectedOption={selectedStatus}
+                                    setSelectedOption={setSelectedStatus}
+                                    placeholder="Filter Status"
+                                    icon={<Check size={18} />}
+                                />
+                            </div>
+                            <div className="date-range-picker flex flex-col gap-1">
+                                <label className="text-foreground font-medium">Tanggal</label>
+                                <div className="flex gap-3">
+                                    <div className="initial-date">
+                                        <DatePicker value={initialDate} placeholder="Pilih Tanggal Awal" onDateSelect={handleInitialDateSelect} />
+                                    </div>
+                                    <div className="flex items-center justify-center">-</div>
+                                    <div className="final-date">
+                                        <DatePicker
+                                            key={finalDateKey}
+                                            value={finalDate}
+                                            placeholder="Pilih Tanggal Akhir"
+                                            onDateSelect={handleFinalDateSelect}
+                                        />
+                                    </div>
+                                </div>
 
-                    <div className="table-label ms-3 mt-6 text-lg font-medium text-center">
-                        <div> Jadwal Pengujian {selectedTest?.name ?? ''} </div>
-                        <div> {selectedLab?.name ?? ''} </div>
-                        {initialDate ? format(initialDate, 'PPPP', { locale: id }) : ''}
-                        {finalDate && finalDate !== initialDate ? ` - ${format(finalDate, 'PPPP', { locale: id })}` : ''}
-                    </div>
-                </div>
-
-                <div className="table">
-
-                    <div className="flex justify-between">
-                        <div className="Code-Search">
-                            <Input
-                                placeholder="Cari Kode Pengajuan..."
-                                value={(table.getColumn("code")?.getFilterValue() as string) ?? ""}
-                                onChange={(e) =>
-                                    table.getColumn("code")?.setFilterValue(e.target.value)
-                                }
-                                className="max-w-sm"
-                            />
-                        </div>
-
-                        <div className="flex space-x-2">
-                            <div className="table-column-filter mb-2">
-                                <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                        <Button variant="outline" className="ml-auto">
-                                            Kolom <ChevronDown />
+                                {(initialDate || finalDate) && (
+                                    <div className="clear-date-button flex justify-end text-right">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => {
+                                                setInitialDate(undefined);
+                                                setFinalDate(undefined);
+                                            }}
+                                            className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs"
+                                        >
+                                            <X size={12} />
+                                            Hapus Filter Tanggal
                                         </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                        {table
-                                            .getAllColumns()
-                                            .filter((column) => column.getCanHide())
-                                            .map((column) => {
-                                                return (
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Tombol Filter untuk layar kecil */}
+                        <div className="mb-2 flex justify-end lg:mb-4 lg:hidden">
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" className="bg-blue-base text-light-base small-font-size font-bold">
+                                        Filter
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="animate-slide-up w-fit p-4 md:p-6 lg:p-8">
+                                    <DialogHeader>
+                                        <DialogTitle>Filter</DialogTitle>
+                                    </DialogHeader>
+                                    <div className="small-font-size flex flex-col gap-4">
+                                        <div className="test-type">
+                                            <SearchableSelect
+                                                label="Jenis Pengujian"
+                                                options={mergedTestPackage}
+                                                selectedOption={selectedTest}
+                                                setSelectedOption={setSelectedTest}
+                                                placeholder="Filter Jenis Pengujian..."
+                                                searchIcon={<HardHat size={16} />}
+                                            />
+                                        </div>
+                                        <div className="lab-type">
+                                            <DropdownSelect
+                                                label="Laboratorium"
+                                                options={laboratories}
+                                                selectedOption={selectedLab}
+                                                setSelectedOption={setSelectedLab}
+                                                placeholder="Filter Laboratorium"
+                                                icon={<FlaskConical size={16} />}
+                                            />
+                                        </div>
+                                        <div className="status-type">
+                                            <DropdownSelect
+                                                label="Status"
+                                                options={statusOptions}
+                                                selectedOption={selectedStatus}
+                                                setSelectedOption={setSelectedStatus}
+                                                placeholder="Filter Status"
+                                                icon={<Check size={16} />}
+                                            />
+                                        </div>
+                                        <div className="date-range-picker">
+                                            <label className="text-foreground font-medium">Tanggal</label>
+                                            <div className="flex justify-between gap-2">
+                                                <div className="initial-date flex flex-col">
+                                                    <DatePicker
+                                                        value={initialDate}
+                                                        placeholder="Pilih Tanggal Awal"
+                                                        onDateSelect={handleInitialDateSelect}
+                                                    />
+                                                </div>
+                                                <div className="final-date flex flex-col">
+                                                    <DatePicker
+                                                        key={finalDateKey}
+                                                        value={finalDate}
+                                                        placeholder="Pilih Tanggal Akhir"
+                                                        onDateSelect={handleFinalDateSelect}
+                                                    />
+                                                </div>
+                                            </div>
+                                            {(initialDate || finalDate) && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setInitialDate(undefined);
+                                                        setFinalDate(undefined);
+                                                    }}
+                                                    className="text-muted-foreground hover:text-foreground mt-1 flex items-center gap-1"
+                                                >
+                                                    <X size={14} />
+                                                    Kosongkan pilihan
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </DialogContent>
+                            </Dialog>
+                        </div>
+
+                        <div className="agenda-table-main">
+                            <div className="agenda-table-option mb-2 flex justify-between lg:mb-4">
+                                <div className="flex w-full flex-wrap justify-end gap-2">
+                                    <div className="code-search">
+                                        <Input
+                                            placeholder="Cari Kode Pengajuan..."
+                                            value={(table.getColumn('code')?.getFilterValue() as string) ?? ''}
+                                            onChange={(e) => table.getColumn('code')?.setFilterValue(e.target.value)}
+                                            className="border-muted bg-background text-foreground focus:ring-primary small-font-size small-font-size w-full rounded-md border py-2 shadow-sm focus:ring-1 focus:outline-none"
+                                        />
+                                    </div>
+                                    <div className="table-column-filter mb-2">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="outline" className="small-font-size ml-auto font-normal">
+                                                    Kolom <ChevronDown />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                {table
+                                                    .getAllColumns()
+                                                    .filter((column) => column.getCanHide())
+                                                    .map((column) => {
+                                                        return (
+                                                            <DropdownMenuCheckboxItem
+                                                                key={column.id}
+                                                                checked={column.getIsVisible()}
+                                                                onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                                                                className="small-font-size"
+                                                            >
+                                                                {columnLabels[column.id] ?? column.id}
+                                                            </DropdownMenuCheckboxItem>
+                                                        );
+                                                    })}
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                    <div className="pagination-rows-selector mb-2">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="outline" className="small-font-size ml-auto font-normal">
+                                                    Tampilkan {rows} Baris <ChevronDown className="ml-1 h-4 w-4" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                {[10, 25, 50, 100].map((size) => (
                                                     <DropdownMenuCheckboxItem
-                                                        key={column.id}
-                                                        className="capitalize"
-                                                        checked={column.getIsVisible()}
-                                                        onCheckedChange={(value) =>
-                                                            column.toggleVisibility(!!value)
-                                                        }
+                                                        key={size}
+                                                        checked={rows === size}
+                                                        onCheckedChange={() => setRows(size)}
+                                                        className="small-font-size"
                                                     >
-                                                        {columnLabels[column.id] ?? column.id}
+                                                        {size} baris
                                                     </DropdownMenuCheckboxItem>
-                                                )
-                                            })}
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            </div>
-                            <div className="pagination-rows-selector mb-2">
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" className="ml-auto">
-                                    Tampilkan {rows} Baris <ChevronDown className="ml-1 h-4 w-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" >
-                                {[10, 25, 50, 100].map((size) => (
-                                    <DropdownMenuCheckboxItem
-                                        key={size}
-                                        checked={rows === size}
-                                        onCheckedChange={() => setRows(size)}
-                                        className="text-sm "
-                                    >
-                                        {size} baris
-                                    </DropdownMenuCheckboxItem>
-                                ))}
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
-                        </div>
-                    </div>
-                    <div className="table-main">
-                        <div className="rounded-md border">
-                            <Table>
-                                <TableHeader>
-                                    {table.getHeaderGroups().map((headerGroup) => (
-                                        <TableRow key={headerGroup.id}>
-                                            {headerGroup.headers.map((header) => {
-                                                return (
-                                                    <TableHead key={header.id}>
-                                                        {header.isPlaceholder
-                                                            ? null
-                                                            : flexRender(
-                                                                header.column.columnDef.header,
-                                                                header.getContext()
-                                                            )}
-                                                    </TableHead>
-                                                )
-                                            })}
-                                        </TableRow>
-                                    ))}
-                                </TableHeader>
-                                <TableBody>
-                                    {table.getRowModel().rows?.length ? (
-                                        table.getRowModel().rows.map((row) => (
-                                            <TableRow
-                                                key={row.id}
-                                            >
-                                                {row.getVisibleCells().map((cell) => (
-                                                    <TableCell key={cell.id}>
-                                                        {flexRender(
-                                                            cell.column.columnDef.cell,
-                                                            cell.getContext()
-                                                        )}
-                                                    </TableCell>
                                                 ))}
-                                            </TableRow>
-                                        ))
-                                    ) : (
-                                        <TableRow>
-                                            <TableCell
-                                                colSpan={columns.length}
-                                                className="h-24 text-center"
-                                            >
-                                                No results.
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </div>
-                        <div className="flex items-center justify-end space-x-2 py-4">
-
-                            <div className="space-x-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => table.previousPage()}
-                                    disabled={!table.getCanPreviousPage()}
-                                >
-                                    Previous
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => table.nextPage()}
-                                    disabled={!table.getCanNextPage()}
-                                >
-                                    Next
-                                </Button>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="agenda-table-body">
+                                <div className="rounded-md border">
+                                    <Table className="small-font-size">
+                                        <TableHeader>
+                                            {table.getHeaderGroups().map((headerGroup) => (
+                                                <TableRow key={headerGroup.id}>
+                                                    {headerGroup.headers.map((header) => {
+                                                        return (
+                                                            <TableHead key={header.id}>
+                                                                {header.isPlaceholder
+                                                                    ? null
+                                                                    : flexRender(header.column.columnDef.header, header.getContext())}
+                                                            </TableHead>
+                                                        );
+                                                    })}
+                                                </TableRow>
+                                            ))}
+                                        </TableHeader>
+                                        <TableBody>
+                                            {table.getRowModel().rows?.length ? (
+                                                table.getRowModel().rows.map((row) => (
+                                                    <TableRow key={row.id}>
+                                                        {row.getVisibleCells().map((cell) => (
+                                                            <TableCell key={cell.id}>
+                                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                            </TableCell>
+                                                        ))}
+                                                    </TableRow>
+                                                ))
+                                            ) : (
+                                                <TableRow>
+                                                    <TableCell colSpan={columns.length} className="h-24 text-center">
+                                                        No results.
+                                                    </TableCell>
+                                                </TableRow>
+                                            )}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                                <div className="flex items-center justify-end space-x-2 py-4">
+                                    <div className="space-x-2">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => table.previousPage()}
+                                            disabled={!table.getCanPreviousPage()}
+                                            className="small-font-size"
+                                        >
+                                            Previous
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => table.nextPage()}
+                                            disabled={!table.getCanNextPage()}
+                                            className="small-font-size"
+                                        >
+                                            Next
+                                        </Button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
-
             </div>
 
             <ToastContainer />
         </AppLayout>
-    )
+    );
 }

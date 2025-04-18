@@ -16,22 +16,23 @@ class DashboardController extends Controller
     public function index(): Response
     {
         $userSubmissions = Submission::withUserScheduleJoin()->get();
-
+        
         $userTransactions = Transaction::query()
-            ->join('submissions', 'transactions.submission_id', '=', 'submissions.id')
-            ->where('submissions.user_id', auth()->id())
-            ->orderBy('transactions.created_at', 'desc')
-            ->select('transactions.*')
-            ->get();
-
-
+        ->join('submissions', 'transactions.submission_id', '=', 'submissions.id')
+        ->where('submissions.user_id', auth()->id())
+        ->orderBy('transactions.created_at', 'desc')
+        ->select('transactions.*')
+        ->get();
+        
+        
         $userTestings = Testing::query()
-            ->join('submissions', 'testings.submission_id', '=', 'submissions.id')
-            ->where('submissions.user_id', auth()->id())
-            ->orderBy('testings.created_at', 'desc')
-            ->select('testings.*')
-            ->get();
-
+        ->join('submissions', 'testings.submission_id', '=', 'submissions.id')
+        ->where('submissions.user_id', auth()->id())
+        ->orderBy('testings.created_at', 'desc')
+        ->select('testings.*')
+        ->get();
+        
+        $submissions = Submission::withScheduleJoin()->get();
         $tests = Test::select(['id', 'name'])->get();
         $packages = Package::select(['id', 'name'])->get();
         $laboratories = Laboratory::select(['id', 'code', 'name'])->get();
@@ -40,6 +41,7 @@ class DashboardController extends Controller
             'userSubmissions' => $userSubmissions,
             'userTransactions' => $userTransactions,
             'userTestings' => $userTestings,
+            'schedule' => $submissions,
             'tests' => $tests,
             'packages' => $packages,
             'laboratories' => $laboratories,
