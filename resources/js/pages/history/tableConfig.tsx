@@ -148,7 +148,7 @@ export const submissionColumns: ColumnDef<SubmissionSchedule>[] = [
 
             return (
                 <div className="flex w-full justify-center">
-                    <span className={`text-light-base items-center rounded-2xl px-2 md:px-3 py-1 text-center font-medium capitalize ${statusColor}`}>
+                    <span className={`text-light-base items-center rounded-2xl px-2 py-1 text-center font-medium capitalize md:px-3 ${statusColor}`}>
                         {row.getValue('status')}
                     </span>
                 </div>
@@ -160,7 +160,7 @@ export const submissionColumns: ColumnDef<SubmissionSchedule>[] = [
         header: () => <div className="flex justify-center text-center">Detail</div>,
         cell: ({ row }) => (
             <div className="flex justify-center">
-                <Button className="cursor-pointer small-font-size" onClick={() => handleDetailClick(row.original)}>
+                <Button className="small-font-size cursor-pointer" onClick={() => handleDetailClick(row.original)}>
                     Lihat Detail
                 </Button>
             </div>
@@ -176,12 +176,21 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
     },
     {
         accessorKey: 'code',
-        header: () => <div className="flex w-[5rem] justify-center text-center">Kode Transaksi</div>,
-        cell: ({ row }) => <div className="flex w-[5rem] justify-center text-center capitalize">{row.getValue('code')}</div>,
+        header: () => <div className="flex w-[7rem] justify-center text-center">Kode Transaksi</div>,
+        cell: ({ row }) => <div className="flex w-[7rem] justify-center text-center capitalize">{row.getValue('code')}</div>,
     },
     {
         accessorKey: 'created_at',
-        header: () => <div className="text-center">Tanggal Waktu Dibuat</div>,
+        header: ({column}) => (
+            <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                className="flex w-[5rem] justify-center text-center"
+            >
+                Tanggal
+                <ArrowUpDown />
+            </Button>
+        ),
         enableColumnFilter: true,
         filterFn: (row, columnId, filterValue) => {
             const rowDate = new Date(row.getValue(columnId));
@@ -199,7 +208,7 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
             const createdAt = parseISO(createdAtRaw);
             const formatted = format(createdAt, 'dd-MM-yyyy, HH:mm', { locale: id });
 
-            return <div className="text-center">{formatted}</div>;
+            return <div className="flex w-[5rem] justify-center text-center capitalize">{formatted}</div>;
         },
     },
     {
@@ -233,7 +242,7 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
             return (
                 <div className="flex justify-center">
                     {invoice ? (
-                        <Button onClick={handleDownload} size="sm" className="cursor-pointer gap-1">
+                        <Button onClick={handleDownload} className="cursor-pointer gap-1">
                             <Download size={14} />
                             Download
                         </Button>
@@ -253,7 +262,7 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
 
             return (
                 <div className="flex w-full justify-center">
-                    <div className={`text-md rounded-2xl px-5 py-1 text-center font-semibold text-white capitalize ${statusColor}`}>{status}</div>
+                    <div className={`text-light-base items-center rounded-2xl px-2 py-1 text-center font-medium capitalize md:px-3 ${statusColor}`}>{status}</div>
                 </div>
             );
         },
@@ -279,12 +288,21 @@ export const testingColumns: ColumnDef<Testing>[] = [
     },
     {
         accessorKey: 'code',
-        header: () => <div className="flex w-[5rem] justify-center text-center">Kode Pengujian</div>,
-        cell: ({ row }) => <div className="flex w-[5rem] justify-center text-center capitalize">{row.getValue('code')}</div>,
+        header: () => <div className="flex w-[7rem] justify-center text-center">Kode Pengujian</div>,
+        cell: ({ row }) => <div className="flex w-[7rem] justify-center text-center capitalize">{row.getValue('code')}</div>,
     },
     {
         accessorKey: 'test_date',
-        header: () => <div className="text-center">Tanggal Pengujian</div>,
+        header: ({ column }) => (
+            <Button
+                variant="ghost"
+                onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+                className="flex w-[5rem] justify-center text-center"
+            >
+                Tanggal
+                <ArrowUpDown />
+            </Button>
+        ),
         enableColumnFilter: true,
         filterFn: (row, columnId, filterValue) => {
             const rowDate = new Date(row.getValue(columnId));
@@ -302,7 +320,7 @@ export const testingColumns: ColumnDef<Testing>[] = [
             const testDate = parseISO(testDateRaw);
             const formatted = format(testDate, 'dd-MM-yyyy');
 
-            return <div className="text-center">{formatted}</div>;
+            return <div className="flex w-[5rem] justify-center text-center capitalize">{formatted}</div>;
         },
     },
     {
@@ -314,7 +332,7 @@ export const testingColumns: ColumnDef<Testing>[] = [
 
             return (
                 <div className="flex w-full justify-center">
-                    <div className={`items-center rounded-2xl px-5 py-1 text-center font-medium capitalize ${statusColor}`}>
+                    <div className={`text-light-base items-center rounded-2xl px-2 py-1 text-center font-medium capitalize md:px-3 ${statusColor}`}>
                         {row.getValue('status')}
                     </div>
                 </div>

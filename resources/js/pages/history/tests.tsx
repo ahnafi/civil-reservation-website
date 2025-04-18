@@ -6,7 +6,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import DropdownSelect from '@/components/ui/DropdownSelect';
 import { Input } from '@/components/ui/input';
-import SearchableSelect from '@/components/ui/SearchableSelect';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, LaboratorySimple, SimpleOption, type SubmissionSchedule, Testing, Transaction } from '@/types';
@@ -23,24 +22,22 @@ import {
     useReactTable,
     VisibilityState,
 } from '@tanstack/react-table';
-import { Check, ChevronDown, FlaskConical, HardHat, X } from 'lucide-react';
+import { Check, ChevronDown, X } from 'lucide-react';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
-import { submissionColumnLabels, submissionColumns, submissionStatusOptions } from './tableConfig';
+import { submissionColumns, testingColumnLabels, testingColumns, testingStatusOptions } from './tableConfig';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Dashboard',
-        href: '/dashboard',
+        title: 'Pengujian',
+        href: '/history/tests',
     },
 ];
 
-export default function MainDashboard({
+export default function Test({
     userSubmissions,
-    tests,
-    packages,
-    laboratories,
+    userTestings,
 }: {
     userSubmissions: SubmissionSchedule[];
     userTransactions: Transaction[];
@@ -54,22 +51,23 @@ export default function MainDashboard({
     const [submissionFilters, setSubmissionFilters] = useState<ColumnFiltersState>([]);
     const [submissionVisibility, setSubmissionVisibility] = useState<VisibilityState>({});
     const [submissionSelection, setSubmissionSelection] = useState({});
-    const [submissionRows, setSubmissionRows] = useState<number>(10);
 
-    // Submission Table Filter State
-    const [submissionSelectedLab, setSubmissionSelectedLab] = useState<LaboratorySimple | null>(null);
-    const [submissionSelectedTest, setSubmissionSelectedTest] = useState<SimpleOption | null>(null);
-    const [submissionSelectedStatus, setSubmissionSelectedStatus] = useState<SimpleOption | null>(null);
+    // Testing Table State
+    const [testingSorting, setTestingSorting] = useState<SortingState>([]);
+    const [testingFilters, setTestingFilters] = useState<ColumnFiltersState>([]);
+    const [testingVisibility, setTestingVisibility] = useState<VisibilityState>({});
+    const [testingSelection, setTestingSelection] = useState({});
+    const [testingRows, setTestingRows] = useState<number>(10);
 
-    const [submissionInitialDate, setSubmissionInitialDate] = useState<Date | undefined>();
-    const [submissionFinalDate, setSubmissionFinalDate] = useState<Date | undefined>();
-    const [submissionFinalDateKey, setSubmissionFinalDateKey] = useState<number>(Date.now());
+    // Testing Table Filter State
+    const [testingSelectedStatus, setTestingSelectedStatus] = useState<SimpleOption | null>(null);
+
+    const [testingInitialDate, setTestingInitialDate] = useState<Date | undefined>();
+    const [testingFinalDate, setTestingFinalDate] = useState<Date | undefined>();
+    const [testingFinalDateKey, setTestingFinalDateKey] = useState<number>(Date.now());
 
     // Alert State
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
-
-    // Merged Test and Package Options
-    const mergedTestPackage: SimpleOption[] = [...packages, ...tests];
 
     // Initial Date Select Handlers
     const handleInitialDateSelect = (
@@ -143,6 +141,26 @@ export default function MainDashboard({
         },
     });
 
+    // Testing Table Definition
+    const testingTable = useReactTable<Testing>({
+        data: userTestings,
+        columns: testingColumns,
+        onSortingChange: setTestingSorting,
+        onColumnFiltersChange: setTestingFilters,
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        onColumnVisibilityChange: setTestingVisibility,
+        onRowSelectionChange: setTestingSelection,
+        state: {
+            sorting: testingSorting,
+            columnFilters: testingFilters,
+            columnVisibility: testingVisibility,
+            rowSelection: testingSelection,
+        },
+    });
+
     // Column Filter Update
     const updateColumnFilter = (setFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>, columnId: string, value: unknown) => {
         setFilters((prevFilters) => {
@@ -154,17 +172,17 @@ export default function MainDashboard({
         });
     };
 
-    // Submission Date Column Filter Effect
+    // Testing Date Column Filter Effect
     useEffect(() => {
-        if (submissionInitialDate) {
-            updateColumnFilter(setSubmissionFilters, 'test_submission_date', {
-                start: submissionInitialDate,
-                end: submissionFinalDate ?? submissionInitialDate,
+        if (testingInitialDate) {
+            updateColumnFilter(setTestingFilters, 'test_date', {
+                start: testingInitialDate,
+                end: testingFinalDate ?? testingInitialDate,
             });
         } else {
-            updateColumnFilter(setSubmissionFilters, 'test_submission_date', undefined);
+            updateColumnFilter(setTestingFilters, 'test_date', undefined);
         }
-    }, [submissionInitialDate, submissionFinalDate]);
+    }, [testingInitialDate, testingFinalDate]);
 
     // Reusable Column Filter Effect
     const useColumnFilterEffect = (
@@ -181,20 +199,8 @@ export default function MainDashboard({
         }, [selectedOption, columnId, setFilters]);
     };
 
-    // Submission Lab Column Filter Effect
-    useEffect(() => {
-        if (submissionSelectedLab?.name) {
-            updateColumnFilter(setSubmissionFilters, 'lab_code', submissionSelectedLab.code);
-        } else {
-            updateColumnFilter(setSubmissionFilters, 'lab_code', undefined);
-        }
-    }, [submissionSelectedLab]);
-
-    // Submission Test Column Filter Effect
-    useColumnFilterEffect(submissionSelectedTest, setSubmissionFilters, 'test_name');
-
-    // Submission Status Column Filter Effect
-    useColumnFilterEffect(submissionSelectedStatus, setSubmissionFilters, 'status');
+    // Testing Status Column Filter Effect
+    useColumnFilterEffect(testingSelectedStatus, setTestingFilters, 'status');
 
     // Row Pagination Effect
     const usePageSizeEffect = <T,>(table: TanStackTable<T>, rows: number) => {
@@ -203,8 +209,8 @@ export default function MainDashboard({
         }, [rows, table]);
     };
 
-    // Submission Table Row Pagination Effect
-    usePageSizeEffect(submissionTable, submissionRows);
+    // Testing Table Row Pagination Effect
+    usePageSizeEffect(testingTable, testingRows);
 
     // Alert Message
     useEffect(() => {
@@ -227,42 +233,21 @@ export default function MainDashboard({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Daftar Pengajuan" />
+            <Head title="Daftar Pengujian" />
 
-            <div className="flex h-full flex-1 flex-col gap-4 overflow-hidden rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    <div className="submission col-span-full space-y-2">
-                        <h1 className="title font-semibold">Daftar Pengajuan</h1>
-                        <div className="submission-table-filters small-font-size mb-2 flex hidden justify-end gap-4 lg:mb-4 lg:flex lg:flex-wrap">
-                            {/* Daftar filter untuk layar besar */}
-                            <div className="test-type">
-                                <SearchableSelect
-                                    label="Jenis Pengujian"
-                                    options={mergedTestPackage}
-                                    selectedOption={submissionSelectedTest}
-                                    setSelectedOption={setSubmissionSelectedTest}
-                                    placeholder="Filter Jenis Pengujian..."
-                                    searchIcon={<HardHat size={16} />}
-                                />
-                            </div>
-                            <div className="lab-type">
-                                <DropdownSelect
-                                    label="Laboratorium"
-                                    options={laboratories}
-                                    selectedOption={submissionSelectedLab}
-                                    setSelectedOption={setSubmissionSelectedLab}
-                                    placeholder="Filter Laboratorium"
-                                    icon={<FlaskConical size={16} />}
-                                />
-                            </div>
+                    <div className="testing col-span-full space-y-2">
+                        <h1 className="title font-semibold">Daftar Pengujian</h1>
+                        <div className="testing-table-filters small-font-size mb-2 hidden justify-end gap-4 lg:mb-4 lg:flex lg:flex-wrap">
                             <div className="status-type">
                                 <DropdownSelect
                                     label="Status"
-                                    options={submissionStatusOptions}
-                                    selectedOption={submissionSelectedStatus}
-                                    setSelectedOption={setSubmissionSelectedStatus}
+                                    options={testingStatusOptions}
+                                    selectedOption={testingSelectedStatus}
+                                    setSelectedOption={setTestingSelectedStatus}
                                     placeholder="Filter Status"
-                                    icon={<Check size={16} />}
+                                    icon={<Check size={18} />}
                                 />
                             </div>
                             <div className="date-range-picker">
@@ -270,39 +255,38 @@ export default function MainDashboard({
                                 <div className="flex gap-3">
                                     <div className="initial-date">
                                         <DatePicker
-                                            value={submissionInitialDate}
+                                            value={testingInitialDate}
                                             placeholder="Pilih Tanggal Awal"
                                             onDateSelect={(date) =>
-                                                handleInitialDateSelect(date, setSubmissionInitialDate, setSubmissionFinalDate, submissionFinalDate)
+                                                handleInitialDateSelect(date, setTestingInitialDate, setTestingFinalDate, testingFinalDate)
                                             }
                                         />
                                     </div>
                                     <div className="flex items-center justify-center">-</div>
                                     <div className="final-date">
                                         <DatePicker
-                                            key={submissionFinalDateKey}
-                                            value={submissionInitialDate}
+                                            key={testingFinalDateKey}
+                                            value={testingFinalDate}
                                             placeholder="Pilih Tanggal Akhir"
                                             onDateSelect={(date) =>
                                                 handleFinalDateSelect(
                                                     date,
-                                                    submissionInitialDate,
-                                                    setSubmissionInitialDate,
-                                                    setSubmissionFinalDate,
+                                                    testingInitialDate,
+                                                    setTestingInitialDate,
+                                                    setTestingFinalDate,
                                                     setAlertMessage,
-                                                    setSubmissionFinalDateKey,
+                                                    setTestingFinalDateKey,
                                                 )
                                             }
                                         />
                                     </div>
                                 </div>
-                                {(submissionInitialDate || submissionFinalDate) && (
+                                {(testingInitialDate || testingFinalDate) && (
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            setSubmissionInitialDate(undefined);
-                                            setSubmissionFinalDate(undefined);
-                                            setSubmissionFilters((prev) => prev.filter((f) => f.id !== 'test_submission_date'));
+                                            setTestingInitialDate(undefined);
+                                            setTestingFinalDate(undefined);
                                         }}
                                         className="text-muted-foreground hover:text-foreground mt-1 flex items-center gap-1"
                                     >
@@ -313,7 +297,7 @@ export default function MainDashboard({
                             </div>
                         </div>
 
-                        {/* Tombol Filter untuk layar kecil */}
+                        {/* Tombol Filter untuk Layar Kecil */}
                         <div className="mb-2 flex justify-end lg:mb-4 lg:hidden">
                             <Dialog open={isFilterDialogOpen} onOpenChange={setIsFilterDialogOpen}>
                                 <DialogTrigger asChild>
@@ -326,32 +310,12 @@ export default function MainDashboard({
                                         <DialogTitle>Filter</DialogTitle>
                                     </DialogHeader>
                                     <div className="small-font-size flex flex-col gap-4">
-                                        <div className="test-type">
-                                            <SearchableSelect
-                                                label="Jenis Pengujian"
-                                                options={mergedTestPackage}
-                                                selectedOption={submissionSelectedTest}
-                                                setSelectedOption={setSubmissionSelectedTest}
-                                                placeholder="Filter Jenis Pengujian..."
-                                                searchIcon={<HardHat size={16} />}
-                                            />
-                                        </div>
-                                        <div className="lab-type">
-                                            <DropdownSelect
-                                                label="Laboratorium"
-                                                options={laboratories}
-                                                selectedOption={submissionSelectedLab}
-                                                setSelectedOption={setSubmissionSelectedLab}
-                                                placeholder="Filter Laboratorium"
-                                                icon={<FlaskConical size={16} />}
-                                            />
-                                        </div>
                                         <div className="status-type">
                                             <DropdownSelect
                                                 label="Status"
-                                                options={submissionStatusOptions}
-                                                selectedOption={submissionSelectedStatus}
-                                                setSelectedOption={setSubmissionSelectedStatus}
+                                                options={testingStatusOptions}
+                                                selectedOption={testingSelectedStatus}
+                                                setSelectedOption={setTestingSelectedStatus}
                                                 placeholder="Filter Status"
                                                 icon={<Check size={16} />}
                                             />
@@ -361,43 +325,42 @@ export default function MainDashboard({
                                             <div className="flex justify-between gap-2">
                                                 <div className="initial-date flex flex-col">
                                                     <DatePicker
-                                                        value={submissionInitialDate}
+                                                        value={testingInitialDate}
                                                         placeholder="Pilih Tanggal Awal"
                                                         onDateSelect={(date) =>
                                                             handleInitialDateSelect(
                                                                 date,
-                                                                setSubmissionInitialDate,
-                                                                setSubmissionFinalDate,
-                                                                submissionFinalDate,
+                                                                setTestingInitialDate,
+                                                                setTestingFinalDate,
+                                                                testingFinalDate,
                                                             )
                                                         }
                                                     />
                                                 </div>
                                                 <div className="final-date flex flex-col">
                                                     <DatePicker
-                                                        key={submissionFinalDateKey}
-                                                        value={submissionInitialDate}
+                                                        key={testingFinalDateKey}
+                                                        value={testingFinalDate}
                                                         placeholder="Pilih Tanggal Akhir"
                                                         onDateSelect={(date) =>
                                                             handleFinalDateSelect(
                                                                 date,
-                                                                submissionInitialDate,
-                                                                setSubmissionInitialDate,
-                                                                setSubmissionFinalDate,
+                                                                testingInitialDate,
+                                                                setTestingInitialDate,
+                                                                setTestingFinalDate,
                                                                 setAlertMessage,
-                                                                setSubmissionFinalDateKey,
+                                                                setTestingFinalDateKey,
                                                             )
                                                         }
                                                     />
                                                 </div>
                                             </div>
-                                            {(submissionInitialDate || submissionFinalDate) && (
+                                            {(testingInitialDate || testingFinalDate) && (
                                                 <button
                                                     type="button"
                                                     onClick={() => {
-                                                        setSubmissionInitialDate(undefined);
-                                                        setSubmissionFinalDate(undefined);
-                                                        setSubmissionFilters((prev) => prev.filter((f) => f.id !== 'test_submission_date'));
+                                                        setTestingInitialDate(undefined);
+                                                        setTestingFinalDate(undefined);
                                                     }}
                                                     className="text-muted-foreground hover:text-foreground mt-1 flex items-center gap-1"
                                                 >
@@ -410,12 +373,13 @@ export default function MainDashboard({
                                 </DialogContent>
                             </Dialog>
                         </div>
-                        <div className="submission-table-main">
-                            <div className="submission-table-option mb-2 flex justify-between lg:mb-4">
-                                <div className="flex w-full justify-end gap-2 flex-wrap">
-                                    <div className="code-search flex flex-col">
+
+                        <div className="testing-table-main">
+                            <div className="testing-table-option mb-2 flex justify-between lg:mb-4">
+                                <div className="flex w-full flex-wrap justify-end gap-2">
+                                    <div className="code-search">
                                         <Input
-                                            placeholder="Cari Kode Pengajuan..."
+                                            placeholder="Cari Kode Pengujian..."
                                             value={(submissionTable.getColumn('code')?.getFilterValue() as string) ?? ''}
                                             onChange={(e) => submissionTable.getColumn('code')?.setFilterValue(e.target.value)}
                                             className="border-muted bg-background text-foreground focus:ring-primary small-font-size small-font-size w-full rounded-md border py-2 shadow-sm focus:ring-1 focus:outline-none"
@@ -429,7 +393,7 @@ export default function MainDashboard({
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                {submissionTable
+                                                {testingTable
                                                     .getAllColumns()
                                                     .filter((column) => column.getCanHide())
                                                     .map((column) => {
@@ -440,7 +404,7 @@ export default function MainDashboard({
                                                                 onCheckedChange={(value) => column.toggleVisibility(!!value)}
                                                                 className="small-font-size"
                                                             >
-                                                                {submissionColumnLabels[column.id] ?? column.id}
+                                                                {testingColumnLabels[column.id] ?? column.id}
                                                             </DropdownMenuCheckboxItem>
                                                         );
                                                     })}
@@ -451,15 +415,15 @@ export default function MainDashboard({
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
                                                 <Button variant="outline" className="small-font-size ml-auto font-normal">
-                                                    Tampilkan {submissionRows} Baris <ChevronDown className="ml-1 h-4 w-4" />
+                                                    Tampilkan {testingRows} Baris <ChevronDown className="ml-1 h-4 w-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
                                                 {[10, 25, 50, 100].map((size) => (
                                                     <DropdownMenuCheckboxItem
                                                         key={size}
-                                                        checked={submissionRows === size}
-                                                        onCheckedChange={() => setSubmissionRows(size)}
+                                                        checked={testingRows === size}
+                                                        onCheckedChange={() => setTestingRows(size)}
                                                         className="small-font-size"
                                                     >
                                                         {size} baris
@@ -470,11 +434,11 @@ export default function MainDashboard({
                                     </div>
                                 </div>
                             </div>
-                            <div className="submission-table-body">
+                            <div className="testing-table-body">
                                 <div className="rounded-md border">
                                     <Table className="small-font-size">
                                         <TableHeader>
-                                            {submissionTable.getHeaderGroups().map((headerGroup) => (
+                                            {testingTable.getHeaderGroups().map((headerGroup) => (
                                                 <TableRow key={headerGroup.id}>
                                                     {headerGroup.headers.map((header) => {
                                                         return (
@@ -489,8 +453,8 @@ export default function MainDashboard({
                                             ))}
                                         </TableHeader>
                                         <TableBody>
-                                            {submissionTable.getRowModel().rows?.length ? (
-                                                submissionTable.getRowModel().rows.map((row) => (
+                                            {testingTable.getRowModel().rows?.length ? (
+                                                testingTable.getRowModel().rows.map((row) => (
                                                     <TableRow key={row.id}>
                                                         {row.getVisibleCells().map((cell) => (
                                                             <TableCell key={cell.id}>
@@ -501,7 +465,7 @@ export default function MainDashboard({
                                                 ))
                                             ) : (
                                                 <TableRow>
-                                                    <TableCell colSpan={submissionColumns.length} className="h-24 text-center">
+                                                    <TableCell colSpan={testingColumns.length} className="h-24 text-center">
                                                         No results.
                                                     </TableCell>
                                                 </TableRow>
@@ -514,8 +478,8 @@ export default function MainDashboard({
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            onClick={() => submissionTable.previousPage()}
-                                            disabled={!submissionTable.getCanPreviousPage()}
+                                            onClick={() => testingTable.previousPage()}
+                                            disabled={!testingTable.getCanPreviousPage()}
                                             className="small-font-size"
                                         >
                                             Previous
@@ -523,8 +487,8 @@ export default function MainDashboard({
                                         <Button
                                             variant="outline"
                                             size="sm"
-                                            onClick={() => submissionTable.nextPage()}
-                                            disabled={!submissionTable.getCanNextPage()}
+                                            onClick={() => testingTable.nextPage()}
+                                            disabled={!testingTable.getCanNextPage()}
                                             className="small-font-size"
                                         >
                                             Next
@@ -536,7 +500,6 @@ export default function MainDashboard({
                     </div>
                 </div>
             </div>
-
             <ToastContainer />
         </AppLayout>
     );

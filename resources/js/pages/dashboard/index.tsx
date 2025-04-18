@@ -249,7 +249,7 @@ export default function MainDashboard({
     });
 
     // Column Filter Update
-    const updateColumnFilter = (setFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>, columnId: string, value: any) => {
+    const updateColumnFilter = (setFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>, columnId: string, value: unknown) => {
         setFilters((prevFilters) => {
             const otherFilters = prevFilters.filter((f) => f.id !== columnId);
             if (value === undefined || value === null || value === '') {

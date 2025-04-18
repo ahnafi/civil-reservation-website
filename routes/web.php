@@ -37,6 +37,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('orders/history');
     })->name('orders-history');
     Route::get('history/submissions', [DashboardController::class, "submissionsHistory"])->name('history-submissions');
+    Route::get('history/tests', [DashboardController::class, "testsHistory"])->name('history-tests');
+    Route::get('history/transactions', [DashboardController::class, "transactionsHistory"])->name('history-transactions');
 });
 
 require __DIR__ . '/settings.php';

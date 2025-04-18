@@ -55,7 +55,7 @@ const historyNavItems: NavItem[] = [
     },
     {
         title: 'Transaksi',
-        url: '/history/payments',
+        url: '/history/transactions',
         icon: History,
     },
     {
