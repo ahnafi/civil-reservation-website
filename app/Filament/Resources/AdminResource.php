@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
+use App\Filament\Resources\AdminResource\Pages;
+use App\Filament\Resources\AdminResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\ToggleButtons;
@@ -12,23 +12,17 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class UserResource extends Resource
+class AdminResource extends Resource
 {
     protected static ?string $model = User::class;
-    protected static ?string $modelLabel = 'Pengguna';
-    protected static ?string $navigationIcon = 'heroicon-o-user-group';
-    protected static ?string $navigationGroup = 'Booking';
-
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::where("role", "!=", "admin")->count();
-    }
+    protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static ?string $modelLabel = 'Admin';
+    protected static ?string $navigationGroup = 'Manajemen Admin';
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where("role", '!=', "admin");
+        return parent::getEloquentQuery()->where("role", "admin");
     }
 
     public static function form(Form $form): Form
@@ -67,13 +61,15 @@ class UserResource extends Resource
                     ->inline()
                     ->required()
                     ->options([
+                        "admin" => "Admin",
                         "external" => "External",
                         "internal" => "Internal",
                     ])
                     ->colors([
+                        "admin" => "danger",
                         "external" => "success",
                         "internal" => "primary"
-                    ]),
+                    ])->default("admin")->hidden(),
                 Forms\Components\FileUpload::make('photo')
                     ->image()
                     ->directory('photo_profiles')
@@ -87,9 +83,6 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-//                Tables\Columns\ImageColumn::make('photo')
-//                    ->label('Foto profil')
-//                    ->circular(),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama Lengkap')
                     ->searchable(),
@@ -97,9 +90,6 @@ class UserResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
                     ->label('Nomor Telepon')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('identity')
-                    ->label("Nomor Identitas")
                     ->searchable(),
                 Tables\Columns\TextColumn::make('role')
                     ->label("Role")
@@ -124,15 +114,6 @@ class UserResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('role')
-                    ->options([
-                        "admin" => "Admin",
-                        "external" => "External",
-                        "internal" => "Internal",
-                    ])
-                    ->multiple()
-            ])
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make(),
@@ -154,9 +135,9 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
-            'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'index' => Pages\ListAdmins::route('/'),
+            'create' => Pages\CreateAdmin::route('/create'),
+            'edit' => Pages\EditAdmin::route('/{record}/edit'),
         ];
     }
 }
