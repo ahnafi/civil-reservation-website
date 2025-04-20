@@ -16,12 +16,15 @@ use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Forms\Get;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 class SubmissionResource extends Resource
 {
@@ -29,11 +32,11 @@ class SubmissionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
     protected static ?string $modelLabel = 'Booking';
-    protected static ?string $navigationGroup = 'Booking';
+    protected static ?string $navigationGroup = 'Manajemen Peminjaman';
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        return static::getModel()::where("status", "submitted")->count();
     }
 
     public static function form(Form $form): Form
@@ -219,6 +222,7 @@ class SubmissionResource extends Resource
                                 "approved" => "success",
                                 "rejected" => "danger"
                             ])
+                            ->default("submitted")
                             ->icons([
                                 'submitted' => 'heroicon-o-pencil',
                                 'rejected' => 'heroicon-o-x-circle',
@@ -238,7 +242,7 @@ class SubmissionResource extends Resource
                             ->label('Tanggal dibuat')
                             ->content(fn(Submission $record): string => $record->created_at->toFormattedDateString())
                             ->visible(fn(?Submission $record): bool => $record !== null),
-                    ])->grow(false),
+                    ])->grow(false)->visibleOn("view"),
                 ])->columnSpanFull()->from("md"),
 
             ]);
@@ -247,6 +251,9 @@ class SubmissionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(
+                fn(Submission $record): string => SubmissionResource::getUrl('view', ['record' => $record]),
+            )
             ->columns([
                 Tables\Columns\TextColumn::make('user.email')
                     ->label("Email pengguna")
@@ -261,12 +268,20 @@ class SubmissionResource extends Resource
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         'submitted' => 'info',
                         'approved' => 'success',
                         'rejected' => 'danger',
+                    })
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'submitted' => 'Diajukan',
+                        'approved' => 'Diterima',
+                        'rejected' => 'Ditolak',
+                        default => ucfirst($state),
                     }),
+
                 Tables\Columns\TextColumn::make('approval_date')
                     ->label("Tanggal diterima")
                     ->dateTime()
@@ -299,11 +314,77 @@ class SubmissionResource extends Resource
                     ->multiple()
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
-            ])
+                Tables\Actions\Action::make("Terima")
+                    ->action(function (Model $record) {
+                        if ($record->user && $record->user->email) {
+                            $record->status = 'approved';
+                            $record->approval_date = Carbon::now()->format('Y-m-d\TH:i:s');
+                            $record->save();
+
+                            Mail::raw('Pengajuan Anda telah disetujui.', function ($message) use ($record) {
+                                $message->to($record->user->email)
+                                    ->subject('Pengajuan Disetujui');
+                            });
+
+                            Notification::make()
+                                ->title('Pengajuan berhasil disetujui')
+                                ->body("Pengajuan oleh {$record->user->name} telah disetujui.")
+                                ->success()
+                                ->send();
+                        } else {
+                            Notification::make()
+                                ->title('Gagal mengubah pengajuan ')
+                                ->body("Pengajuan oleh {$record->user->name} gagal diubah.")
+                                ->danger()
+                                ->send();
+                        }
+
+                    })
+                    ->button()
+                    ->color("success")
+                    ->requiresConfirmation()
+                    ->icon("heroicon-o-check")
+                    ->visible(fn($record) => $record->status === 'submitted'),
+
+                Tables\Actions\Action::make("Tolak")
+                    ->action(function (Model $record) {
+                        if ($record->user && $record->user->email) {
+
+                            $record->status = 'rejected';
+                            $record->save();
+
+                            Mail::raw('Pengajuan Anda tidak disetujui.', function ($message) use ($record) {
+                                $message->to($record->user->email)
+                                    ->subject('Pengajuan Ditolak');
+                            });
+
+                            Notification::make()
+                                ->title('Pengajuan Ditolak')
+                                ->body("Pengajuan oleh {$record->user->name} telah ditolak.")
+                                ->success()
+                                ->send();
+                        } else {
+                            Notification::make()
+                                ->title('Gagal mengubah pengajuan ')
+                                ->body("Pengajuan oleh {$record->user->name} gagal diubah.")
+                                ->danger()
+                                ->send();
+                        }
+
+                    })
+                    ->button()
+                    ->color("danger")
+                    ->requiresConfirmation()
+                    ->icon("heroicon-o-x-circle")
+                    ->visible(fn($record) => $record->status === 'submitted'),
+
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\RestoreAction::make(),
+                ])->tooltip("Aksi"),
+            ], position: Tables\Enums\ActionsPosition::AfterColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
@@ -327,12 +408,14 @@ class SubmissionResource extends Resource
             'index' => Pages\ListSubmissions::route('/'),
             'create' => Pages\CreateSubmission::route('/create'),
             'edit' => Pages\EditSubmission::route('/{record}/edit'),
+            'view' => Pages\ViewSubmission::route('/{record}'),
         ];
     }
 
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
+            ->with("user")
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);

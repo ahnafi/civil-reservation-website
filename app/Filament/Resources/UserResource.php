@@ -19,7 +19,7 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
     protected static ?string $modelLabel = 'Pengguna';
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
-    protected static ?string $navigationGroup = 'Booking';
+    protected static ?string $navigationGroup = 'Manajemen Peminjaman';
 
     public static function getNavigationBadge(): ?string
     {
@@ -127,7 +127,6 @@ class UserResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('role')
                     ->options([
-                        "admin" => "Admin",
                         "external" => "External",
                         "internal" => "Internal",
                     ])
