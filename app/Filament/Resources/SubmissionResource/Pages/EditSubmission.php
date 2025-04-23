@@ -18,4 +18,14 @@ class EditSubmission extends EditRecord
             Actions\RestoreAction::make(),
         ];
     }
+
+    public function getContentTabLabel(): ?string
+    {
+        return "Pengajuan Peminjaman";
+    }
+
+    public function hasCombinedRelationManagerTabsWithContent(): bool
+    {
+        return true;
+    }
 }

@@ -378,6 +378,20 @@ class SubmissionResource extends Resource
                     ->icon("heroicon-o-x-circle")
                     ->visible(fn($record) => $record->status === 'submitted'),
 
+                Tables\Actions\Action::make("Transaksi")
+                    ->icon("heroicon-o-credit-card")
+                    ->color("warning")
+                    ->button()
+                    ->url(fn(Submission $record): string => route("filament.admin.resources.submissions.edit", [$record, "activeRelationManager" => 0]))
+                    ->visible(fn($record) => $record->status === 'approved'),
+
+                Tables\Actions\Action::make("Pengujian")
+                    ->icon("heroicon-o-beaker")
+                    ->color("info")
+                    ->button()
+                    ->url(fn(Submission $record): string => route("filament.admin.resources.submissions.edit", [$record, "activeRelationManager" => 1]))
+                    ->visible(fn($record) => $record->status === 'approved'),
+
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\ViewAction::make(),

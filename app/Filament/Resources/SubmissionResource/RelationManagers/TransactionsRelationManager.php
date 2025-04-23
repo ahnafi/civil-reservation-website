@@ -19,6 +19,8 @@ use Illuminate\Support\Str;
 class TransactionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'transactions';
+
+    protected static ?string $title = "Transaksi";
     protected static ?string $modelLabel = 'Transaksi';
 
     public function form(Form $form): Form

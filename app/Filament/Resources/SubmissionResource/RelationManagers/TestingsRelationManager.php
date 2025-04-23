@@ -17,13 +17,14 @@ class TestingsRelationManager extends RelationManager
 {
     protected static string $relationship = 'testing';
     protected static ?string $modelLabel = 'Pengujian';
+    protected static ?string $title = "Pengujian";
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
                 ToggleButtons::make('status')
-                ->label('Status Pengujian')
+                    ->label('Status Pengujian')
                     ->inline()
                     ->required()
                     ->options([
