@@ -52,9 +52,6 @@ class AdminResource extends Resource
                     ->validationMessages([
                         'telRegex' => 'Format nomor telepon tidak valid. Gunakan format +62 atau 0 diikuti dengan 9-12 digit angka.',
                     ]),
-                Forms\Components\TextInput::make('identity')
-                    ->label('Nomor Identitas(NIK/NIM/NIP)')
-                    ->maxLength(255),
                 Forms\Components\DateTimePicker::make('email_verified_at')
                     ->label('Tanggal verifikasi Email'),
                 ToggleButtons::make('role')
