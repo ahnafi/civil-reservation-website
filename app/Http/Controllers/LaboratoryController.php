@@ -7,9 +7,16 @@ use Illuminate\Http\Request;
 
 class LaboratoryController extends Controller
 {
-    public function show(Laboratory $laboratory)
+    public function index()
     {
-        return inertia("laboratory/show", [
+        return inertia("laboratories/index", [
+            "laboratories" => Laboratory::get(),
+        ]);
+    }
+
+    public function detail(Laboratory $laboratory)
+    {
+        return inertia("laboratories/detail", [
             "laboratory" => $laboratory,
             "tests" => $laboratory->tests()->with("packages")->with('category')->get(),
             "packages" => $laboratory->packages()->with("tests")->get(),

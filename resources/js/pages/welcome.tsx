@@ -38,15 +38,17 @@ export default function Welcome() {
                 </nav>
                 <div className="section-padding-x mx-auto flex max-w-screen-lg items-center justify-between gap-4 py-4 md:py-8">
                     <div className="border-dark-base dark:border-light-base flex flex-col-reverse items-center justify-between overflow-hidden rounded-lg border bg-white shadow-[0px_0px_1px_0px_rgba(0,0,0,0.03),0px_1px_2px_0px_rgba(0,0,0,0.06)] md:flex-row dark:bg-[#161615] dark:shadow-[0px_0px_1px_0px_rgba(255,255,255,0.03),0px_1px_2px_0px_rgba(255,255,255,0.06)]">
-                        <div className="p-4 md:p-8 small-font-size">
+                        <div className="small-font-size p-4 md:p-8">
                             <h2 className="font-semibold">Selamat Datang</h2>
-                            <h4 className="font-medium mb-1">di Sistem Reservasi Lab Teknik Sipil</h4>
+                            <h4 className="mb-1 font-medium">di Sistem Reservasi Lab Teknik Sipil</h4>
                             <p className="text-dark-secondary dark:text-light-secondary small-font-size">
                                 Sistem reservasi lab teknik sipil ini bertujuan untuk mempermudah mahasiswa ataupun pihak eksternal dalam melakukan
                                 reservasi lab.
                             </p>
-                            <p className="text-dark-secondary dark:text-light-secondary small-font-size">Kami sarankan untuk memulai dengan yang berikut ini.</p>
-                            <ul className="text-dark-secondary dark:text-light-secondary flex flex-col mb-4">
+                            <p className="text-dark-secondary dark:text-light-secondary small-font-size">
+                                Kami sarankan untuk memulai dengan yang berikut ini.
+                            </p>
+                            <ul className="text-dark-secondary dark:text-light-secondary mb-4 flex flex-col">
                                 <li className="relative flex items-center gap-4 py-2 before:absolute before:top-1/2 before:bottom-0 before:left-[0.4rem] before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A]">
                                     <span className="relative bg-white py-1 dark:bg-[#161615]">
                                         <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[#e3e3e0] bg-[#FDFDFC] shadow-[0px_0px_1px_0px_rgba(0,0,0,0.03),0px_1px_2px_0px_rgba(0,0,0,0.06)] dark:border-[#3E3E3A] dark:bg-[#161615]">
@@ -111,13 +113,13 @@ export default function Welcome() {
                                 </li>
                             </ul>
                             <a
-                                href="/register"
+                                href={auth.user ? route('dashboard') : route('login')}
                                 className="small-font-size inline-block rounded-sm border border-black bg-[#1b1b18] px-5 py-1.5 leading-normal text-white hover:border-black hover:bg-black dark:border-[#eeeeec] dark:bg-[#eeeeec] dark:text-[#1C1C1A] dark:hover:border-white dark:hover:bg-white"
                             >
                                 Reservasi Sekarang
                             </a>
                         </div>
-                        <div className="border-dark-base dark:border-light-base h-64 md:h-84 lg:h-96 xl:h-108 w-full md:border-l bg-[url('/img/backgrounds/gedung-ft.jpg')] bg-cover bg-center bg-no-repeat"></div>
+                        <div className="border-dark-base dark:border-light-base h-64 w-full bg-[url('/img/backgrounds/gedung-ft.jpg')] bg-cover bg-center bg-no-repeat md:h-84 md:border-l lg:h-96 xl:h-108"></div>
                     </div>
                 </div>
             </div>

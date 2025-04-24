@@ -270,7 +270,6 @@ export default function MainDashboard({
                     </div>
                 </div>
             </div>
-
             <ToastContainer />
         </AppLayout>
     );

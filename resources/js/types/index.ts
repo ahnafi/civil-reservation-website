@@ -53,6 +53,7 @@ export interface Laboratory {
     name: string;
     code: string;
     room: string;
+    slug: string;
     created_at: Date;
     updated_at: Date;
 }
@@ -176,7 +177,9 @@ export interface Testing {
     created_at: string;
     updated_at: string;
     deleted_at?: string | null;
+    links?: unknown;
 }
 
 export type PaginatedTests = Pagination<Test>;
 export type PaginatedPackage = Pagination<Package>;
+export type PaginatedLaboratories = Pagination<Laboratory>;

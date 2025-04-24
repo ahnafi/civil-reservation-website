@@ -1,7 +1,9 @@
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, PaginatedTests, Test } from '@/types';
 import { Head, Link } from '@inertiajs/react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -20,6 +22,50 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
         }).format(value);
     };
 
+    const renderPaginationLinks = () => {
+        const { links, current_page, last_page } = tests;
+
+        const numberedLinks = links.filter((link) => !link.label.includes('Previous') && !link.label.includes('Next'));
+
+        return (
+            <div className="mt-6 flex items-center justify-center gap-1">
+                <Button variant="outline" size="icon" disabled={current_page === 1} asChild={current_page !== 1}>
+                    {current_page !== 1 ? (
+                        <Link href={tests.prev_page_url || '#'}>
+                            <ChevronLeft className="h-4 w-4" />
+                        </Link>
+                    ) : (
+                        <span>
+                            <ChevronLeft className="h-4 w-4" />
+                        </span>
+                    )}
+                </Button>
+                {numberedLinks.map((link, i: number) => (
+                    <Button
+                        key={i}
+                        variant={link.active ? 'default' : 'outline'}
+                        size="sm"
+                        className={link.active ? 'bg-blue-600 hover:bg-blue-700' : ''}
+                        asChild={!link.active}
+                    >
+                        {!link.active ? <Link href={link.url || '#'}>{link.label}</Link> : <span>{link.label}</span>}
+                    </Button>
+                ))}
+                <Button variant="outline" size="icon" disabled={current_page === last_page} asChild={current_page !== last_page}>
+                    {current_page !== last_page ? (
+                        <Link href={tests.next_page_url || '#'}>
+                            <ChevronRight className="h-4 w-4" />
+                        </Link>
+                    ) : (
+                        <span>
+                            <ChevronRight className="h-4 w-4" />
+                        </span>
+                    )}
+                </Button>
+            </div>
+        );
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Pengujian" />
@@ -28,12 +74,16 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                     {tests.data.map((data: Test) => (
                         <Card className="gap-0 p-2" key={data.id}>
                             <CardHeader className="px-0">
-                                <Link href={'tests/' + data.slug}>
-                                    <img src={'/storage/test_image/' + data.images} alt={data.name} className="rounded-md" />
+                                <Link href={'/test/' + data.slug}>
+                                    <img
+                                        src={'/storage/test_image/' + data.images}
+                                        alt={data.name}
+                                        className="h-48 w-full rounded-md object-cover md:h-54 lg:h-60"
+                                    />
                                 </Link>
                                 <CardTitle>
-                                    <Link href={'tests/' + data.slug}>
-                                        <h3>{data.name}</h3>
+                                    <Link href={'/test/' + data.slug}>
+                                        <h3 className="truncate-2-lines">{data.name}</h3>
                                     </Link>
                                 </CardTitle>
                             </CardHeader>
@@ -64,7 +114,7 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                                             >
                                                 <path d="M48 0C21.5 0 0 21.5 0 48L0 464c0 26.5 21.5 48 48 48l96 0 0-80c0-26.5 21.5-48 48-48s48 21.5 48 48l0 80 96 0c26.5 0 48-21.5 48-48l0-416c0-26.5-21.5-48-48-48L48 0zM64 240c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zm112-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zM80 96l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zM272 96l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16z" />
                                             </svg>
-                                            <span className="small-font-size">{data.laboratory.name}</span>
+                                            <span className="small-font-size">{data.laboratory.code}</span>
                                         </div>
                                         <div
                                             className="text-light-base bg-teal-base flex items-center gap-1 rounded-md px-2 py-1"
@@ -85,7 +135,7 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                                 <div className="flex flex-wrap items-center justify-between">
                                     <h4 className="font-semibold">{formatRupiah(data.price)}</h4>
                                     <Link
-                                        href={'tests/' + data.slug}
+                                        href={'/test/' + data.slug}
                                         className="bg-blue-base text-light-base flex items-center justify-between gap-1 rounded-md px-3 py-2"
                                     >
                                         <svg
@@ -109,6 +159,10 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                             </CardContent>
                         </Card>
                     ))}
+                </div>
+                {renderPaginationLinks()}
+                <div className="mt-4 text-center text-sm text-gray-500">
+                    Menampilkan {tests.from} hingga {tests.to} dari {tests.total} pengujian
                 </div>
             </div>
         </AppLayout>
