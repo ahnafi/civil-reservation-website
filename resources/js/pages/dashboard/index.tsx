@@ -1,12 +1,12 @@
 ('use-client');
 
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartConfig, ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { GeneralSchedule, LaboratorySimple, SimpleOption, type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import {
     ColumnFiltersState,
     flexRender,
@@ -52,6 +52,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function MainDashboard({
     schedule,
+    laboratories,
 }: {
     schedule: GeneralSchedule[];
     tests: SimpleOption[];
@@ -82,6 +83,8 @@ export default function MainDashboard({
             rowSelection,
         },
     });
+
+    console.info(laboratories);
 
     function formatToRupiah(value: number): string {
         return new Intl.NumberFormat('id-ID', {
@@ -205,6 +208,64 @@ export default function MainDashboard({
                                     Next
                                 </Button>
                             </div>
+                        </div>
+                    </div>
+                    <div className="col-span-full space-y-2">
+                        <h3 className="font-semibold">Laboratorium yang Tersedia</h3>
+                        <div className="col-span-full grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                            {laboratories.map((data, index) => (
+                                <Card className="gap-0 p-2" key={index}>
+                                    <CardHeader className="px-0">
+                                        <Link href={`/laboratory/${data.slug}`}>
+                                            <img
+                                                src={`/storage/${data.image}`}
+                                                alt={`${data.name} Foto`}
+                                                className="h-28 w-full rounded-md object-cover md:h-48"
+                                            />
+                                        </Link>
+                                        <CardTitle>
+                                            <Link href={`/laboratory/${data.slug}`}>
+                                                <h4>{data.name}</h4>
+                                            </Link>
+                                        </CardTitle>
+                                    </CardHeader>
+                                    <CardContent className="px-0">
+                                        <CardDescription className="space-y-2">
+                                            <p className="truncate-2-lines">{data.description}</p>
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <div
+                                                    className="text-light-base bg-purple-base flex items-center gap-1 rounded-md px-2 py-1"
+                                                    title="Laboratorium"
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 384 512"
+                                                        className="h-4 w-4 md:h-5 md:w-5"
+                                                        fill="currentColor"
+                                                    >
+                                                        <path d="M48 0C21.5 0 0 21.5 0 48L0 464c0 26.5 21.5 48 48 48l96 0 0-80c0-26.5 21.5-48 48-48s48 21.5 48 48l0 80 96 0c26.5 0 48-21.5 48-48l0-416c0-26.5-21.5-48-48-48L48 0zM64 240c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zm112-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zM80 96l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zM272 96l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16z" />
+                                                    </svg>
+                                                    <span className="small-font-size">{data.code}</span>
+                                                </div>
+                                                <div
+                                                    className="text-light-base bg-lime-base flex items-center gap-1 rounded-md px-2 py-1"
+                                                    title="Laboratorium"
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 320 512"
+                                                        fill="currentColor"
+                                                        className="h-4 w-4 md:h-5 md:w-5"
+                                                    >
+                                                        <path d="M112 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm40 304l0 128c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-223.1L59.4 304.5c-9.1 15.1-28.8 20-43.9 10.9s-20-28.8-10.9-43.9l58.3-97c17.4-28.9 48.6-46.6 82.3-46.6l29.7 0c33.7 0 64.9 17.7 82.3 46.6l58.3 97c9.1 15.1 4.2 34.8-10.9 43.9s-34.8 4.2-43.9-10.9L232 256.9 232 480c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-128-16 0z" />
+                                                    </svg>
+                                                    <span className="small-font-size">5</span>
+                                                </div>
+                                            </div>
+                                        </CardDescription>
+                                    </CardContent>
+                                </Card>
+                            ))}
                         </div>
                     </div>
                 </div>

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LaboratoryController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TestController;
@@ -17,9 +18,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('laboratories', function () {
         return Inertia::render('laboratories/index');
     })->name('laboratories');
-    Route::get('laboratories/example', function () {
-        return Inertia::render('laboratories/example');
-    })->name('tests-example');
+    Route::get('laboratory/{laboratory:slug}', [LaboratoryController::class, 'show'])->name('laboratory.show');
     Route::get('tests', [TestController::class, "index"])->name('tests');
     Route::get('tests/{test:slug}', [TestController::class, "detail"])->name('tests-detail');
     Route::get('packages', [PackageController::class, "index"])->name('packages');

@@ -29,7 +29,7 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                         <Card className="gap-0 p-2" key={data.id}>
                             <CardHeader className="px-0">
                                 <Link href={'tests/' + data.slug}>
-                                    <img src={'/storage/' + data.images[0]} alt={data.name} className="rounded-md" />
+                                    <img src={'/storage/test_image/' + data.images} alt={data.name} className="rounded-md" />
                                 </Link>
                                 <CardTitle>
                                     <Link href={'tests/' + data.slug}>

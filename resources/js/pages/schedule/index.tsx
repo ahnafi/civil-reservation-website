@@ -81,11 +81,11 @@ export default function Schedule({
     const [selectedTest, setSelectedTest] = useState<SimpleOption | null>(null);
     const [selectedStatus, setSelectedStatus] = useState<SimpleOption | null>(null);
 
-    const now = new Date();
-    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-    const [initialDate, setInitialDate] = useState<Date | undefined>(firstDayOfMonth);
-    const [finalDate, setFinalDate] = useState<Date | undefined>(lastDayOfMonth);
+    // const now = new Date();
+    // const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    // const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const [initialDate, setInitialDate] = useState<Date | undefined>();
+    const [finalDate, setFinalDate] = useState<Date | undefined>();
 
     const [finalDateKey, setFinalDateKey] = useState<number>(Date.now());
 

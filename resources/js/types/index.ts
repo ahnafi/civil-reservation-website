@@ -134,7 +134,10 @@ export interface SimpleOption {
 export interface LaboratorySimple {
     id: number;
     code: string;
+    slug: string;
     name: string;
+    description: string;
+    image: string;
 }
 
 // Transaction Types

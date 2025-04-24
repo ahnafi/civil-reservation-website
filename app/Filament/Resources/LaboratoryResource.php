@@ -38,6 +38,16 @@ class LaboratoryResource extends Resource
                         ->label('Kode ruangan laboratorium')
                         ->required()
                         ->maxLength(255),
+                    Forms\Components\Textarea::make('description')
+                        ->label('Deskripsi laboratorium')
+                        ->required()
+                        ->maxLength(65535),
+                    Forms\Components\FileUpload::make('image')
+                        ->label('Gambar laboratorium')
+                        ->image()
+                        ->required()
+                        ->maxSize(2048)
+                        ->directory('laboratories'),
                 ])->columns(),
             ]);
     }
@@ -46,14 +56,22 @@ class LaboratoryResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('image')
+                    ->label('Gambar')
+                    ->size(50)
+                    ->circular(),
                 Tables\Columns\TextColumn::make('code')
-                    ->label('Kode laboratorium')
+                    ->label('Kode Lab')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Nama laboratorium')
+                    ->label('Nama')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('room')
-                    ->label('Kode ruangan laboratorium')
+                    ->label('Kode Ruangan')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('description')
+                    ->label('Deskripsi')
+                    ->limit(50)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label("Tanggal Ditambahkan")

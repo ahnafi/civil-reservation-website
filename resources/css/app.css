@@ -58,7 +58,12 @@
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
 
+    --color-dark-base: oklch(13% 0.028 261.692);
+    --color-dark-secondary: oklch(27.9% 0.041 260.031);
+    --color-dark-tertiary: oklch(44.6% 0.03 256.802);
     --color-light-base: oklch(0.985 0.002 247.839);
+    --color-light-secondary: oklch(96.7% 0.003 264.542);
+    --color-light-tertiary: oklch(87.2% 0.01 258.338);
     --color-blue-base: oklch(0.546 0.245 262.881);
     --color-amber-base: oklch(0.666 0.179 58.318);
     --color-purple-base: oklch(0.558 0.288 302.321);
@@ -120,6 +125,10 @@
     small {
         @apply text-xs lg:text-sm;
     }
+
+    .section-padding-x {
+        @apply px-6 sm:px-8 md:px-12 xl:px-20;
+      }
 }
 
 @layer components {
