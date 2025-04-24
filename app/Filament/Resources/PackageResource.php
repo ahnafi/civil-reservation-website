@@ -21,10 +21,10 @@ class PackageResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-group';
     protected static ?string $navigationGroup = 'Pengujian';
 
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::count();
-    }
+//    public static function getNavigationBadge(): ?string
+//    {
+//        return static::getModel()::count();
+//    }
 
     public static function form(Form $form): Form
     {
