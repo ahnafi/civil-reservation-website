@@ -1,9 +1,12 @@
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Test } from '@/types';
 import { Head, Link } from '@inertiajs/react';
+import { Clock, Layers, MapPin, Ruler, Tag } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Detail({ test }: { test: Test }) {
@@ -20,104 +23,218 @@ export default function Detail({ test }: { test: Test }) {
 
     const [mainImage, setMainImage] = useState(test.images[0]);
 
-    const formatRupiah = (value: number, currency = 'IDR') => {
+    const formatRupiah = (value: number) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
-            currency: currency,
+            currency: 'IDR',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
         }).format(value);
     };
 
-    console.log(test);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={test.name} />
 
-            <div className="grid grid-cols-1 gap-6 p-4 lg:grid-cols-2 xl:grid-cols-3">
-                <div className="row-span-2 space-y-2">
-                    <img
-                        src={'/storage/' + mainImage}
-                        alt={test.name}
-                        className="max-h-96 w-full rounded-lg object-cover transition-all duration-300"
-                    />
-                    <Carousel>
-                        <CarouselContent>
-                            {test.images.map((image: string, index: number) => (
-                                <CarouselItem className="basis-1/2 md:basis-1/3 lg:basis-1/4" key={index}>
-                                    <img src={'/storage/' + image} alt={test.name} className="rounded-md" onClick={() => setMainImage(image)} />
-                                </CarouselItem>
-                            ))}
-                        </CarouselContent>
-                    </Carousel>
+            <div className="container mx-auto py-6">
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+                    {/* Image Gallery Section */}
+                    <div className="lg:col-span-1">
+                        <Card className="overflow-hidden py-0">
+                            <CardContent className="p-0">
+                                <div className="relative aspect-square w-full overflow-hidden">
+                                    <img
+                                        src={'/storage/test_image/' + mainImage}
+                                        alt={test.name}
+                                        className="h-full w-full object-cover transition-all duration-300 hover:scale-105"
+                                    />
+                                    {test.is_active && <Badge className="dark:text-light-base absolute top-3 right-3 bg-green-500">Tersedia</Badge>}
+                                </div>
+
+                                <div className="p-4">
+                                    <Carousel className="w-full">
+                                        <CarouselContent>
+                                            {test.images.map((image: string, index: number) => (
+                                                <CarouselItem className="basis-1/3 md:basis-1/4" key={index}>
+                                                    <div
+                                                        className={`cursor-pointer overflow-hidden rounded-md border-2 ${
+                                                            mainImage === image ? 'border-primary' : 'border-transparent'
+                                                        }`}
+                                                        onClick={() => setMainImage(image)}
+                                                    >
+                                                        <img
+                                                            src={'/storage/test_image/' + image}
+                                                            alt={`${test.name} ${index + 1}`}
+                                                            className="aspect-square h-full w-full object-cover"
+                                                        />
+                                                    </div>
+                                                </CarouselItem>
+                                            ))}
+                                        </CarouselContent>
+                                        <CarouselPrevious className="left-1" />
+                                        <CarouselNext className="right-1" />
+                                    </Carousel>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* Test Details Section */}
+                    <div className="lg:col-span-2">
+                        <Card className="p-4 md:p-8">
+                            <CardHeader className="p-0">
+                                <div className="flex justify-between">
+                                    <div>
+                                        <CardTitle className="mb-2 font-bold">
+                                            <h2>{test.name}</h2>
+                                        </CardTitle>
+                                        <CardDescription className="flex items-center gap-2">
+                                            <Tag className="h-4 w-4" />
+                                            <span>{test.category.name}</span>
+                                        </CardDescription>
+                                    </div>
+                                    <Badge className="bg-green-base dark:text-light-base font-semibol h-fit">
+                                        <p>{formatRupiah(test.price)}</p>
+                                    </Badge>
+                                </div>
+                            </CardHeader>
+
+                            <CardContent className="space-y-4 p-0">
+                                <div>
+                                    <h4 className="font-semibold">Deskripsi</h4>
+                                    <p className="text-muted-foreground">{test.description}</p>
+                                </div>
+
+                                <Separator />
+
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                    <div className="flex items-center gap-3">
+                                        <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-full">
+                                            <Layers className="text-primary h-5 w-5" />
+                                        </div>
+                                        <div>
+                                            <p className="text-muted-foreground text-sm">Laboratorium</p>
+                                            <Link href={`/laboratory/${test.laboratory.slug}`} className="font-medium hover:underline">
+                                                {test.laboratory.name}
+                                            </Link>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                        <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-full">
+                                            <MapPin className="text-primary h-5 w-5" />
+                                        </div>
+                                        <div>
+                                            <p className="text-muted-foreground text-sm">Lokasi</p>
+                                            <p className="font-medium">{test.laboratory.room}</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                        <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-full">
+                                            <Ruler className="text-primary h-5 w-5" />
+                                        </div>
+                                        <div>
+                                            <p className="text-muted-foreground text-sm">Minimum Pemesanan</p>
+                                            <p className="font-medium">{test.minimum_unit} Unit</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                        <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-full">
+                                            <Clock className="text-primary h-5 w-5" />
+                                        </div>
+                                        <div>
+                                            <p className="text-muted-foreground text-sm">Slot Harian</p>
+                                            <p className="font-medium">{test.daily_slot} Slot</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {test.packages && test.packages.length > 0 && (
+                                    <>
+                                        <Separator />
+                                        <div>
+                                            <h4 className="mb-2 font-semibold">Tersedia dalam Paket</h4>
+                                            <div className="space-y-4">
+                                                {test.packages.map((pkg) => (
+                                                    <Card key={pkg.id} className="bg-secondary/30 py-0">
+                                                        <CardContent className="p-2">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="h-16 w-16 overflow-hidden rounded-md">
+                                                                    <img
+                                                                        src={`/storage/test_image/${pkg.images[0]}`}
+                                                                        alt={pkg.name}
+                                                                        className="h-full w-full object-cover"
+                                                                    />
+                                                                </div>
+                                                                <div className="small-font-size flex-1">
+                                                                    <Link href={`/package/${pkg.slug}`} className="font-medium hover:underline">
+                                                                        {pkg.name}
+                                                                    </Link>
+                                                                    <p className="text-muted-foreground">{formatRupiah(pkg.price)}</p>
+                                                                </div>
+                                                                <Button variant="secondary" size="sm" asChild>
+                                                                    <Link href={`/package/${pkg.slug}`} className="small-font-size">
+                                                                        Detail
+                                                                    </Link>
+                                                                </Button>
+                                                            </div>
+                                                        </CardContent>
+                                                    </Card>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </CardContent>
+
+                            <CardFooter className="flex flex-col gap-4 p-0 sm:flex-row">
+                                <Link
+                                    href={`/tests/${test.slug}/order`}
+                                    className="bg-blue-base text-light-base normal-font-size w-full rounded-md px-4 py-2 text-center font-semibold hover:bg-blue-600/90 md:py-4"
+                                >
+                                    Pesan Sekarang
+                                </Link>
+                            </CardFooter>
+                        </Card>
+                    </div>
                 </div>
 
-                <div className="space-y-4">
-                    <h1 className="font-black">{test.name}</h1>
-                    <Separator />
-                    <div className="">
-                        <p className="text-neutral-400">Deskripsi</p>
-                        <p className="">{test.description}</p>
-                    </div>
-
-                    {/*<div className="">*/}
-                    {/*    <p className="text-neutral-400">*/}
-                    {/*        Catatan <span className="text-red-base">*</span>*/}
-                    {/*    </p>*/}
-                    {/*    <p className="">{test.name}</p>*/}
-                    {/*</div>*/}
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <p className="text-neutral-400">Satuan</p>
-                            <Link href="#" className="font-medium hover:underline">
-                                {test.category.name}
-                            </Link>
-                        </div>
-
-                        <div>
-                            <p className="text-neutral-400">Laboratorium</p>
-                            <Link href="#" className="font-medium hover:underline">
-                                {test.laboratory.name}
-                            </Link>
-                        </div>
-
-                        <div>
-                            <p className="text-neutral-400">Minimum Pemesanan</p>
-                            <Link href="#" className="font-medium hover:underline">
-                                {test.minimum_unit}
-                            </Link>
-                        </div>
-
-                        <div>
-                            <p className="text-neutral-400">Harga</p>
-                            <Link href="#" className="font-medium hover:underline">
-                                Rp {test.price.toLocaleString()}/{test.minimum_unit}
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="flex flex-col gap-4">
-                    <div className="flex flex-col gap-2">
-                        <h2 className="font-black">
-                            Mulai Dari <span className="text-blue-base">{formatRupiah(test.price)}</span>
-                        </h2>
-                        <p>Pembayaran fleksibel tersedia dengan E-money atau M-banking.</p>
-                        <Button className="bg-blue-base text-light-base dark:text-light-base flex cursor-pointer items-center justify-center px-24 py-6 transition-colors duration-300 ease-out hover:bg-blue-700 hover:decoration-current! dark:bg-blue-500 dark:hover:bg-blue-600 dark:hover:decoration-current!">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" className="h-8 w-8 md:h-12 md:w-12" fill="currentColor">
-                                <path d="M0 24C0 10.7 10.7 0 24 0L69.5 0c22 0 41.5 12.8 50.6 32l411 0c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3l-288.5 0 5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5L488 336c13.3 0 24 10.7 24 24s-10.7 24-24 24l-288.3 0c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5L24 48C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z" />
-                            </svg>
-                            <span className="big-font-size font-semibold">Pesan Sekarang</span>
-                        </Button>
-                        <Separator />
-                    </div>
-                    <ul className="list-inside list-disc">
-                        <li className="normal-font-size">Hasil uji akan dikirimkan melalui email.</li>
-                        <li className="normal-font-size">Hasil uji akan dikirimkan dalam waktu 3-5 hari kerja.</li>
-                        <li className="normal-font-size">Hasil uji dapat diunduh dalam bentuk PDF.</li>
-                    </ul>
+                {/* Lab Description Section */}
+                <div className="mt-8">
+                    <Card className="p-4">
+                        <CardHeader className="p-0">
+                            <CardTitle className="text-xl">
+                                <h4>Tentang {test.laboratory.name}</h4>
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="p-0">
+                            <div className="flex flex-col gap-6 md:flex-row">
+                                <div className="w-full md:w-1/4">
+                                    <div className="overflow-hidden rounded-lg">
+                                        <img
+                                            src={`/storage/${test.laboratory.image}`}
+                                            alt={test.laboratory.name}
+                                            className="h-full w-full object-cover"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <div className="mb-2 flex items-center gap-2">
+                                        <Badge variant="outline">{test.laboratory.code}</Badge>
+                                        <Badge variant="outline">{test.laboratory.room}</Badge>
+                                    </div>
+                                    <p className="text-muted-foreground">{test.laboratory.description}</p>
+                                    <div className="mt-4">
+                                        <Button variant="link" asChild className="p-0">
+                                            <Link href={`/laboratories/${test.laboratory.slug}`}>Lihat Detail Laboratorium</Link>
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </AppLayout>

@@ -16,6 +16,8 @@ class PackageController extends Controller
 
     public function detail(Package $package): Response
     {
-        return Inertia::render('packages/detail', ["data" => $package->load("tests")]);
+        return Inertia::render('packages/detail', [
+            "data" => $package->load("tests", "laboratory"),
+        ]);
     }
 }

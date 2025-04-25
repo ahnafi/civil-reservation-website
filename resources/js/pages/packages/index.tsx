@@ -35,7 +35,7 @@ export default function Packages({ paginated }: { paginated: PaginatedPackage })
                                 </span>
                                 <div className="flex flex-col gap-1">
                                     <CardTitle>
-                                        <Link href={'/packages/' + data.slug}>
+                                        <Link href={'/package/' + data.slug}>
                                             <h2 className="big-font-size">{data.name}</h2>
                                         </Link>
                                     </CardTitle>
@@ -63,7 +63,7 @@ export default function Packages({ paginated }: { paginated: PaginatedPackage })
                                     ))}
                                 </ul>
                                 <Link
-                                    href={'/packages/' + data.slug}
+                                    href={'/package/' + data.slug}
                                     className="text-blue-base border-blue-base hover:bg-blue-base hover:text-light-base flex items-center justify-center gap-1 rounded-md border-2 px-3 py-2 transition duration-300"
                                 >
                                     <svg
