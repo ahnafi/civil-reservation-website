@@ -13,8 +13,11 @@ return new class extends Migration {
         Schema::create('laboratories', function (Blueprint $table) {
             $table->id();
             $table->string("code");
+            $table->string("slug");
             $table->string("name");
             $table->string("room");
+            $table->text("description");
+            $table->string("image");
             $table->timestamps();
             $table->softDeletes();
         });

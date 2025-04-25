@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\LaboratoryController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TestController;
@@ -15,16 +16,12 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, "index"])->name('dashboard');
     Route::get('schedule', [ScheduleController::class, "index"])->name("schedule");
-    Route::get('laboratories', function () {
-        return Inertia::render('laboratories/index');
-    })->name('laboratories');
-    Route::get('laboratories/example', function () {
-        return Inertia::render('laboratories/example');
-    })->name('tests-example');
+    Route::get('laboratories', [LaboratoryController::class, 'index'])->name('laboratories');
+    Route::get('laboratory/{laboratory:slug}', [LaboratoryController::class, 'detail'])->name('laboratory-detail');
     Route::get('tests', [TestController::class, "index"])->name('tests');
-    Route::get('tests/{test:slug}', [TestController::class, "detail"])->name('tests-detail');
+    Route::get('test/{test:slug}', [TestController::class, "detail"])->name('tests-detail');
     Route::get('packages', [PackageController::class, "index"])->name('packages');
-    Route::get('packages/{package:slug}', [PackageController::class, "detail"])->name('packages-detail');
+    Route::get('package/{package:slug}', [PackageController::class, "detail"])->name('packages-detail');
     Route::get('orders/cart', function () {
         return Inertia::render('orders/cart');
     })->name('orders-cart');
