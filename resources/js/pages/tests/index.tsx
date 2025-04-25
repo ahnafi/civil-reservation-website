@@ -74,17 +74,12 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                     {tests.data.map((data: Test) => (
                         <Card className="gap-0 p-2" key={data.id}>
                             <CardHeader className="px-0">
-<<<<<<< HEAD
-                                <Link href={'tests/' + data.slug}>
-                                    <img src={'/storage/test_image/' + data.images} alt={data.name} className="rounded-md" />
-=======
                                 <Link href={'/test/' + data.slug}>
                                     <img
                                         src={'/storage/test_image/' + data.images}
                                         alt={data.name}
                                         className="h-48 w-full rounded-md object-cover md:h-54 lg:h-60"
                                     />
->>>>>>> dashboard
                                 </Link>
                                 <CardTitle>
                                     <Link href={'/test/' + data.slug}>
