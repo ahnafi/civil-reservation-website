@@ -34,7 +34,7 @@ class Transaction extends Model
             $submission = $transaction->submission;
             $submissionId = $submission?->id ?? '000';
             $userId = $submission?->user_id ?? '000';
-            $transactionCount = $submission ? $submission->transactions()->count() + 1 : 1;
+            $transactionCount = $submission ? $submission->transactions()->withTrashed()->count() + 1 : 1;
             $transaction->code = 'CVL-' . now()->format('Ymd') . $submissionId . $userId . $transactionCount;
 
             // Set the payment deadline to 1 day from now

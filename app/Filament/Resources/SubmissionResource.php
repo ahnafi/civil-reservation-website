@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
+use function Laravel\Prompts\textarea;
 
 class SubmissionResource extends Resource
 {
@@ -347,13 +348,18 @@ class SubmissionResource extends Resource
                     ->visible(fn($record) => $record->status === 'submitted'),
 
                 Tables\Actions\Action::make("Tolak")
-                    ->action(function (Model $record) {
+                    ->form([
+                        Forms\Components\Textarea::make("reason")
+                            ->required()
+                            ->label("Perihal"),
+                    ])
+                    ->action(function (array $data, Model $record) {
                         if ($record->user && $record->user->email) {
 
                             $record->status = 'rejected';
                             $record->save();
 
-                            Mail::raw('Pengajuan Anda tidak disetujui.', function ($message) use ($record) {
+                            Mail::raw("Pengajuan Anda ditolak." . $data["reason"], function ($message) use ($record) {
                                 $message->to($record->user->email)
                                     ->subject('Pengajuan Ditolak');
                             });

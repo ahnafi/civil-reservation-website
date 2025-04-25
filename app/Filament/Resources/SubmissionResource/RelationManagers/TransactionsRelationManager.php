@@ -5,15 +5,19 @@ namespace App\Filament\Resources\SubmissionResource\RelationManagers;
 use App\Models\Submission;
 use App\Models\Transaction;
 use Filament\Forms;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class TransactionsRelationManager extends RelationManager
@@ -35,7 +39,7 @@ class TransactionsRelationManager extends RelationManager
                         $submission = $this->getOwnerRecord();
                         $submissionId = $submission?->id ?? '000';
                         $userId = $submission?->user_id ?? '000';
-                        $transactionCount = $submission ? $submission->transactions()->count() + 1 : 1;
+                        $transactionCount = $submission ? $submission->transactions()->withTrashed()->count() + 1 : 1;
 
                         return 'CVL-' . now()->format('Ymd') . $submissionId . $userId . $transactionCount;
                     })
@@ -49,6 +53,7 @@ class TransactionsRelationManager extends RelationManager
                     ->prefix("Rp"),
 
                 ToggleButtons::make('payment_method')
+                    ->hiddenOn("create")
                     ->label("Metode Pembayaran")
                     ->inline()
                     ->options([
@@ -69,6 +74,8 @@ class TransactionsRelationManager extends RelationManager
                     ]),
 
                 ToggleButtons::make('status')
+                    ->default("pending")
+                    ->hiddenOn("create")
                     ->inline()
                     ->required()
                     ->options([
@@ -106,11 +113,13 @@ class TransactionsRelationManager extends RelationManager
                     ->directory('payment_invoice'),
 
                 Forms\Components\FileUpload::make('payment_receipt_image')
+                    ->hiddenOn("create")
                     ->label('Bukti Pembayaran')
                     ->image()
                     ->directory('payment_receipts'),
 
                 Forms\Components\DateTimePicker::make('payment_date')
+                    ->hiddenOn("create")
                     ->label('Tanggal Pembayaran')
                     ->nullable(),
                 Forms\Components\Textarea::make('note')
@@ -128,6 +137,11 @@ class TransactionsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('amount')->label('Total')->sortable(),
                 Tables\Columns\TextColumn::make('payment_method')->label('Metode Pembayaran')->sortable(),
                 Tables\Columns\TextColumn::make('status')->label('Status')->sortable()->badge()
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'pending' => 'Pending',
+                        "success" => "Diterima",
+                        "failed" => "Ditolak",
+                    })
                     ->color(fn(string $state): string => match ($state) {
                         "pending" => "info",
                         "success" => "success",
@@ -148,21 +162,92 @@ class TransactionsRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make("Setujui")
+                    ->icon("heroicon-o-check-circle")
+                    ->requiresConfirmation()
+                    ->color("success")
+                    ->visible(fn($record) => $record->status === 'pending')
+                    ->action(function (Model $record) {
+                        $user = $record->submission->user;
+
+                        if ($record->payment_method == null) {
+                            Notification::make()
+                                ->title('Gagal mengubah transaksi')
+                                ->body("Transaksi gagal disetujui karena metode pembayaran tidak diisi.")
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+
+                        if ($user && $user->email) {
+                            $record->status = 'success';
+                            $record->payment_date = Carbon::now()->format('Y-m-d\TH:i:s');
+                            $record->save();
+
+                            Mail::raw("Pembayaran Anda telah disetujui dengan kode pembayaran {$record->code}.", function ($message) use ($user) {
+                                $message->to($user->email)
+                                    ->subject('Pembayaran Disetujui');
+                            });
+
+                            Notification::make()
+                                ->title('Pengajuan berhasil disetujui')
+                                ->body("Pengajuan oleh {$user->name} telah disetujui.")
+                                ->success()
+                                ->send();
+                        } else {
+                            Notification::make()
+                                ->title('Gagal mengubah transaksi')
+                                ->body("Transaksi gagal karena data pengguna tidak lengkap.")
+                                ->danger()
+                                ->send();
+                        }
+                    }),
+
+                Tables\Actions\Action::make("Tolak")
+                    ->icon("heroicon-o-x-circle")
+                    ->requiresConfirmation()
+                    ->form([
+                        Forms\Components\Textarea::make('note')
+                            ->required()
+                            ->label("Perihal"),
+                    ])
+                    ->color("danger")
+                    ->visible(fn($record) => $record->status === 'pending')
+                    ->action(function (array $data, Model $record) {
+                        $user = $record->submission->user;
+
+                        if ($user && $user->email) {
+                            $record->status = 'failed';
+                            $record->note = $data['note']; // ambil dari input form
+                            $record->save();
+
+                            Mail::raw("Pembayaran Anda telah ditolak dengan kode pembayaran {$record->code}.", function ($message) use ($user) {
+                                $message->to($user->email)
+                                    ->subject('Pembayaran Ditolak');
+                            });
+
+                            Notification::make()
+                                ->title('Transaksi ditolak')
+                                ->body("Transaksi oleh {$user->name} telah ditolak.")
+                                ->success()
+                                ->send();
+                        } else {
+                            Notification::make()
+                                ->title('Gagal mengubah transaksi')
+                                ->body("Transaksi gagal diubah karena data pengguna tidak lengkap.")
+                                ->danger()
+                                ->send();
+                        }
+                    }),
+
+                Tables\Actions\ActionGroup::make([Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),]),
                 Tables\Actions\ForceDeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                ]),
-            ])
-            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]));
+                Tables\Actions\RestoreAction::make(),])
+            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make(),
+                Tables\Actions\ForceDeleteBulkAction::make(),
+                Tables\Actions\RestoreBulkAction::make(),]),])
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([SoftDeletingScope::class,]));
     }
 }
