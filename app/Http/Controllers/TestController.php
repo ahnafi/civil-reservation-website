@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Test;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\Request;
@@ -19,6 +20,8 @@ class TestController extends Controller
     public function detail(Test $test): RedirectResponse|Response
     {
         if (!$test->is_active) return redirect()->route('tests');
-        return Inertia::render("tests/detail", ['test' => $test->load("category", "laboratory")]);
+        return Inertia::render("tests/detail", [
+            'test' => $test->load("category", "laboratory", "packages"),
+        ]);
     }
     }

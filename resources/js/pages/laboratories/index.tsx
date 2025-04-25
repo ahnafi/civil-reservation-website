@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem, Laboratory } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -10,79 +10,55 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const dummyData: {
-    title: string;
-    description: string;
-    room: string;
-    dailySlots: number;
-    status: string;
-    link: string;
-    image: string;
-}[] = [
-    {
-        title: 'Laboratorium Kimia',
-        description: 'Laboratorium kimia adalah tempat untuk melakukan percobaan kimia.',
-        room: 'Lab 1',
-        dailySlots: 10,
-        status: 'Buka',
-        link: '/laboratories/example',
-        image: '/img/tests/laboratory-1.jpg',
-    },
-    {
-        title: 'Laboratorium Fisika',
-        description: 'Laboratorium fisika adalah tempat untuk melakukan percobaan fisika.',
-        room: 'Lab 2',
-        dailySlots: 5,
-        status: 'Tutup',
-        link: '/laboratories/example',
-        image: '/img/tests/laboratory-1.jpg',
-    },
-    {
-        title: 'Laboratorium Biologi',
-        description: 'Laboratorium biologi adalah tempat untuk melakukan percobaan biologi.',
-        room: 'Lab 3',
-        dailySlots: 15,
-        status: 'Buka',
-        link: '/laboratories/example',
-        image: '/img/tests/laboratory-1.jpg',
-    },
-    {
-        title: 'Laboratorium Komputer',
-        description: 'Laboratorium komputer adalah tempat untuk melakukan percobaan komputer.',
-        room: 'Lab 4',
-        dailySlots: 20,
-        status: 'Buka',
-        link: '/laboratories/example',
-        image: '/img/tests/laboratory-1.jpg',
-    },
-];
+export default function Laboratories({ laboratories }: { laboratories: Laboratory }) {
+    const formatRupiah = (value: number, currency = 'IDR') => {
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: currency,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(value);
+    };
 
-export default function Laboratories() {
+    console.info(laboratories);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Pengujian" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="grid auto-rows-min grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {dummyData.map((data, index) => (
-                        <Card className="gap-0 p-2" key={index}>
+                    {laboratories.map((laboratory: Laboratory) => (
+                        <Card className="gap-0 p-2" key={laboratory.id}>
                             <CardHeader className="px-0">
-                                <Link href={data.link}>
-                                    <img src={data.image} alt="Laboratory 1 Image" className="rounded-md" />
+                                <Link href={'/laboratory/' + laboratory.slug}>
+                                    <img
+                                        src={'/storage/' + laboratory.image}
+                                        alt={laboratory.name}
+                                        className="h-48 w-full rounded-md object-cover md:h-54 lg:h-60"
+                                    />
                                 </Link>
                                 <CardTitle>
-                                    <Link href={data.link}>
-                                        <h3>{data.title}</h3>
+                                    <Link href={'/laboratory/' + laboratory.slug}>
+                                        <h3 className="truncate-2-lines">{laboratory.name}</h3>
                                     </Link>
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="px-0">
-                                <CardDescription className="space-y-2">
-                                    <p className="truncate-2-lines">{data.description}</p>
+                                <CardDescription className="mb-4 space-y-2">
+                                    <p className="truncate-2-lines">{laboratory.description}</p>
                                     <div className="flex flex-wrap items-center gap-2">
-                                        <div
-                                            className="text-light-base bg-purple-base flex items-center gap-1 rounded-md px-2 py-1"
-                                            title="Laboratorium"
-                                        >
+                                        <div className="text-light-base bg-amber-base flex items-center gap-1 rounded-md px-2 py-1" title="Ruangan">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 512 512"
+                                                className="h-4 w-4 md:h-5 md:w-5"
+                                                fill="currentColor"
+                                            >
+                                                <path d="M342.6 9.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l9.4 9.4L28.1 342.6C10.1 360.6 0 385 0 410.5L0 416c0 53 43 96 96 96l5.5 0c25.5 0 49.9-10.1 67.9-28.1L448 205.3l9.4 9.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-32-32-96-96-32-32zM205.3 256L352 109.3 402.7 160l-96 96-101.5 0z" />
+                                            </svg>
+                                            <span className="small-font-size">{laboratory.room}</span>
+                                        </div>
+                                        <div className="text-light-base bg-purple-base flex items-center gap-1 rounded-md px-2 py-1" title="Kode">
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg"
                                                 viewBox="0 0 384 512"
@@ -91,38 +67,24 @@ export default function Laboratories() {
                                             >
                                                 <path d="M48 0C21.5 0 0 21.5 0 48L0 464c0 26.5 21.5 48 48 48l96 0 0-80c0-26.5 21.5-48 48-48s48 21.5 48 48l0 80 96 0c26.5 0 48-21.5 48-48l0-416c0-26.5-21.5-48-48-48L48 0zM64 240c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zm112-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zM80 96l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zM272 96l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16z" />
                                             </svg>
-                                            <span className="small-font-size">{data.room}</span>
-                                        </div>
-                                        <div
-                                            className="text-light-base bg-lime-base flex items-center gap-1 rounded-md px-2 py-1"
-                                            title="Laboratorium"
-                                        >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 320 512"
-                                                fill="currentColor"
-                                                className="h-4 w-4 md:h-5 md:w-5"
-                                            >
-                                                <path d="M112 48a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm40 304l0 128c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-223.1L59.4 304.5c-9.1 15.1-28.8 20-43.9 10.9s-20-28.8-10.9-43.9l58.3-97c17.4-28.9 48.6-46.6 82.3-46.6l29.7 0c33.7 0 64.9 17.7 82.3 46.6l58.3 97c9.1 15.1 4.2 34.8-10.9 43.9s-34.8 4.2-43.9-10.9L232 256.9 232 480c0 17.7-14.3 32-32 32s-32-14.3-32-32l0-128-16 0z" />
-                                            </svg>
-                                            <span className="small-font-size">{data.dailySlots}</span>
-                                        </div>
-                                        <div
-                                            className="text-light-base bg-cyan-base flex items-center gap-1 rounded-md px-2 py-1"
-                                            title="Laboratorium"
-                                        >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 512 512"
-                                                fill="currentColor"
-                                                className="h-4 w-4 md:h-5 md:w-5"
-                                            >
-                                                <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM216 336l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24zm40-208a32 32 0 1 1 0 64 32 32 0 1 1 0-64z" />
-                                            </svg>
-                                            <span className="small-font-size">{data.status}</span>
+                                            <span className="small-font-size">{laboratory.code}</span>
                                         </div>
                                     </div>
                                 </CardDescription>
+                                <Link
+                                    href={'/laboratory/' + laboratory.slug}
+                                    className="bg-blue-base text-light-base flex w-fit items-center gap-1 rounded-md px-3 py-2"
+                                >
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 512 512"
+                                        className="h-4 w-4 md:h-5 md:w-5"
+                                        fill="currentColor"
+                                    >
+                                        <path d="M352 0c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9L370.7 96 201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L416 141.3l41.4 41.4c9.2 9.2 22.9 11.9 34.9 6.9s19.8-16.6 19.8-29.6l0-128c0-17.7-14.3-32-32-32L352 0zM80 32C35.8 32 0 67.8 0 112L0 432c0 44.2 35.8 80 80 80l320 0c44.2 0 80-35.8 80-80l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-320c0-8.8 7.2-16 16-16l112 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 32z" />
+                                    </svg>
+                                    <span className="small-font-size">Lihat Detail</span>
+                                </Link>
                             </CardContent>
                         </Card>
                     ))}
