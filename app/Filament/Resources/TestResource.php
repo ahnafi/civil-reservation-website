@@ -22,10 +22,10 @@ class TestResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-beaker';
     protected static ?string $navigationGroup = 'Pengujian';
 
-    public static function getNavigationBadge(): ?string
-    {
-        return static::getModel()::count();
-    }
+//    public static function getNavigationBadge(): ?string
+//    {
+//        return static::getModel()::count();
+//    }
 
     public static function form(Form $form): Form
     {
