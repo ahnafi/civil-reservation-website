@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
@@ -62,4 +63,8 @@ class Package extends Model
         return $this->belongsTo(Laboratory::class);
     }
 
+    public function carts(): MorphMany
+    {
+    return $this->morphMany(Cart::class, 'cartable');
+    }
 }

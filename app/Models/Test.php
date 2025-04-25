@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
@@ -74,6 +75,11 @@ class Test extends Model
     public function submissionTests(): HasMany
     {
         return $this->hasMany(SubmissionTest::class);
+    }
+
+    public function carts(): MorphMany
+    {
+        return $this->morphMany(Cart::class, 'cartable');
     }
 
     public function scopeActive($query)
