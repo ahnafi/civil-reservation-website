@@ -132,6 +132,10 @@
 }
 
 @layer components {
+    .large-font-size {
+        @apply text-xl md:text-2xl;
+    }
+
     .big-font-size {
         @apply text-lg md:text-xl;
     }
