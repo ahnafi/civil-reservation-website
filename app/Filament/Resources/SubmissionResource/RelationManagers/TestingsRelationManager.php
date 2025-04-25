@@ -24,6 +24,7 @@ class TestingsRelationManager extends RelationManager
         return $form
             ->schema([
                 ToggleButtons::make('status')
+                    ->visibleOn(["edit", "view"])
                     ->label('Status Pengujian')
                     ->inline()
                     ->required()
@@ -39,6 +40,7 @@ class TestingsRelationManager extends RelationManager
                         "testing" => "heroicon-o-clock",
                         "completed" => "heroicon-o-check-circle",
                     ])
+                    ->default("testing")
                     ->required()
                     ->reactive()
                     ->afterStateUpdated(function ($state, Set $set) {
@@ -50,19 +52,23 @@ class TestingsRelationManager extends RelationManager
                         }
                     }),
 
-                Forms\Components\Textarea::make('note')
-                    ->label('Catatan')
-                    ->nullable(),
-
                 Forms\Components\DateTimePicker::make('test_date')
-                    ->label('Tanggal Testing')
+                    ->label('Tanggal Pengujian')
                     ->nullable(),
 
                 Forms\Components\DateTimePicker::make('completed_at')
+                    ->visibleOn(["edit", "view"])
                     ->label('Tanggal Selesai')
                     ->nullable(),
 
+                Forms\Components\Textarea::make('note')
+                    ->columnSpanFull()
+                    ->visibleOn(["edit", "view"])
+                    ->label('Catatan')
+                    ->nullable(),
+
                 Forms\Components\FileUpload::make('documents')
+                    ->visibleOn(["edit", "view"])
                     ->label('Lampiran')
                     ->multiple()
                     ->directory('testing_documents')
@@ -82,6 +88,10 @@ class TestingsRelationManager extends RelationManager
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('status')->label('Status')->sortable()
+                    ->formatStateUsing(fn($state): string => match ($state) {
+                        "testing" => "Sedang berjalan",
+                        "completed" => "Selesai",
+                    })
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         "testing" => "warning",
