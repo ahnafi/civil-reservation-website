@@ -23,12 +23,15 @@ class UserResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::where("role", "!=", "admin")->count();
+        return static::getModel()::where("role", "internal")
+            ->orWhere("role", "external")->count();
     }
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where("role", '!=', "admin");
+        return parent::getEloquentQuery()
+            ->where("role", "internal")
+            ->orWhere("role", "external");
     }
 
     public static function form(Form $form): Form
@@ -107,7 +110,6 @@ class UserResource extends Resource
                     ->color(fn(string $state): string => match ($state) {
                         'external' => 'info',
                         'internal' => 'success',
-                        'admin' => 'danger',
                     }),
                 Tables\Columns\TextColumn::make("email_verified_at")
                     ->label("Tanggal verifikasi Email")
