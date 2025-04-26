@@ -12,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class AdminResource extends Resource
 {
@@ -22,7 +23,9 @@ class AdminResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where("role", "admin");
+        return parent::getEloquentQuery()
+            ->where("role", "admin")
+            ->orWhere("role", "superadmin");
     }
 
     public static function form(Form $form): Form
@@ -79,6 +82,7 @@ class AdminResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(null)
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama Lengkap')
@@ -94,7 +98,8 @@ class AdminResource extends Resource
                     ->color(fn(string $state): string => match ($state) {
                         'external' => 'info',
                         'internal' => 'success',
-                        'admin' => 'danger',
+                        'admin' => 'warning',
+                        'superadmin' => 'danger',
                     }),
                 Tables\Columns\TextColumn::make("email_verified_at")
                     ->label("Tanggal verifikasi Email")
@@ -112,14 +117,18 @@ class AdminResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\EditAction::make()
+                    ->visible(fn($record): bool => $record->role == "admin" || (Auth::user()->role == "superadmin" && $record->role == "superadmin")),
+                Tables\Actions\DeleteAction::make()
+                    ->requiresConfirmation()
+                    ->visible(fn($record): bool => Auth::user()->role == "superadmin" && $record->role == "admin"),
             ]);
+//            ->bulkActions([
+//                Tables\Actions\BulkActionGroup::make([
+//                    Tables\Actions\DeleteBulkAction::make(),
+//                ])->visible(fn(): bool => Auth::user()->role == "superadmin"),
+//            ]);
     }
 
     public static function getRelations(): array
