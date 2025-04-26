@@ -14,6 +14,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Get Main Page
     Route::get('dashboard', [DashboardController::class, "index"])->name('dashboard');
     Route::get('schedule', [ScheduleController::class, "index"])->name("schedule");
     Route::get('laboratories', [LaboratoryController::class, 'index'])->name('laboratories');
@@ -22,6 +23,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('test/{test:slug}', [TestController::class, "detail"])->name('tests-detail');
     Route::get('packages', [PackageController::class, "index"])->name('packages');
     Route::get('package/{package:slug}', [PackageController::class, "detail"])->name('packages-detail');
+
+    // Get Booking Page
     Route::get('orders/cart', function () {
         return Inertia::render('orders/cart');
     })->name('orders-cart');
@@ -35,9 +38,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('orders/history');
     })->name('orders-history');
     Route::get('history/submissions', [DashboardController::class, "submissionsHistory"])->name('history-submissions');
+
+    // Get History Page
     Route::get('history/tests', [DashboardController::class, "testsHistory"])->name('history-tests');
     Route::get('history/transactions', [DashboardController::class, "transactionsHistory"])->name('history-transactions');
-    Route::post('/cart/add', [BookingController::class, 'addToCart'])->name('cart.add');
+
+    // Post Page
+    Route::post('cart/submit', [BookingController::class, 'submitSubmission'])->name('createSubmission');
+    Route::post('submission/payment', [BookingController::class, 'submitPayment'])->name('submitPayment');
 });
 
 require __DIR__ . '/settings.php';
