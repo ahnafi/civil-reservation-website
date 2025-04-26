@@ -1,0 +1,63 @@
+<?php
+
+namespace App\Http\Requests;
+use App\Models\Test;
+use Illuminate\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
+
+class SubmitSubmissionRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return false;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'company_name' => 'required|string|max:255',
+            'project_name' => 'required|string|max:255',
+            'project_address' => 'required|string|max:255',
+            'total_cost' => 'required|integer|min:0',
+            'test_submission_date' => 'required|date',
+            'submission_tests' => 'required|array',
+            'submission_tests.*.test_id' => 'required|exists:tests,id',
+            'submission_tests.*.quantity' => 'required|integer',
+            'submission_packages' => 'required|array',
+            'submission_packages.*' => 'exists:packages,id',
+        ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function ($validator) {
+            $tests = $this->input('submission_tests', []);
+
+            $testIds = collect($tests)->pluck('test_id')->filter()->toArray();
+
+            $loadedTests = Test::with('category')->whereIn('id', $testIds)->get()->keyBy('id');
+
+            foreach ($tests as $index => $submissionTest) {
+                $test = $loadedTests->get($submissionTest['test_id'] ?? null);
+
+                if ($test && isset($submissionTest['quantity'])) {
+                    if ($submissionTest['quantity'] < $test->minimum_unit) {
+                        $validator->errors()->add(
+                            "submission_tests.$index.quantity",
+                            "Jumlah pengajuan untuk pengujian {$test->name} tidak boleh kurang dari {$test->minimum_unit} {$test->category->name}"
+                        );
+                    }
+                }
+            }
+        });
+    }
+
+}
