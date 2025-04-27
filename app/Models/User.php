@@ -45,6 +45,27 @@ class User extends Authenticatable implements FilamentUser
      *
      * @return array<string, string>
      */
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            if ($user->email) {
+                $email = strtolower($user->email);
+
+                if (str_ends_with($email, 'unsoed.ac.id') || str_ends_with($email, '@mhs.unsoed.ac.id')) {
+                    $user->role = 'internal';
+                    $user->save();
+                } else {
+                    $user->role = 'external';
+                    $user->save();
+                }
+            }
+        });
+    }
+
+
     protected function casts(): array
     {
         return [
