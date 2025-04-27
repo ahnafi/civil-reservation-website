@@ -32,7 +32,7 @@ class SubmissionResource extends Resource
     protected static ?string $model = Submission::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
-    protected static ?string $modelLabel = 'Booking';
+    protected static ?string $modelLabel = 'Pengajuan Peminjaman';
     protected static ?string $navigationGroup = 'Manajemen Peminjaman';
 
     public static function getNavigationBadge(): ?string

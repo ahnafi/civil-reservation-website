@@ -13,25 +13,20 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
+use function PHPUnit\Framework\isNull;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
     protected static ?string $modelLabel = 'Pengguna';
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
-    protected static ?string $navigationGroup = 'Manajemen Peminjaman';
+    protected static ?string $navigationGroup = 'Manajemen Pengguna';
 
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::where("role", "internal")
             ->orWhere("role", "external")->count();
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()
-            ->where("role", "internal")
-            ->orWhere("role", "external");
     }
 
     public static function form(Form $form): Form
@@ -53,7 +48,8 @@ class UserResource extends Resource
                     ->revealable()
                     ->minLength(8)
                     ->dehydrated(fn($state) => filled($state))
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->visible(fn($record) => is_null($record) || ($record && $record->role !== "superadmin") || Auth::user()->role == "superadmin"),
                 Forms\Components\TextInput::make('phone')
                     ->label('Nomor Telepon')
                     ->tel()
@@ -63,20 +59,48 @@ class UserResource extends Resource
                     ]),
                 Forms\Components\TextInput::make('identity')
                     ->label('Nomor Identitas(NIK/NIM/NIP)')
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->visible(fn($record) => is_null($record) || $record->identity == "internal" || $record->identity == "external"),
                 Forms\Components\DateTimePicker::make('email_verified_at')
                     ->label('Tanggal verifikasi Email'),
                 ToggleButtons::make('role')
                     ->inline()
                     ->required()
-                    ->options([
-                        "external" => "External",
-                        "internal" => "Internal",
-                    ])
+                    ->options(function ($record) {
+
+                        if (is_null($record)) {
+                            return [
+                                'external' => 'External',
+                                'internal' => 'Internal',
+                                'admin' => 'Admin',
+                            ];
+                        }
+
+                        if ($record->role === 'admin') {
+                            return [
+                                'admin' => 'Admin',
+                            ];
+                        }
+
+                        if ($record->role === 'internal' || $record->role === 'external') {
+                            return [
+                                'external' => 'External',
+                                'internal' => 'Internal',
+                            ];
+                        }
+
+                        return [
+                            "external" => "External",
+                            "internal" => "Internal",
+                            "admin" => "Admin"
+                        ];
+                    })
                     ->colors([
                         "external" => "success",
-                        "internal" => "primary"
-                    ]),
+                        "internal" => "primary",
+                        "admin" => "warning",
+                    ])->visible(fn($record) => is_null($record) || ($record && $record->role != "superadmin"))
+                    ->hidden(fn($record) => ($record && $record->id == Auth::user()->id)),
                 Forms\Components\FileUpload::make('photo')
                     ->image()
                     ->directory('photo_profiles')
@@ -89,6 +113,7 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->recordUrl(null)
             ->columns([
 //                Tables\Columns\ImageColumn::make('photo')
 //                    ->label('Foto profil')
@@ -110,6 +135,8 @@ class UserResource extends Resource
                     ->color(fn(string $state): string => match ($state) {
                         'external' => 'info',
                         'internal' => 'success',
+                        'admin' => 'warning',
+                        'superadmin' => 'danger',
                     }),
                 Tables\Columns\TextColumn::make("email_verified_at")
                     ->label("Tanggal verifikasi Email")
@@ -127,21 +154,16 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('role')
-                    ->options([
-                        "external" => "External",
-                        "internal" => "Internal",
-                    ])
-                    ->multiple()
+                //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
                 Tables\Actions\ViewAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
+                Tables\Actions\EditAction::make()
+                    ->hidden(fn($record): bool => Auth::user()->role != "superadmin" && $record->role == "superadmin"),
+                Tables\Actions\DeleteAction::make()
+                    ->requiresConfirmation()
+                    ->visible(fn($record): bool => $record->role != "superadmin" && (Auth::user()->role == "superadmin" || Auth::user()->role == "admin"))
+                    ->hidden(fn($record): bool => $record->id == Auth::user()->id),
             ]);
     }
 
