@@ -11,7 +11,7 @@ class TestController extends Controller
 {
     public function index(): Response
     {
-        $tests = Test::active()->with(["category", "laboratory"])->paginate(40);
+        $tests = Test::active()->with(["category", "laboratory"])->paginate(20);
         return Inertia::render("tests/index", ['tests' => $tests]);
     }
 
