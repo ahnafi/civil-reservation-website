@@ -51,19 +51,23 @@ class User extends Authenticatable implements FilamentUser
         parent::boot();
 
         static::created(function ($user) {
+            if ($user->role !== null) {
+                return;
+            }
+
             if ($user->email) {
                 $email = strtolower($user->email);
 
                 if (str_ends_with($email, 'unsoed.ac.id') || str_ends_with($email, '@mhs.unsoed.ac.id')) {
                     $user->role = 'internal';
-                    $user->save();
                 } else {
                     $user->role = 'external';
-                    $user->save();
                 }
+                $user->save();
             }
         });
     }
+
 
 
     protected function casts(): array
