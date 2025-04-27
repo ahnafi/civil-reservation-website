@@ -74,7 +74,7 @@ class BookingUtils
         $schedule->test_id = $test_id;
         $schedule->date = $date;
 
-        $schedule->available_slots = $schedule->test->available_slots;
+        $schedule->available_slots = $schedule->test->daily_slot;
         $schedule->save();
 
         self::createScheduleTesting($schedule, $testing_id);
