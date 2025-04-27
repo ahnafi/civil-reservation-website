@@ -6,6 +6,9 @@ use App\Models\Submission;
 use App\Models\Package;
 use App\Models\Test;
 use App\Models\Transaction;
+use App\Models\Testing;
+use App\Models\Schedule;
+use App\Models\ScheduleTesting;
 use Laravel\Pennant\Feature;
 use Illuminate\Support\Facades\DB;
 use App\Services\FileNaming;
@@ -86,6 +89,12 @@ class BookingService
 
         $transaction->payment_receipt_image = $filename;
         $transaction->save();
+    }
+
+    public function storeScheduleTesting($testing_id)
+    {
+        $testIds = BookingUtils::getTestIdsFromTesting($testing_id);
+        BookingUtils::handleScheduleForTesting($testing_id, $testIds);
     }
 
 }
