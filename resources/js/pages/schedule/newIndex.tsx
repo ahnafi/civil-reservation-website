@@ -132,64 +132,70 @@ export default function Schedule({tests}: {tests: SimpleOption[] } )
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Jadwal Pengujian" />
                 <div className="flex h-full flex-1 flex-col gap-4 overflow-hidden rounded-xl p-4">
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-                        <div className="schedule col-span-full space-y-2">
-                            <h1 className="title font-semibold">Cek Ketersediaan Jadwal Pengujian Laboratorium</h1>
-                            <div className="schedule-filters small-font-size mb-2 flex hidden justify-end gap-4 lg:mb-4 lg:flex lg:flex-wrap">
-                                <div className="test-type">
-                                    <form>
-                                        <input type="hidden" name="test_id" value={data.test_id} />
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    <div className="schedule col-span-full space-y-2">
+                        <h1 className="title font-semibold">Cek Ketersediaan Jadwal Pengujian Laboratorium</h1>
+                        <div className="schedule-filters small-font-size mb-2 flex hidden justify-end gap-4 lg:mb-4 lg:flex lg:flex-wrap">
+                            <div className="test-type">
+                                <form>
+                                    <input type="hidden" name="test_id" value={data.test_id} />
 
-                                        <SearchableSelect
-                                            label="Jenis Pengujian"
-                                            options={tests}
-                                            selectedOption={selectedTest}
-                                            setSelectedOption={setSelectedTest}
-                                            placeholder="Cari Jenis Pengujian..."
-                                            searchIcon={<HardHat size={18} />}
-                                        />
-                                    </form>
-                                </div>
-
-                                <div className="date-range-picker flex flex-col gap-1">
-                                    <label className="text-foreground font-medium">Tanggal</label>
-                                    <div className="flex gap-3">
-                                        <div className="initial-date">
-                                            <DatePicker value={initialDate} placeholder="Pilih Tanggal Awal" onDateSelect={handleInitialDateSelect} />
-                                        </div>
-                                        <div className="flex items-center justify-center">-</div>
-                                        <div className="final-date">
-                                            <DatePicker
-                                                key={finalDateKey}
-                                                value={finalDate}
-                                                placeholder="Pilih Tanggal Akhir"
-                                                onDateSelect={handleFinalDateSelect}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {(initialDate || finalDate) && (
-                                        <div className="clear-date-button flex justify-end text-right">
-                                            <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => {
-                                                    setInitialDate(undefined);
-                                                    setFinalDate(undefined);
-                                                }}
-                                                className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs"
-                                            >
-                                                <X size={12} />
-                                                Hapus Filter Tanggal
-                                            </Button>
-                                        </div>
-                                    )}
-                                </div>
+                                    <SearchableSelect
+                                        label="Jenis Pengujian"
+                                        options={tests}
+                                        selectedOption={selectedTest}
+                                        setSelectedOption={setSelectedTest}
+                                        placeholder="Cari Jenis Pengujian..."
+                                        searchIcon={<HardHat size={18} />}
+                                    />
+                                </form>
                             </div>
+
+                            <div className="date-range-picker flex flex-col gap-1">
+                                <label className="text-foreground font-medium">Tanggal</label>
+                                <div className="flex gap-3">
+                                    <div className="initial-date">
+                                        <DatePicker value={initialDate} placeholder="Pilih Tanggal Awal" onDateSelect={handleInitialDateSelect} />
+                                    </div>
+                                    <div className="flex items-center justify-center">-</div>
+                                    <div className="final-date">
+                                        <DatePicker
+                                            key={finalDateKey}
+                                            value={finalDate}
+                                            placeholder="Pilih Tanggal Akhir"
+                                            onDateSelect={handleFinalDateSelect}
+                                        />
+                                    </div>
+                                </div>
+
+                                {(initialDate || finalDate) && (
+                                    <div className="clear-date-button flex justify-end text-right">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => {
+                                                setInitialDate(undefined);
+                                                setFinalDate(undefined);
+                                            }}
+                                            className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs"
+                                        >
+                                            <X size={12} />
+                                            Hapus Filter Tanggal
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="schedule-content flex w-full flex-col gap-4 overflow-hidden p-4">
+                            {!selectedTest && (
+                                <div className="flex w-full items-center justify-center text-xl font-semibold text-muted-foreground">
+                                    Silahkan pilih jenis pengujian untuk melihat jadwal pengujian.....
+                                </div>
+                            )}
 
                             {selectedTest && testData != null && schedules != null && (
                                 <div className="results flex w-full rounded-xl bg-card p-4 shadow-md">
-                                    {/* Test Information Section */}
                                     <div className="test-detail flex w-full">
                                         <div className="test-image w-1/3 flex items-center justify-center rounded-lg bg-gray-100 p-2">
                                             {testData.images && testData.images.length > 0 ? (
@@ -204,61 +210,63 @@ export default function Schedule({tests}: {tests: SimpleOption[] } )
                                         </div>
 
                                         <div className="test-info w-2/3 ml-4 flex flex-col space-y-2">
-                                            <h3 className="font-semibold text-xl">{testData.name}</h3>
-                                            <p className="text-sm">{testData.description}</p>
+                                            <h3 className="font-semibold text-2xl">{testData.name}</h3>
 
-                                            {/* Test Metadata */}
-                                            <div className="test-metadata grid grid-cols-2 gap-4 text-sm">
+                                            <p className="text-base">{testData.description}</p>
+
+                                            <div className="test-metadata grid grid-cols-2 gap-4 text-base">
                                                 <div>
-                                                    <span className="font-medium">Category:</span> {testData.category_name}
+                                                    <span className="font-medium">Satuan:</span> {testData.category_name}
                                                 </div>
                                                 <div>
-                                                    <span className="font-medium">Min. Unit:</span> {testData.minimum_unit}
+                                                    <span className="font-medium">Min. Unit:</span> {testData.minimum_unit} {testData.category_name}
                                                 </div>
                                                 <div>
-                                                    <span className="font-medium">Daily Slots:</span> {testData.daily_slot}
+                                                    <span className="font-medium">Slot Harian:</span> {testData.daily_slot}
                                                 </div>
                                                 <div>
-                                                    <span className="font-medium">Status:</span> {testData.is_active ? 'Active' : 'Inactive'}
+                                                    <span className="font-medium">Status:</span> {testData.is_active ? 'Aktif' : 'Inaktif'}
                                                 </div>
                                             </div>
 
-                                            {/* Laboratory Information */}
                                             <div className="laboratory-info mt-4 pt-2 border-t border-gray-300">
-                                                <div className="font-medium text-lg">Laboratory Information</div>
-                                                <div className="grid grid-cols-2 gap-4 text-sm mt-2">
+                                                <div className="font-medium text-lg">Informasi Laboratorium</div>
+                                                <div className="grid grid-cols-2 gap-4 text-base mt-2">
                                                     <div>
-                                                        <span className="font-medium">Name:</span> {testData.laboratory_name}
+                                                        <span className="font-medium">Kode:</span> {testData.laboratory_code}
                                                     </div>
                                                     <div>
-                                                        <span className="font-medium">Code:</span> {testData.laboratory_code}
+                                                        <span className="font-medium">Nama:</span> {testData.laboratory_name}
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
 
-                                    {/* Schedules Section - as a card below the test information */}
-                                    <div className="schedules mt-4 p-4 rounded-xl bg-white shadow-lg">
-                                        <div className="font-semibold text-xl mb-4">Available Schedules</div>
-                                        <div className="schedule-list space-y-3">
-                                            {schedules.map((schedule: scheduleForSchedule) => (
-                                                <div key={schedule.id} className="schedule-item flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-sm">
-                                                    <div className="schedule-date text-sm font-medium text-gray-700">
-                                                        {new Date(schedule.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
-                                                    </div>
-                                                    <div className="schedule-slots text-sm text-gray-500">
-                                                        {schedule.available_slots} slots available
-                                                    </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {selectedTest && testData != null && schedules != null && (
+                                <div className="schedules mt-4 p-4 rounded-xl bg-white shadow-lg">
+                                    <div className="font-semibold text-xl mb-4">Jadwal Terambil</div>
+                                    <div className="schedule-list space-y-3">
+                                        {schedules.map((schedule: scheduleForSchedule) => (
+                                            <div key={schedule.id} className="schedule-item flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-sm">
+                                                <div className="schedule-date text-md font-medium text-gray-800">
+                                                    {new Date(schedule.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
                                                 </div>
-                                            ))}
-                                        </div>
+                                                <div className="schedule-slots text-md text-gray-700">
+                                                    {schedule.available_slots} slots available
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             )}
                         </div>
                     </div>
                 </div>
+            </div>
             <ToastContainer />
         </AppLayout>
     );
