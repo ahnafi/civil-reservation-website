@@ -180,6 +180,27 @@ export interface Testing {
     links?: unknown;
 }
 
+export interface testForSchedule {
+    id: number;
+    name: string;
+    description: string;
+    images: string[];
+    minimum_unit: number;
+    daily_slot: number;
+    is_active: boolean;
+    category_id: number;
+    category_name: string;
+    laboratory_id: number;
+    laboratory_code: string;
+    laboratory_name:  string;
+}
+
+export interface scheduleForSchedule {
+    id: number;
+    test_id: number;
+    available_slots: number;
+}
+
 export type PaginatedTests = Pagination<Test>;
 export type PaginatedPackage = Pagination<Package>;
 export type PaginatedLaboratories = Pagination<Laboratory>;
