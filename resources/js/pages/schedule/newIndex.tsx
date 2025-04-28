@@ -24,15 +24,15 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Schedule({tests}: {tests: SimpleOption[] } )
  {
+     const [selectedTest, setSelectedTest] = useState<SimpleOption | null>(null);
+     const [testData, setTestData] = useState<testForSchedule | null>(null);
+     const [schedules, setSchedules] = useState<scheduleForSchedule[] | null>(null);
+
      const { data, setData, post, processing, errors } = useForm<{
          test_id: number | '';
      }>({
          test_id: '',
      });
-
-     const [selectedTest, setSelectedTest] = useState<SimpleOption | null>(null);
-     const [testData, setTestData] = useState<testForSchedule | null>(null);
-     const [schedules, setSchedules] = useState<scheduleForSchedule[] | null>(null);
 
      useEffect(() => {
          if (!selectedTest) return;
@@ -64,7 +64,17 @@ export default function Schedule({tests}: {tests: SimpleOption[] } )
     const [initialDate, setInitialDate] = useState<Date | undefined>(firstDayOfMonth);
     const [finalDate, setFinalDate] = useState<Date | undefined>(lastDayOfMonth);
 
-    const [finalDateKey, setFinalDateKey] = useState<number>(Date.now());
+     const [finalDateKey, setFinalDateKey] = useState<number>(Date.now());
+
+     function isWithinDateRange(date: Date, start?: Date, end?: Date) {
+         const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+         const s = start ? new Date(start.getFullYear(), start.getMonth(), start.getDate()) : undefined;
+         const e = end ? new Date(end.getFullYear(), end.getMonth(), end.getDate()) : undefined;
+
+         if (s && d < s) return false;
+         if (e && d > e) return false;
+         return true;
+     }
 
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
@@ -245,7 +255,9 @@ export default function Schedule({tests}: {tests: SimpleOption[] } )
                                 <div className="schedules mt-4 p-4 rounded-xl bg-white shadow-lg">
                                     <div className="font-semibold text-xl mb-4">Jadwal Terambil</div>
                                     <div className="schedule-list space-y-3">
-                                        {schedules.map((schedule: scheduleForSchedule) => (
+                                        {schedules
+                                            .filter((schedule) => isWithinDateRange(new Date(schedule.date), initialDate, finalDate))
+                                            .map((schedule: scheduleForSchedule) => (
                                             <div key={schedule.id} className="schedule-item flex flex-col bg-gray-50 p-4 rounded-lg shadow-sm">
                                                 <div className="schedule-date text-md font-semibold text-gray-800 mb-2">
                                                     {new Date(schedule.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -255,7 +267,7 @@ export default function Schedule({tests}: {tests: SimpleOption[] } )
                                                         <span className="font-semibold">Slot Tersedia:</span> {schedule.available_slots}
                                                     </div>
                                                     <div>
-                                                        <span className="font-semibold">Pengajuan Disetujui:</span> {schedule.approved_count}
+                                                        <span className="font-semibold">Slot Terambil:</span> {schedule.approved_count}
                                                     </div>
                                                     <div>
                                                         <span className="font-semibold">Pengajuan Pending:</span> {schedule.pending_count}
@@ -266,7 +278,6 @@ export default function Schedule({tests}: {tests: SimpleOption[] } )
                                         ))}
                                     </div>
                                 </div>
-
                             )}
                         </div>
                     </div>
