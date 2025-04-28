@@ -6,6 +6,7 @@ import { Inertia } from '@inertiajs/inertia';
 import { router, useForm } from '@inertiajs/react';
 import { Check, ChevronDown, FlaskConical, HardHat, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { DatePicker } from '@/components/DatePicker';
@@ -21,20 +22,45 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Schedule({ testData, tests, schedules }: { testData: testForSchedule, tests: SimpleOption[], schedules: scheduleForSchedule })
+export default function Schedule({tests}: {tests: SimpleOption[] } )
  {
-     const [selectedTest, setSelectedTest] = useState<SimpleOption | null>(null);
      const { data, setData, post, processing, errors } = useForm<{
          test_id: number | '';
      }>({
          test_id: '',
      });
 
+     const [selectedTest, setSelectedTest] = useState<SimpleOption | null>(null);
+     const [testData, setTestData] = useState<testForSchedule | null>(null);
+     const [schedules, setSchedules] = useState<scheduleForSchedule[] | null>(null);
+
      useEffect(() => {
-         if (selectedTest) {
-             setData('test_id', selectedTest.id);
-             post(route('schedule.submit'));
-         }
+         if (!selectedTest) return;
+
+         console.log('Selected Test:', selectedTest);
+
+         const fetchScheduleData = async () => {
+             try {
+                 const response = await axios.post(route('schedule.submit'), {
+                     test_id: selectedTest.id,
+                 });
+
+                 console.log('Full Response:', response.data);
+
+                 const { testData, schedules } = response.data;
+
+                 setTestData(testData);
+                 setSchedules(schedules);
+
+                 console.log('Updated Test Data:', testData);
+                 console.log('Updated Schedules:', schedules);
+             } catch (error) {
+                 console.error(error);
+             }
+         };
+
+
+         fetchScheduleData();
      }, [selectedTest]);
 
     const now = new Date();
@@ -109,7 +135,7 @@ export default function Schedule({ testData, tests, schedules }: { testData: tes
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                         <div className="schedule col-span-full space-y-2">
                             <h1 className="title font-semibold">Cek Ketersediaan Jadwal Pengujian Laboratorium</h1>
-                            <div className="schdule-filters small-font-size mb-2 flex hidden justify-end gap-4 lg:mb-4 lg:flex lg:flex-wrap">
+                            <div className="schedule-filters small-font-size mb-2 flex hidden justify-end gap-4 lg:mb-4 lg:flex lg:flex-wrap">
                                 <div className="test-type">
                                     <form>
                                         <input type="hidden" name="test_id" value={data.test_id} />
@@ -160,25 +186,76 @@ export default function Schedule({ testData, tests, schedules }: { testData: tes
                                     )}
                                 </div>
                             </div>
-                            <div className="schedule-content flex h-full w-full flex-col gap-4 overflow-hidden rounded-xl bg-card p-4 shadow-md">
-                                {!selectedTest &&(
-                                    <div className="flex h-full w-full items-center justify-center text-xl font-semibold text-muted-foreground">
-                                        Silahkan pilih jenis pengujian untuk melihat jadwal pengujian.....
-                                    </div>
-                                )}
 
-                                {selectedTest && (
-                                    <div className="test-details h-full w-full grid grid-cols-1 rounded-xl bg-card p-4 shadow-md">
-                                        {/*<div className="test-image flex h-20 w-full items-center justify-center rounded-xl bg-card">*/}
-                                        {/*    <img*/}
-                                        {/*        src={'/storage/test_image/' + testData.images[0]}*/}
-                                        {/*        alt = {testData.name}*/}
-                                        {/*        className="h-48 w-full rounded-md object-cover md:h-54 lg:h-60"*/}
-                                        {/*    />*/}
-                                        {/*</div>*/}
+                            {selectedTest && testData != null && schedules != null && (
+                                <div className="results flex w-full rounded-xl bg-card p-4 shadow-md">
+                                    {/* Test Information Section */}
+                                    <div className="test-detail flex w-full">
+                                        <div className="test-image w-1/3 flex items-center justify-center rounded-lg bg-gray-100 p-2">
+                                            {testData.images && testData.images.length > 0 ? (
+                                                <img
+                                                    src={'/storage/test_image/' + testData.images[0]}
+                                                    alt={testData.name}
+                                                    className="w-full h-full object-contain rounded-lg"
+                                                />
+                                            ) : (
+                                                <span className="text-gray-400">No image available</span>
+                                            )}
+                                        </div>
+
+                                        <div className="test-info w-2/3 ml-4 flex flex-col space-y-2">
+                                            <h3 className="font-semibold text-xl">{testData.name}</h3>
+                                            <p className="text-sm">{testData.description}</p>
+
+                                            {/* Test Metadata */}
+                                            <div className="test-metadata grid grid-cols-2 gap-4 text-sm">
+                                                <div>
+                                                    <span className="font-medium">Category:</span> {testData.category_name}
+                                                </div>
+                                                <div>
+                                                    <span className="font-medium">Min. Unit:</span> {testData.minimum_unit}
+                                                </div>
+                                                <div>
+                                                    <span className="font-medium">Daily Slots:</span> {testData.daily_slot}
+                                                </div>
+                                                <div>
+                                                    <span className="font-medium">Status:</span> {testData.is_active ? 'Active' : 'Inactive'}
+                                                </div>
+                                            </div>
+
+                                            {/* Laboratory Information */}
+                                            <div className="laboratory-info mt-4 pt-2 border-t border-gray-300">
+                                                <div className="font-medium text-lg">Laboratory Information</div>
+                                                <div className="grid grid-cols-2 gap-4 text-sm mt-2">
+                                                    <div>
+                                                        <span className="font-medium">Name:</span> {testData.laboratory_name}
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-medium">Code:</span> {testData.laboratory_code}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                )}
-                            </div>
+
+                                    {/* Schedules Section - as a card below the test information */}
+                                    <div className="schedules mt-4 p-4 rounded-xl bg-white shadow-lg">
+                                        <div className="font-semibold text-xl mb-4">Available Schedules</div>
+                                        <div className="schedule-list space-y-3">
+                                            {schedules.map((schedule: scheduleForSchedule) => (
+                                                <div key={schedule.id} className="schedule-item flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-sm">
+                                                    <div className="schedule-date text-sm font-medium text-gray-700">
+                                                        {new Date(schedule.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                                    </div>
+                                                    <div className="schedule-slots text-sm text-gray-500">
+                                                        {schedule.available_slots} slots available
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
