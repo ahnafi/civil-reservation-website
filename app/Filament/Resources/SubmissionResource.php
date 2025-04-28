@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\SubmissionExporter;
 use App\Filament\Resources\SubmissionResource\Pages;
 use App\Filament\Resources\SubmissionResource\RelationManagers;
 use App\Models\Package;
 use App\Models\Submission;
 use App\Models\Test;
 use App\Models\User;
+use Filament\Tables\Actions\ExportAction;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -25,7 +27,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
-use function Laravel\Prompts\textarea;
 
 class SubmissionResource extends Resource
 {
@@ -255,6 +256,12 @@ class SubmissionResource extends Resource
             ->recordUrl(
                 fn(Submission $record): string => SubmissionResource::getUrl('view', ['record' => $record]),
             )
+            ->headerActions([
+                ExportAction::make()
+                    ->exporter(SubmissionExporter::class)
+                    ->color("success")
+                    ->label("Ekspor data ke Excel")
+            ])
             ->columns([
                 Tables\Columns\TextColumn::make('user.email')
                     ->label("Email pengguna")
