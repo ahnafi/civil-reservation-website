@@ -199,6 +199,8 @@ export interface scheduleForSchedule {
     id: number;
     date: string;
     available_slots: number;
+    approved_count: number;
+    pending_count: number;
 }
 
 export type PaginatedTests = Pagination<Test>;
