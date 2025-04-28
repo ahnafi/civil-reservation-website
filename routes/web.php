@@ -46,6 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Post Page
     Route::post('cart/submit', [BookingController::class, 'submitSubmission'])->name('createSubmission');
     Route::post('submission/payment', [BookingController::class, 'submitPayment'])->name('submitPayment');
+    Route::post('schedule/submit', [ScheduleController::class, 'getSchedule'])->name('schedule.submit');
 });
 
 require __DIR__ . '/settings.php';
