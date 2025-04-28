@@ -3,7 +3,7 @@
 import AppLayout from '@/layouts/app-layout';
 import * as React from 'react';
 import { Inertia } from '@inertiajs/inertia';
-import { router } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { Check, ChevronDown, FlaskConical, HardHat, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ToastContainer, toast } from 'react-toastify';
@@ -23,8 +23,19 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Schedule({ testData, tests, schedules }: { testData: testForSchedule, tests: SimpleOption[], schedules: scheduleForSchedule })
  {
+     const [selectedTest, setSelectedTest] = useState<SimpleOption | null>(null);
+     const { data, setData, post, processing, errors } = useForm<{
+         test_id: number | '';
+     }>({
+         test_id: '',
+     });
 
-    const [selectedTest, setSelectedTest] = useState<SimpleOption | null>(tests[0]);
+     useEffect(() => {
+         if (selectedTest) {
+             setData('test_id', selectedTest.id);
+             post(route('schedule.submit'));
+         }
+     }, [selectedTest]);
 
     const now = new Date();
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -50,12 +61,6 @@ export default function Schedule({ testData, tests, schedules }: { testData: tes
             setAlertMessage(null);
         }
     }, [alertMessage]);
-
-    useEffect(() => {
-        if (selectedTest) {
-            Inertia.post(route('schedule.submit'), { test_id: selectedTest.id});
-        }
-    }, [selectedTest]);
 
     const handleInitialDateSelect = (date: Date | undefined) => {
         const selected = date ?? new Date();
@@ -106,14 +111,18 @@ export default function Schedule({ testData, tests, schedules }: { testData: tes
                             <h1 className="title font-semibold">Cek Ketersediaan Jadwal Pengujian Laboratorium</h1>
                             <div className="schdule-filters small-font-size mb-2 flex hidden justify-end gap-4 lg:mb-4 lg:flex lg:flex-wrap">
                                 <div className="test-type">
-                                    <SearchableSelect
-                                        label="Jenis Pengujian"
-                                        options={tests}
-                                        selectedOption={selectedTest}
-                                        setSelectedOption={setSelectedTest}
-                                        placeholder="Cari Jenis Pengujian..."
-                                        searchIcon={<HardHat size={18} />}
-                                    />
+                                    <form>
+                                        <input type="hidden" name="test_id" value={data.test_id} />
+
+                                        <SearchableSelect
+                                            label="Jenis Pengujian"
+                                            options={tests}
+                                            selectedOption={selectedTest}
+                                            setSelectedOption={setSelectedTest}
+                                            placeholder="Cari Jenis Pengujian..."
+                                            searchIcon={<HardHat size={18} />}
+                                        />
+                                    </form>
                                 </div>
 
                                 <div className="date-range-picker flex flex-col gap-1">
