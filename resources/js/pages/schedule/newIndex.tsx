@@ -37,22 +37,17 @@ export default function Schedule({tests}: {tests: SimpleOption[] } )
      useEffect(() => {
          if (!selectedTest) return;
 
-         console.log('Selected Test:', selectedTest);
-
          const fetchScheduleData = async () => {
              try {
                  const response = await axios.post(route('schedule.submit'), {
                      test_id: selectedTest.id,
                  });
 
-                 console.log('Full Response:', response.data);
-
                  const { testData, schedules } = response.data;
 
                  setTestData(testData);
                  setSchedules(schedules);
 
-                 console.log('Updated Test Data:', testData);
                  console.log('Updated Schedules:', schedules);
              } catch (error) {
                  console.error(error);
@@ -251,17 +246,27 @@ export default function Schedule({tests}: {tests: SimpleOption[] } )
                                     <div className="font-semibold text-xl mb-4">Jadwal Terambil</div>
                                     <div className="schedule-list space-y-3">
                                         {schedules.map((schedule: scheduleForSchedule) => (
-                                            <div key={schedule.id} className="schedule-item flex justify-between items-center bg-gray-50 p-3 rounded-lg shadow-sm">
-                                                <div className="schedule-date text-md font-medium text-gray-800">
+                                            <div key={schedule.id} className="schedule-item flex flex-col bg-gray-50 p-4 rounded-lg shadow-sm">
+                                                <div className="schedule-date text-md font-semibold text-gray-800 mb-2">
                                                     {new Date(schedule.date).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })}
                                                 </div>
-                                                <div className="schedule-slots text-md text-gray-700">
-                                                    {schedule.available_slots} slots available
+                                                <div className="schedule-details grid grid-cols-3 gap-4 text-base text-gray-700">
+                                                    <div>
+                                                        <span className="font-semibold">Slot Tersedia:</span> {schedule.available_slots}
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-semibold">Pengajuan Disetujui:</span> {schedule.approved_count}
+                                                    </div>
+                                                    <div>
+                                                        <span className="font-semibold">Pengajuan Pending:</span> {schedule.pending_count}
+                                                    </div>
                                                 </div>
+
                                             </div>
                                         ))}
                                     </div>
                                 </div>
+
                             )}
                         </div>
                     </div>
