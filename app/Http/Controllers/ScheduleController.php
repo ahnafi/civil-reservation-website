@@ -71,6 +71,30 @@
 
             $test_schedule = Schedule::select(['id', 'date', 'available_slots'])->where('test_id', $validated['test_id'])->get();
 
+            $test_schedule = DB::table('schedules')
+                ->select([
+                    'schedules.id',
+                    'schedules.date',
+                    'schedules.available_slots',
+                    DB::raw('COUNT(DISTINCT CASE WHEN submissions.status = "approved" THEN testings.id END) as approved_count'),
+                    DB::raw('COUNT(DISTINCT CASE WHEN submissions.status = "submitted" THEN testings.id END) as pending_count')
+                ])
+                ->leftJoin('testings', function($join) use ($validated) {
+                    $join->on('schedules.date', '=', 'testings.test_date')
+                        ->whereNull('testings.deleted_at');
+                })
+                ->leftJoin('submissions', function($join) {
+                    $join->on('testings.submission_id', '=', 'submissions.id')
+                        ->whereNull('submissions.deleted_at');
+                })
+                ->leftJoin('submission_test', function($join) use ($validated) {
+                    $join->on('submissions.id', '=', 'submission_test.submission_id')
+                        ->where('submission_test.test_id', '=', $validated['test_id']);
+                })
+                ->where('schedules.test_id', $validated['test_id'])
+                ->groupBy('schedules.id', 'schedules.date', 'schedules.available_slots')
+                ->get();
+
             return response()->json([
                 'testData' => $test,
                 'schedules' => $test_schedule,
