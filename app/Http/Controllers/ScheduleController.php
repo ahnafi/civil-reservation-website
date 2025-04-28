@@ -45,7 +45,7 @@
                 'test_id' => 'required|integer|exists:tests,id',
             ]);
 
-            $test = $test = DB::table('tests')
+            $test = DB::table('tests')
                 ->select(
                     'tests.id',
                     'tests.name',
@@ -65,14 +65,14 @@
                 ->where('tests.id', $validated['test_id'])
                 ->first();
 
-            $test_schedule = Schedule::where('test_id', $validated['test_id'])
-                ->get();
+            if ($test) {
+                $test->images = json_decode($test->images);
+            }
 
-            $tests = Test::select(['id', 'name'])->get();
+            $test_schedule = Schedule::select(['id', 'date', 'available_slots'])->where('test_id', $validated['test_id'])->get();
 
-            return Inertia::render('schedule/newIndex', [
+            return response()->json([
                 'testData' => $test,
-                'tests' => $tests,
                 'schedules' => $test_schedule,
             ]);
         }
