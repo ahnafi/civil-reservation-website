@@ -197,7 +197,7 @@ export interface testForSchedule {
 
 export interface scheduleForSchedule {
     id: number;
-    test_id: number;
+    date: string;
     available_slots: number;
 }
 
