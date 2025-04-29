@@ -22,6 +22,7 @@ class UserResource extends Resource
     protected static ?string $modelLabel = 'Pengguna';
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationGroup = 'Manajemen Pengguna';
+    protected static ?string $navigationBadgeTooltip = 'Pengguna yang terdaftar';
 
     public static function getNavigationBadge(): ?string
     {

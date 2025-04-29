@@ -35,7 +35,7 @@ class SubmissionResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
     protected static ?string $modelLabel = 'Pengajuan Peminjaman';
     protected static ?string $navigationGroup = 'Manajemen Peminjaman';
-
+    protected static ?string $navigationBadgeTooltip = 'Banyak pengajuan yang diajukan';
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::where("status", "submitted")->count();
@@ -263,6 +263,9 @@ class SubmissionResource extends Resource
                     ->label("Ekspor data ke Excel")
             ])
             ->columns([
+                Tables\Columns\TextColumn::make('code')
+                    ->searchable()
+                    ->label('Kode Pengajuan'),
                 Tables\Columns\TextColumn::make('user.email')
                     ->label("Email pengguna")
                     ->searchable(),
