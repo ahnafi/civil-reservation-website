@@ -79,9 +79,9 @@ class TransactionsRelationManager extends RelationManager
                     ->inline()
                     ->required()
                     ->options([
-                        "pending" => "Pending",
-                        "success" => "Berhasil",
-                        "failed" => "Gagal"
+                        'pending' => 'Diajukan',
+                        'success' => 'Diterima',
+                        'failed' => 'Ditolak',
                     ])
                     ->colors([
                         "pending" => "info",
