@@ -205,6 +205,8 @@ export default function Transactions({
     // Filter Dialog State
     const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
 
+    console.log(userTransactions)
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Daftar Transaksi" />

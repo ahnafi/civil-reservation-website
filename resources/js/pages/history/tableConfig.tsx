@@ -161,7 +161,7 @@ export const submissionColumns: ColumnDef<SubmissionSchedule>[] = [
         header: () => <div className="flex justify-center text-center">Detail</div>,
         cell: ({ row }) => (
             <div className="flex justify-center">
-                <Link href={`/history/submission/detail/${row.original.code}`} className="small-font-size cursor-pointer rounded-full bg-blue-base px-2 py-1 text-center font-medium text-light-base hover:bg-blue-600">
+                <Link href={`/history/submission/${row.original.code}`} className="small-font-size cursor-pointer rounded-full bg-blue-base px-2 py-1 text-center font-medium text-light-base hover:bg-blue-600">
                     Lihat Detail
                 </Link>
             </div>
@@ -273,9 +273,9 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
         header: () => <div className="flex justify-center text-center">Detail</div>,
         cell: ({ row }) => (
             <div className="flex justify-center">
-                <Button className="cursor-pointer" onClick={() => console.log(row.original)}>
+                <Link href={`/history/transaction/${row.original.code}`} className="small-font-size cursor-pointer rounded-full bg-blue-base px-2 py-1 text-center font-medium text-light-base hover:bg-blue-600">
                     Lihat Detail
-                </Button>
+                </Link>
             </div>
         ),
     },

@@ -74,14 +74,41 @@ class HistoryController extends Controller
         ]);
     }
 
-    public function transactionsHistoryDetail($code): Response
+    public function submissionHistoryDetail($code): Response
     {
-        $transaction = Transaction::with(['submission', 'submission.user'])
-            ->where('code', $code)
-            ->firstOrFail();
+        $submissionHistoryDetail = Submission::withUserScheduleJoin()
+            ->where('submissions.user_id', auth()->id())
+            ->where('submissions.code', $code)
+            ->get();
 
-        return Inertia::render('history/detail/transactions-detail', [
-            'transaction' => $transaction,
+        return Inertia::render('history/detail/submission', [
+            'submissionHistoryDetail' => $submissionHistoryDetail,
+        ]);
+    }
+
+    public function transactionHistoryDetail($code): Response
+    {
+        $transactionHistoryDetail = Transaction::query()
+            ->join('submissions', 'transactions.submission_id', '=', 'submissions.id')
+            ->where('submissions.user_id', auth()->id())
+            ->where('transactions.code', $code)
+            ->get();
+
+        return Inertia::render('history/detail/transaction', [
+            'transactionCode' => $transactionHistoryDetail[0]->code,
+            'transactionHistoryDetail' => $transactionHistoryDetail,
+        ]);
+    }
+
+    public function testHistoryDetail($code): Response
+    {
+        $testHistoryDetail = Testing::withUserScheduleJoin()
+            ->where('testings.user_id', auth()->id())
+            ->where('testings.code', $code)
+            ->get();
+
+        return Inertia::render('history/detail/test', [
+            'testHistoryDetail' => $testHistoryDetail,
         ]);
     }
 }

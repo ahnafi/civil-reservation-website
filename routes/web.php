@@ -36,9 +36,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('orders/history');
     })->name('orders-history');
     Route::get('history/submissions', [HistoryController::class, "submissionsHistory"])->name('history-submissions');
-    Route::get('history/submissions/detail/{submission:code}', [HistoryController::class, "submissionsHistory"])->name('history-submissions');
+    Route::get('history/submission/{submission:code}', [HistoryController::class, "submissionHistoryDetail"])->name('history-submission-detail');
     Route::get('history/tests', [HistoryController::class, "testsHistory"])->name('history-tests');
+    Route::get('history/test/{test:code}', [HistoryController::class, "testHistoryDetail"])->name('history-test-detail');
     Route::get('history/transactions', [HistoryController::class, "transactionsHistory"])->name('history-transactions');
+    Route::get('history/transaction/{transaction:code}', [HistoryController::class, "transactionHistoryDetail"])->name('history-transactions-detail');
     Route::post('cart/add', [BookingController::class, 'addToCart'])->name('cart.add');
 });
 
