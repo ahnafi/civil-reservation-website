@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\HistoryController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -34,10 +35,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('orders/history', function () {
         return Inertia::render('orders/history');
     })->name('orders-history');
-    Route::get('history/submissions', [DashboardController::class, "submissionsHistory"])->name('history-submissions');
-    Route::get('history/tests', [DashboardController::class, "testsHistory"])->name('history-tests');
-    Route::get('history/transactions', [DashboardController::class, "transactionsHistory"])->name('history-transactions');
-    Route::post('/cart/add', [BookingController::class, 'addToCart'])->name('cart.add');
+    Route::get('history/submissions', [HistoryController::class, "submissionsHistory"])->name('history-submissions');
+    Route::get('history/submissions/detail/{submission:code}', [HistoryController::class, "submissionsHistory"])->name('history-submissions');
+    Route::get('history/tests', [HistoryController::class, "testsHistory"])->name('history-tests');
+    Route::get('history/transactions', [HistoryController::class, "transactionsHistory"])->name('history-transactions');
+    Route::post('cart/add', [BookingController::class, 'addToCart'])->name('cart.add');
 });
 
 require __DIR__ . '/settings.php';
