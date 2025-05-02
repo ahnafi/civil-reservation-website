@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\TransactionExporter;
 use App\Filament\Resources\TransactionResource\Pages;
 use App\Filament\Resources\TransactionResource\RelationManagers;
 use App\Models\Transaction;
+use Filament\Actions\ExportAction;
 use Filament\Forms;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
@@ -23,6 +25,7 @@ class TransactionResource extends Resource
     protected static ?string $modelLabel = 'Transaksi';
     protected static ?string $navigationGroup = 'Manajemen Peminjaman';
     protected static ?string $navigationBadgeTooltip = 'Banyak transaksi yang diajukan';
+
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::where("status", "pending")->count();
@@ -139,6 +142,11 @@ class TransactionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->headerActions([
+                    Tables\Actions\ExportAction::make()
+                        ->exporter(TransactionExporter::class)
+                ]
+            )
             ->columns([
                 Tables\Columns\TextColumn::make('code')
                     ->label('Kode Transaksi')

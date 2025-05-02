@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\TestingExporter;
+use App\Filament\Exports\TransactionExporter;
 use App\Filament\Resources\TestingResource\Pages;
 use App\Filament\Resources\TestingResource\RelationManagers;
 use App\Models\Testing;
@@ -50,6 +52,11 @@ class TestingResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->headerActions([
+                    Tables\Actions\ExportAction::make()
+                        ->exporter(TestingExporter::class)
+                ]
+            )
             ->columns([
                 Tables\Columns\TextColumn::make('code')
                     ->label('Kode pengujian')
