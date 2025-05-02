@@ -184,17 +184,17 @@ export interface Transaction {
     id: number;
     code: string;
     amount: number;
-    payment_method?: PaymentMethod | null;
-    note?: string | null;
+    payment_method?: PaymentMethod;
+    note?: string;
     status: TransactionStatus;
-    payment_invoice_file?: string | null;
-    payment_receipt_image?: string | null;
+    payment_invoice_file?: string;
+    payment_receipt_image?: string;
     payment_deadline: string;
-    payment_date?: string | null;
+    payment_date?: string;
     submission_id: number;
     created_at: string;
     updated_at: string;
-    deleted_at?: string | null;
+    deleted_at?: string;
 }
 
 // Testing Types

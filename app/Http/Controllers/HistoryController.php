@@ -92,20 +92,24 @@ class HistoryController extends Controller
             ->join('submissions', 'transactions.submission_id', '=', 'submissions.id')
             ->where('submissions.user_id', auth()->id())
             ->where('transactions.code', $code)
+            ->select('transactions.*')
             ->get();
 
         return Inertia::render('history/detail/transaction', [
-            'transactionCode' => $transactionHistoryDetail[0]->code,
             'transactionHistoryDetail' => $transactionHistoryDetail,
         ]);
     }
 
     public function testHistoryDetail($code): Response
     {
-        $testHistoryDetail = Testing::withUserScheduleJoin()
-            ->where('testings.user_id', auth()->id())
-            ->where('testings.code', $code)
-            ->get();
+        $testHistoryDetail = Testing::query()
+            ->join('submissions', 'testings.submission_id', '=', 'submissions.id')
+            ->where('submissions.user_id', auth()->id())
+            ->orderBy('testings.created_at', 'desc')
+            ->select('testings.*')
+            ->get();;
+
+
 
         return Inertia::render('history/detail/test', [
             'testHistoryDetail' => $testHistoryDetail,

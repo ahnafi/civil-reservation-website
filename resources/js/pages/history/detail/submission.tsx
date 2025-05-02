@@ -73,6 +73,7 @@ export default function SubmissionDetail({ submissionHistoryDetail }: { submissi
     if (!testRecord) {
         return (
             <AppLayout>
+                <Head title="Tidak Terdapat Pengajuan" />
                 <div className="container mx-auto py-8">
                     <Card>
                         <CardContent className="p-8 text-center">
@@ -90,7 +91,7 @@ export default function SubmissionDetail({ submissionHistoryDetail }: { submissi
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Detail Pengajuan" />
+            <Head title={`Pengajuan ${testRecord.code}`} />
             <div className="container mx-auto">
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                     {/* Main content - 2/3 width on large screens */}
@@ -205,7 +206,7 @@ export default function SubmissionDetail({ submissionHistoryDetail }: { submissi
                                     </div>
                                 )}
                             </CardContent>
-                            <CardFooter className="border-t bg-slate-50 p-4 dark:bg-slate-800">
+                            <CardFooter className="border-t bg-slate-50 p-2 dark:bg-slate-800">
                                 <div className="w-full text-center text-sm text-gray-500">
                                     Terakhir diperbarui: {formatDate(testRecord.test_submission_date)}
                                 </div>
@@ -217,8 +218,8 @@ export default function SubmissionDetail({ submissionHistoryDetail }: { submissi
                                 <CardTitle className="text-lg">Bantuan</CardTitle>
                             </CardHeader>
                             <CardContent className="p-4">
-                                <div className="text-sm">
-                                    <p className="mb-2">Jika Anda memiliki pertanyaan tentang pengajuan ini, silakan hubungi tim dukungan kami.</p>
+                                <div className="space-y-2 text-sm">
+                                    <p>Jika Anda memiliki pertanyaan tentang pengajuan ini, silakan hubungi tim dukungan kami.</p>
                                     <Button variant="outline" className="w-full">
                                         Hubungi Dukungan
                                     </Button>
