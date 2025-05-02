@@ -37,7 +37,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     }
 
     return (
-        <div className={`inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium ${colorClasses}`}>
+        <div className={`inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 small-font-size font-medium ${colorClasses}`}>
             {icon}
             {status === 'testing' ? 'Dalam Proses' : status.charAt(0).toUpperCase() + status.slice(1)}
         </div>
@@ -162,10 +162,10 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                             label="ID Pengajuan"
                                             value={
                                                 <Link
-                                                    href={`/history/submission/${testRecord.submission_id}`}
+                                                    href={`/history/submission/${testRecord.submission_code}`}
                                                     className="text-blue-600 hover:underline"
                                                 >
-                                                    Lihat Pengajuan #{testRecord.submission_id}
+                                                    Lihat Pengajuan #{testRecord.submission_code}
                                                 </Link>
                                             }
                                         />
@@ -253,8 +253,8 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
 
                     {/* Sidebar - 1/3 width on large screens */}
                     <div className="lg:col-span-1">
-                        <Card className="overflow-hidden p-0 gap-0">
-                            <CardHeader className="border-b p-4 bg-slate-50 dark:bg-slate-800">
+                        <Card className="gap-0 overflow-hidden p-0">
+                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-slate-800">
                                 <CardTitle className="text-lg">Status Pengujian</CardTitle>
                             </CardHeader>
                             <CardContent className="p-4">
@@ -324,13 +324,13 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                 </div>
                             </CardContent>
                             <CardFooter className="border-t bg-slate-50 p-2 dark:bg-slate-800">
-                                <div className="w-full text-center text-sm text-gray-500">
+                                <div className="w-full text-center small-font-size text-gray-500">
                                     Terakhir diperbarui: {formatDate(testRecord.updated_at)}
                                 </div>
                             </CardFooter>
                         </Card>
 
-                        <Card className="mt-6 overflow-hidden p-0 gap-0">
+                        <Card className="mt-6 gap-0 overflow-hidden p-0">
                             <CardHeader className="border-b bg-slate-50 p-4 dark:bg-slate-800">
                                 <CardTitle className="text-lg">Pengingat Pengujian</CardTitle>
                             </CardHeader>
@@ -341,7 +341,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                             <ClipboardCheck className="h-5 w-5 text-blue-600" />
                                             Hal yang Perlu Diperhatikan
                                         </h4>
-                                        <ul className="list-inside list-disc space-y-1 text-sm text-blue-700 dark:text-blue-400">
+                                        <ul className="list-inside list-disc space-y-1 small-font-size text-blue-700 dark:text-blue-400">
                                             <li>Pastikan sampel pengujian telah disiapkan dengan baik</li>
                                             <li>Datang tepat waktu sesuai jadwal yang ditentukan</li>
                                             <li>Hasil pengujian akan tersedia setelah proses selesai</li>
@@ -356,12 +356,12 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                             </CardContent>
                         </Card>
 
-                        <Card className="mt-6 overflow-hidden p-0 gap-0">
-                            <CardHeader className="border-b bg-slate-50 dark:bg-slate-800 p-4">
+                        <Card className="mt-6 gap-0 overflow-hidden p-0">
+                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-slate-800">
                                 <CardTitle className="text-lg">Bantuan</CardTitle>
                             </CardHeader>
                             <CardContent className="p-4">
-                                <div className="space-y-4 text-sm">
+                                <div className="space-y-4 small-font-size">
                                     <p>Jika Anda memiliki pertanyaan tentang pengujian ini, silakan hubungi tim dukungan kami.</p>
                                     <Button variant="outline" className="w-full">
                                         Hubungi Dukungan

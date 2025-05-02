@@ -162,10 +162,10 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                             label="ID Pengajuan"
                                             value={
                                                 <Link
-                                                    href={`/history/submission/${transaction.submission_id}`}
+                                                    href={`/history/submission/${transaction.submission_code}`}
                                                     className="text-blue-600 hover:underline"
                                                 >
-                                                    Lihat Pengajuan #{transaction.submission_id}
+                                                    Lihat Pengajuan #{transaction.submission_code}
                                                 </Link>
                                             }
                                         />

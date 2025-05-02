@@ -187,6 +187,7 @@ export interface Transaction {
     payment_method?: PaymentMethod;
     note?: string;
     status: TransactionStatus;
+    submission_code: string;
     payment_invoice_file?: string;
     payment_receipt_image?: string;
     payment_deadline: string;
@@ -209,6 +210,7 @@ export interface Testing {
     test_date: string;
     completed_at?: string | null;
     submission_id: number;
+    submission_code: string;
     created_at: string;
     updated_at: string;
     deleted_at?: string | null;

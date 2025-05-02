@@ -92,7 +92,7 @@ class HistoryController extends Controller
             ->join('submissions', 'transactions.submission_id', '=', 'submissions.id')
             ->where('submissions.user_id', auth()->id())
             ->where('transactions.code', $code)
-            ->select('transactions.*')
+            ->select('transactions.*', 'submissions.code as submission_code')
             ->get();
 
         return Inertia::render('history/detail/transaction', [
@@ -106,10 +106,8 @@ class HistoryController extends Controller
             ->join('submissions', 'testings.submission_id', '=', 'submissions.id')
             ->where('submissions.user_id', auth()->id())
             ->orderBy('testings.created_at', 'desc')
-            ->select('testings.*')
-            ->get();;
-
-
+            ->select('testings.*', 'submissions.code as submission_code')
+            ->get();
 
         return Inertia::render('history/detail/test', [
             'testHistoryDetail' => $testHistoryDetail,
