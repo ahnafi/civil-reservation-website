@@ -30,6 +30,10 @@ import { transactionColumnLabels, transactionColumns, transactionStatusOptions }
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
+        title: 'Riwayat',
+        href: '/history',
+    },
+    {
         title: 'Daftar Transaksi',
         href: '/history/transactions',
     },
@@ -204,6 +208,8 @@ export default function Transactions({
 
     // Filter Dialog State
     const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
+
+    console.log(userTransactions)
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

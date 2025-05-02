@@ -66,9 +66,15 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
     };
 
     // Calculate savings from individual test prices
-    const totalIndividualPrice = data.tests.reduce((total, test) => total + test.price, 0);
-    const savings = totalIndividualPrice - data.price;
-    const savingsPercentage = Math.round((savings / totalIndividualPrice) * 100);
+    let totalIndividualPrice = 0;
+    let savings = 0;
+    let savingsPercentage = 0;
+
+    if (data.tests) {
+        totalIndividualPrice = data.tests.reduce((total, test) => total + test.price, 0);
+        savings = totalIndividualPrice - (data.price || 0);
+        savingsPercentage = totalIndividualPrice > 0 ? Math.round((savings / totalIndividualPrice) * 100) : 0;
+    }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -79,7 +85,7 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                     {/* Package Header Section */}
                     <div className="lg:col-span-12">
                         <div className="flex flex-col gap-4 rounded-lg bg-gradient-to-r from-blue-50 to-cyan-50 p-4 dark:from-blue-950/30 dark:to-cyan-950/30">
-                            <div className="flex flex-col items-start justify-between gap-4 md:flex-row sm:items-center">
+                            <div className="flex flex-col items-start justify-between gap-4 sm:items-center md:flex-row">
                                 <div className="flex items-center gap-2">
                                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
                                         <Package className="h-6 w-6 text-blue-600 dark:text-blue-300" />
@@ -150,7 +156,7 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                                 <CardContent className="space-y-4 p-0">
                                     <div className="flex justify-between">
                                         <span className="text-muted-foreground">Jumlah Pengujian</span>
-                                        <span className="font-medium">{data.tests.length} Pengujian</span>
+                                        <span className="font-medium">{data.tests?.length} Pengujian</span>
                                     </div>
                                     <Separator />
                                     <div className="flex justify-between">
@@ -187,9 +193,15 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                         <div className="space-y-6">
                             <Tabs defaultValue="details" className="small-font-size w-full">
                                 <TabsList className="small-font-size grid w-full grid-cols-3">
-                                    <TabsTrigger className="text-xs md:text-sm" value="details">Deskripsi</TabsTrigger>
-                                    <TabsTrigger className="text-xs md:text-sm" value="tests">Pengujian Termasuk</TabsTrigger>
-                                    <TabsTrigger className="text-xs md:text-sm" value="how-it-works">Cara Kerja</TabsTrigger>
+                                    <TabsTrigger className="text-xs md:text-sm" value="details">
+                                        Deskripsi
+                                    </TabsTrigger>
+                                    <TabsTrigger className="text-xs md:text-sm" value="tests">
+                                        Pengujian Termasuk
+                                    </TabsTrigger>
+                                    <TabsTrigger className="text-xs md:text-sm" value="how-it-works">
+                                        Cara Kerja
+                                    </TabsTrigger>
                                 </TabsList>
 
                                 <TabsContent value="details" className="mt-4">
@@ -235,13 +247,13 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                                         <CardHeader className="p-0">
                                             <CardTitle className="large-font-size">Pengujian dalam Paket</CardTitle>
                                             <CardDescription className="small-font-size">
-                                                Paket ini mencakup {data.tests.length} pengujian
+                                                Paket ini mencakup {data.tests?.length} pengujian
                                             </CardDescription>
                                         </CardHeader>
                                         <CardContent className="p-0">
                                             <div className="space-y-6">
-                                                {data.tests.map((test, index) => (
-                                                    <div key={test.id} className="rounded-lg border p-2">
+                                                {data.tests?.map((test, index: number) => (
+                                                    <div key={index} className="rounded-lg border p-2">
                                                         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                                             <div className="flex items-center gap-4">
                                                                 <div className="bg-primary/10 flex h-16 w-16 items-center justify-center rounded-md">
@@ -288,7 +300,7 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                                                             {step.id}
                                                         </div>
                                                         <div>
-                                                            <p className="text-base md:text-lg font-medium">{step.title}</p>
+                                                            <p className="text-base font-medium md:text-lg">{step.title}</p>
                                                             <p className="text-muted-foreground small-font-size">{step.description}</p>
                                                         </div>
                                                     </div>

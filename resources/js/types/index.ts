@@ -54,6 +54,9 @@ export interface Laboratory {
     code: string;
     room: string;
     slug: string;
+    image: string;
+    daily_slot?: number;
+    description: string;
     created_at: Date;
     updated_at: Date;
 }
@@ -66,15 +69,16 @@ export interface Test {
     description: string;
     images: string[];
     minimum_unit: number;
-    dailySlot: number;
-    isActive: boolean;
+    daily_slot: number;
+    is_active: boolean;
     category_id: number;
     laboratory_id: number;
     created_at: Date;
     updated_at: Date;
-    deletedAt: Date | null;
+    deleted_at: Date | null;
     category: Category;
     laboratory: Laboratory;
+    packages: Package[] | null;
 }
 
 export interface Package {
@@ -85,9 +89,15 @@ export interface Package {
     images: string[];
     description: string;
     tests: Test[] | null;
+    laboratory: Laboratory;
 }
 
 export interface Pagination<T> {
+    links: {
+        url: string | null;
+        label: string;
+        active: boolean;
+    }[];
     total: number;
     per_page: number;
     current_page: number;
@@ -100,6 +110,31 @@ export interface Pagination<T> {
     from: number;
     to: number;
     data: T[];
+}
+
+// Page Props
+export interface PageProps {
+    laboratory?: Laboratory;
+    tests?: Array<{
+        category: Category;
+        id: number;
+        name: string;
+        slug: string;
+        price: number;
+        description: string;
+        images: string;
+        minimum_unit: number;
+        daily_slot: number;
+        is_active: boolean;
+    }>;
+    packages?: Array<{
+        id: number;
+        name: string;
+        slug: string;
+        price: number;
+        images: string;
+        description: string;
+    }>;
 }
 
 // Submission Type
@@ -149,17 +184,18 @@ export interface Transaction {
     id: number;
     code: string;
     amount: number;
-    payment_method?: PaymentMethod | null;
-    note?: string | null;
+    payment_method?: PaymentMethod;
+    note?: string;
     status: TransactionStatus;
-    payment_invoice_file?: string | null;
-    payment_receipt_image?: string | null;
+    submission_code: string;
+    payment_invoice_file?: string;
+    payment_receipt_image?: string;
     payment_deadline: string;
-    payment_date?: string | null;
+    payment_date?: string;
     submission_id: number;
     created_at: string;
     updated_at: string;
-    deleted_at?: string | null;
+    deleted_at?: string;
 }
 
 // Testing Types
@@ -174,6 +210,7 @@ export interface Testing {
     test_date: string;
     completed_at?: string | null;
     submission_id: number;
+    submission_code: string;
     created_at: string;
     updated_at: string;
     deleted_at?: string | null;

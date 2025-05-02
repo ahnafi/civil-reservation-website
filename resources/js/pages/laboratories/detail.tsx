@@ -3,45 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Category } from '@/types';
+import { type BreadcrumbItem, PageProps } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Barcode, Calendar, Clock, FileCheck, MapPin } from 'lucide-react';
 import { useState } from 'react';
-
-interface Laboratory {
-    code: string;
-    name: string;
-    slug: string;
-    room: string;
-    description: string;
-    image: string;
-    price: number;
-    daily_slot?: number;
-}
-
-interface PageProps {
-    laboratory: Laboratory;
-    tests: Array<{
-        category: Category;
-        id: number;
-        name: string;
-        slug: string;
-        price: number;
-        description: string;
-        images: string;
-        minimum_unit: number;
-        daily_slot: number;
-        is_active: boolean;
-    }>;
-    packages: Array<{
-        id: number;
-        name: string;
-        slug: string;
-        price: number;
-        images: string;
-        description: string;
-    }>;
-}
 
 export default function Laboratory() {
     const { laboratory, tests, packages } = usePage().props as PageProps;
@@ -57,8 +22,8 @@ export default function Laboratory() {
             href: '/laboratories',
         },
         {
-            title: `Laboratorium ${laboratory.name}`,
-            href: `/laboratory/${laboratory.slug}`,
+            title: `Laboratorium ${laboratory?.name}`,
+            href: `/laboratory/${laboratory?.slug}`,
         },
     ];
 
@@ -73,7 +38,7 @@ export default function Laboratory() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={laboratory.name} />
+            <Head title={laboratory?.name} />
 
             <div className="container mx-auto">
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -81,15 +46,15 @@ export default function Laboratory() {
                     <div className="lg:col-span-2">
                         <Card className="overflow-hidden py-0">
                             <div className="relative h-80 w-full">
-                                <img src={`/storage/${laboratory.image}`} alt={`${laboratory.name}`} className="h-full w-full object-cover" />
+                                <img src={`/storage/${laboratory?.image}`} alt={`${laboratory?.name}`} className="h-full w-full object-cover" />
                                 <div className="absolute top-4 left-4">
-                                    <Badge className="bg-blue-600 px-3 py-1 text-white">{laboratory.code}</Badge>
+                                    <Badge className="bg-blue-600 px-3 py-1 text-white">{laboratory?.code}</Badge>
                                 </div>
                             </div>
 
                             <CardContent className="p-6">
                                 <div className="mb-4 flex items-center justify-between">
-                                    <h1 className="text-2xl font-bold">{laboratory.name}</h1>
+                                    <h1 className="text-2xl font-bold">{laboratory?.name}</h1>
                                     <Badge variant="outline" className="border-blue-300 text-blue-700">
                                         Laboratorium
                                     </Badge>
@@ -99,7 +64,7 @@ export default function Laboratory() {
 
                                 <div className="mb-6">
                                     <h3 className="mb-2 text-lg font-medium">Deskripsi</h3>
-                                    <p className="text-gray-600 dark:text-gray-300">{laboratory.description}</p>
+                                    <p className="text-gray-600 dark:text-gray-300">{laboratory?.description}</p>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-6 md:grid-cols-3">
@@ -107,7 +72,7 @@ export default function Laboratory() {
                                         <MapPin className="h-5 w-5 text-blue-600" />
                                         <div>
                                             <p className="text-sm text-gray-500 dark:text-gray-400">Ruang</p>
-                                            <p className="font-medium">{laboratory.room}</p>
+                                            <p className="font-medium">{laboratory?.room}</p>
                                         </div>
                                     </div>
 
@@ -115,7 +80,7 @@ export default function Laboratory() {
                                         <Calendar className="h-5 w-5 text-blue-600" />
                                         <div>
                                             <p className="text-sm text-gray-500 dark:text-gray-400">Kuota Harian</p>
-                                            <p className="font-medium">{laboratory.daily_slot || 'Tidak dibatasi'}</p>
+                                            <p className="font-medium">{laboratory?.daily_slot || 'Tidak dibatasi'}</p>
                                         </div>
                                     </div>
 
@@ -123,7 +88,7 @@ export default function Laboratory() {
                                         <Barcode className="h-5 w-5 text-blue-600" />
                                         <div>
                                             <p className="text-sm text-gray-500 dark:text-gray-400">Kode</p>
-                                            <p className="font-medium">{laboratory.code}</p>
+                                            <p className="font-medium">{laboratory?.code}</p>
                                         </div>
                                     </div>
                                 </div>
