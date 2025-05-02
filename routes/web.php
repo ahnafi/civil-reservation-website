@@ -38,26 +38,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('orders/history', function () {
         return Inertia::render('orders/history');
     })->name('orders-history');
-<<<<<<< HEAD
-    Route::get('history/submissions', [DashboardController::class, "submissionsHistory"])->name('history-submissions');
 
-    // Get History Page
-    Route::get('history/tests', [DashboardController::class, "testsHistory"])->name('history-tests');
-    Route::get('history/transactions', [DashboardController::class, "transactionsHistory"])->name('history-transactions');
-
-    // Post Page
-    Route::post('cart/submit', [BookingController::class, 'submitSubmission'])->name('createSubmission');
-    Route::post('submission/payment', [BookingController::class, 'submitPayment'])->name('submitPayment');
-    Route::post('schedule/submit', [ScheduleController::class, 'getSchedule'])->name('schedule.submit');
-=======
+    // Get Submission History
     Route::get('history/submissions', [HistoryController::class, "submissionsHistory"])->name('history-submissions');
     Route::get('history/submission/{submission:code}', [HistoryController::class, "submissionHistoryDetail"])->name('history-submission-detail');
+
+    // Get Test History
     Route::get('history/tests', [HistoryController::class, "testsHistory"])->name('history-tests');
     Route::get('history/test/{test:code}', [HistoryController::class, "testHistoryDetail"])->name('history-test-detail');
+
+    // Get Transaction History
     Route::get('history/transactions', [HistoryController::class, "transactionsHistory"])->name('history-transactions');
     Route::get('history/transaction/{transaction:code}', [HistoryController::class, "transactionHistoryDetail"])->name('history-transactions-detail');
     Route::post('cart/add', [BookingController::class, 'addToCart'])->name('cart.add');
->>>>>>> frontend
 });
 
 require __DIR__ . '/settings.php';
