@@ -351,7 +351,6 @@ class SubmissionResource extends Resource
                         }
 
                     })
-                    ->button()
                     ->color("success")
                     ->requiresConfirmation()
                     ->icon("heroicon-o-check")
@@ -388,7 +387,6 @@ class SubmissionResource extends Resource
                         }
 
                     })
-                    ->button()
                     ->color("danger")
                     ->requiresConfirmation()
                     ->icon("heroicon-o-x-circle")
@@ -397,14 +395,12 @@ class SubmissionResource extends Resource
                 Tables\Actions\Action::make("Transaksi")
                     ->icon("heroicon-o-credit-card")
                     ->color("warning")
-                    ->button()
                     ->url(fn(Submission $record): string => route("filament.admin.resources.submissions.edit", [$record, "activeRelationManager" => 0]))
                     ->visible(fn($record) => $record->status === 'approved'),
 
                 Tables\Actions\Action::make("Pengujian")
                     ->icon("heroicon-o-beaker")
                     ->color("info")
-                    ->button()
                     ->url(fn(Submission $record): string => route("filament.admin.resources.submissions.edit", [$record, "activeRelationManager" => 1]))
                     ->visible(fn($record) => $record->status === 'approved'),
 
