@@ -5,7 +5,9 @@ namespace App\Filament\Resources;
 use App\Filament\Exports\TransactionExporter;
 use App\Filament\Resources\TransactionResource\Pages;
 use App\Filament\Resources\TransactionResource\RelationManagers;
+use App\Models\Submission;
 use App\Models\Transaction;
+use App\Services\TransactionService;
 use Filament\Actions\ExportAction;
 use Filament\Forms;
 use Filament\Forms\Components\ToggleButtons;
@@ -15,6 +17,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 
@@ -26,6 +29,13 @@ class TransactionResource extends Resource
     protected static ?string $navigationGroup = 'Manajemen Peminjaman';
     protected static ?string $navigationBadgeTooltip = 'Banyak transaksi yang diajukan';
 
+    private TransactionService $transactionService;
+
+    public function __construct()
+    {
+        $this->transactionService = app(TransactionService::class);
+    }
+
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::where("status", "pending")->count();
@@ -36,36 +46,47 @@ class TransactionResource extends Resource
         return $form
             ->schema([
 
-                Forms\Components\Select::make('submission')
+                Forms\Components\Select::make('submission_id')
                     ->relationship("submission", "code")
                     ->searchable()
+                    ->columnSpanFull()
+                    ->live()
+                    ->required()
+                    ->afterStateUpdated(function ($state, Set $set) {
+                        $submission = Submission::find($state);
+                        if ($submission) {
+                            $set("submission_id", $submission->id);
+                            $set("amount", $submission->total_cost);
+
+                            $submissionId = $submission?->id ?? '000';
+                            $userId = $submission?->user_id ?? '000';
+                            $transactionCount = $submission ? $submission->transactions()->withTrashed()->count() + 1 : 1;
+
+                            $set("code", 'CVL-' . now()->format('Ymd') . $submissionId . $userId . $transactionCount);
+                        }
+                    })
                     ->label('Kode Pengajuan'),
 
                 Forms\Components\TextInput::make('code')
                     ->label('Kode Unik Transaksi')
-                    ->required()
+                    ->columnSpanFull()
+                    ->hiddenOn("create")
                     ->unique(ignoreRecord: true)
-//                    ->default(function () {
-//                        $submission = $this->getOwnerRecord();
-//                        $submissionId = $submission?->id ?? '000';
-//                        $userId = $submission?->user_id ?? '000';
-//                        $transactionCount = $submission ? $submission->transactions()->withTrashed()->count() + 1 : 1;
-//
-//                        return 'CVL-' . now()->format('Ymd') . $submissionId . $userId . $transactionCount;
-//                    })
                     ->disabled(),
 
                 Forms\Components\TextInput::make('amount')
                     ->numeric()
                     ->required()
+                    ->columnSpanFull()
                     ->label('Total Pembayaran')
-//                    ->default(fn() => $this->getOwnerRecord()->total_cost ?? 0)
+                    ->default(0)
                     ->prefix("Rp"),
 
                 ToggleButtons::make('payment_method')
                     ->hiddenOn("create")
                     ->label("Metode Pembayaran")
                     ->inline()
+                    ->columnSpanFull()
                     ->options([
                         "BANK JATENG" => "BANK JATENG",
                         "BANK MANDIRI" => "BANK MANDIRI",
@@ -87,6 +108,7 @@ class TransactionResource extends Resource
                     ->default("pending")
                     ->hiddenOn("create")
                     ->inline()
+                    ->columnSpanFull()
                     ->required()
                     ->options([
                         "pending" => "Pending",
@@ -115,6 +137,7 @@ class TransactionResource extends Resource
 
                 Forms\Components\FileUpload::make('payment_invoice_file')
                     ->label('Invoice Pembayaran')
+                    ->columnSpanFull()
                     ->acceptedFileTypes([
                         'application/pdf',
                         'application/msword',
@@ -124,6 +147,7 @@ class TransactionResource extends Resource
 
                 Forms\Components\FileUpload::make('payment_receipt_image')
                     ->hiddenOn("create")
+                    ->columnSpanFull()
                     ->label('Bukti Pembayaran')
                     ->image()
                     ->directory('payment_receipts'),
@@ -131,6 +155,7 @@ class TransactionResource extends Resource
                 Forms\Components\DateTimePicker::make('payment_date')
                     ->hiddenOn("create")
                     ->label('Tanggal Pembayaran')
+                    ->columnSpanFull()
                     ->nullable(),
                 Forms\Components\Textarea::make('note')
                     ->label('Catatan')
@@ -142,11 +167,13 @@ class TransactionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->headerActions([
+            ->headerActions(
+                [
                     Tables\Actions\ExportAction::make()
                         ->exporter(TransactionExporter::class)
                 ]
             )
+            ->recordUrl(null)
             ->columns([
                 Tables\Columns\TextColumn::make('code')
                     ->label('Kode Transaksi')
@@ -158,6 +185,15 @@ class TransactionResource extends Resource
                     ->label('Total Pembayaran')
                     ->numeric()
                     ->prefix("Rp "),
+
+                Tables\Columns\TextColumn::make('payment_deadline')
+                    ->label('Batas Pembayaran')
+                    ->date()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('payment_date')
+                    ->label('Tanggal Pembayaran')
+                    ->dateTime()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->label("Status")
                     ->badge()
@@ -172,14 +208,6 @@ class TransactionResource extends Resource
                         'failed' => 'Ditolak',
                         default => ucfirst($state),
                     }),
-                Tables\Columns\TextColumn::make('payment_deadline')
-                    ->label('Batas Waktu Pembayaran')
-                    ->dateTime()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('payment_date')
-                    ->label('Tanggal Pembayaran')
-                    ->dateTime()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -195,11 +223,49 @@ class TransactionResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make("status")
+                    ->label("Filter berdasarkan status")
+                    ->options([
+                        "pending" => "Diajukan",
+                        "success" => "Dibayar",
+                        "failed" => "Gagal"
+                    ]),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\Action::make("Setujui")
+                    ->icon("heroicon-o-check-circle")
+                    ->requiresConfirmation()
+                    ->color("success")
+                    ->visible(fn($record) => $record->status === 'pending')
+                    ->action(function (Model $record) {
+                        $transactionService = app(\App\Services\TransactionService::class);
+                        $transactionService->accept($record);
+                    }),
+
+                Tables\Actions\Action::make("Tolak")
+                    ->icon("heroicon-o-x-circle")
+                    ->requiresConfirmation()
+                    ->form([
+                        Forms\Components\Textarea::make('note')
+                            ->required()
+                            ->label("Perihal"),
+                    ])
+                    ->color("danger")
+                    ->visible(fn($record) => $record->status === 'pending')
+                    ->action(function (array $data, Model $record) {
+                        $transactionService = app(\App\Services\TransactionService::class);
+                        $transactionService->reject($data, $record);
+                    }),
+
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make()
             ]);
-//            ->bulkActions([
+        //            ->bulkActions([
 //                Tables\Actions\BulkActionGroup::make([
 //                    Tables\Actions\DeleteBulkAction::make(),
 //                    Tables\Actions\ForceDeleteBulkAction::make(),
@@ -208,7 +274,7 @@ class TransactionResource extends Resource
 //            ]);
     }
 
-//    public static function getRelations(): array
+    //    public static function getRelations(): array
 //    {
 //        return [
 //            //
