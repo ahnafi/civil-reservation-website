@@ -6,12 +6,16 @@ use Filament\Forms;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 class TestingsRelationManager extends RelationManager
 {
@@ -87,6 +91,8 @@ class TestingsRelationManager extends RelationManager
     {
         return $table
             ->columns([
+                TextColumn::make('code')->label('Kode'),
+
                 Tables\Columns\TextColumn::make('status')->label('Status')->sortable()
                     ->formatStateUsing(fn($state): string => match ($state) {
                         "testing" => "Sedang berjalan",
@@ -97,7 +103,7 @@ class TestingsRelationManager extends RelationManager
                         "testing" => "warning",
                         "completed" => "success",
                     }),
-                Tables\Columns\TextColumn::make('test_date')->label('Tanggal Testing')->dateTime(),
+                Tables\Columns\TextColumn::make('test_date')->label('Tanggal Pengujian')->dateTime(),
                 Tables\Columns\TextColumn::make('completed_at')->label('Selesai')->dateTime(),
             ])
             ->filters([
@@ -107,11 +113,68 @@ class TestingsRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+
+                Tables\Actions\Action::make("Selesaikan")
+                    ->form([
+
+                        Forms\Components\FileUpload::make('documents')
+                            ->label('Lampiran')
+                            ->multiple()
+                            ->directory('testing_documents')
+                            ->acceptedFileTypes([
+                                'application/pdf',
+                                'application/msword',
+                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                            ])
+                            ->required()
+                            ->openable()
+                            ->helperText('Format file yang diterima: PDF, DOC, DOCX.')
+                            ->columnSpanFull(),
+
+                        Forms\Components\Textarea::make('note')
+                            ->columnSpanFull()
+                            ->label('Catatan')
+                            ->nullable(),
+
+                    ])
+                    ->action(function (array $data, Model $record) {
+
+                        $user = $record->submission->user;
+                        if ($user && $user->email) {
+
+                            $record->status = "completed";
+                            $record->completed_at = Carbon::now()->format('Y-m-d\TH:i:s');
+                            $record->documents = $data['documents'];
+                            $record->note = $data['note'] ?? null;
+                            $record->save();
+
+                            Mail::raw("Pengujian selesai.", function ($message) use ($user) {
+                                $message->to($user->email)
+                                    ->subject('Pengujian selesai');
+                            });
+
+                            Notification::make()
+                                ->title('Pengujian selesai')
+                                ->body("Pengajuan oleh {$user->name} dengan kode pengajuan {$record->submission->code} telah selesai.")
+                                ->success()
+                                ->send();
+                        } else {
+                            Notification::make()
+                                ->title('Gagal mengubah pengujian ')
+                                ->body("Pengujian dengan kode {$record->code} gagal diubah.")
+                                ->danger()
+                                ->send();
+                        }
+                    })
+                    ->requiresConfirmation()
+                    ->color("success")
+                    ->icon("heroicon-o-check-circle")
+                    ->visible(fn($record) => $record->status === 'testing'),
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\DeleteAction::make(),
-                Tables\Actions\ForceDeleteAction::make(),
-                Tables\Actions\RestoreAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

@@ -353,7 +353,7 @@ class SubmissionResource extends Resource
                     })
                     ->color("success")
                     ->requiresConfirmation()
-                    ->icon("heroicon-o-check")
+                    ->icon("heroicon-o-check-circle")
                     ->visible(fn($record) => $record->status === 'submitted'),
 
                 Tables\Actions\Action::make("Tolak")
