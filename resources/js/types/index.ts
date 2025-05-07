@@ -240,6 +240,37 @@ export interface scheduleForSchedule {
     pending_count: number;
 }
 
+export interface Booking {
+    company_name: string;
+    project_name: string;
+    project_address: string;
+    test_submission_date: string;
+    submission_tests: Test[];
+    submission_packages: Package[];
+}
+
+export interface TestCart {
+    test_id: number;
+    slug: string;
+    unit: number;
+    test: Test;
+}
+
+export interface PackageCart {
+    package_id: number;
+    slug: string;
+    package: Package;
+}
+
+export interface BookingForm {
+    company_name: string;
+    project_name: string;
+    project_address: string;
+    test_submission_date: string;
+    note: string;
+    total_cost: number;
+}
+
 export type PaginatedTests = Pagination<Test>;
 export type PaginatedPackage = Pagination<Package>;
 export type PaginatedLaboratories = Pagination<Laboratory>;

@@ -22,4 +22,4 @@ class TestController extends Controller
             'test' => $test->load("category", "laboratory", "packages"),
         ]);
     }
-    }
+}

@@ -212,7 +212,7 @@ export default function MainDashboard({
                     </div>
                     <div className="col-span-full space-y-2">
                         <h3 className="font-semibold">Laboratorium yang Tersedia</h3>
-                        <div className="col-span-full grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+                        <div className="col-span-full grid gap-4 grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
                             {laboratories.map((data, index) => (
                                 <Card className="gap-0 p-2" key={index}>
                                     <CardHeader className="px-0">
