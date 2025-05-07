@@ -5,10 +5,10 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Package as TestPackage } from '@/types';
+import { type BreadcrumbItem, Package as TestPackage, PackageCart } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { BarChart3, Building2, CheckCircle2, Clock, MapPin, Package } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const howItWorks: {
     id: number;
@@ -55,6 +55,35 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
     ];
 
     const [mainImage, setMainImage] = useState(data.images[0]);
+    const [packageCart, setPackageCart] = useState<PackageCart[]>([]);
+    const [isAdding, setIsAdding] = useState(false);
+
+    useEffect(() => {
+        const savedPackage = localStorage.getItem('package_cart');
+        if (savedPackage) {
+            const parsedPackage = JSON.parse(savedPackage);
+            setPackageCart(parsedPackage);
+        }
+    }, []);
+
+    const handleAddTestToCart = (selectedPackage: TestPackage) => {
+        setIsAdding(true);
+        const existingTest: PackageCart | undefined = packageCart.find((item) => item.package_id === selectedPackage.id);
+        if (existingTest) {
+            alert('Package already exists in the cart');
+            setIsAdding(false);
+        } else {
+            const newTestCart: PackageCart = {
+                package_id: selectedPackage.id,
+                slug: selectedPackage.slug,
+                package: selectedPackage,
+            }
+            setPackageCart([...packageCart, newTestCart]);
+            alert('Package added to cart');
+            localStorage.setItem('package_cart', JSON.stringify([...packageCart, newTestCart]));
+            setIsAdding(false);
+        }
+    };
 
     const formatRupiah = (value: number) => {
         return new Intl.NumberFormat('id-ID', {
@@ -180,7 +209,7 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="p-0">
-                                    <Button className="w-full" size="lg">
+                                    <Button onClick={() => handleAddTestToCart(data)} className="w-full" size="lg">
                                         Pesan Paket Ini
                                     </Button>
                                 </CardFooter>
