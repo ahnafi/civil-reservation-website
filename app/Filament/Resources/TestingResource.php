@@ -6,6 +6,7 @@ use App\Filament\Exports\TestingExporter;
 use App\Filament\Resources\TestingResource\Pages;
 use App\Filament\Resources\TestingResource\RelationManagers;
 use App\Models\Testing;
+use App\Services\TestingService;
 use Filament\Forms;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
@@ -108,8 +109,10 @@ class TestingResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->headerActions([
+            ->headerActions(
+                [
                     Tables\Actions\ExportAction::make()
+                        ->color("success")
                         ->exporter(TestingExporter::class)
                 ]
             )
@@ -135,7 +138,7 @@ class TestingResource extends Resource
                     ->label("Tanggal pengujian")
                     ->sortable(),
                 Tables\Columns\TextColumn::make('completed_at')
-                    ->label("Tnggal selesai")
+                    ->label("Tanggal selesai")
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -168,7 +171,6 @@ class TestingResource extends Resource
                                 'application/msword',
                                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                             ])
-                            ->required()
                             ->openable()
                             ->helperText('Format file yang diterima: PDF, DOC, DOCX.')
                             ->columnSpanFull(),
@@ -180,33 +182,8 @@ class TestingResource extends Resource
 
                     ])
                     ->action(function (array $data, Model $record) {
-
-                        $user = $record->submission->user;
-                        if ($user && $user->email) {
-
-                            $record->status = "completed";
-                            $record->completed_at = Carbon::now()->format('Y-m-d\TH:i:s');
-                            $record->documents = $data['documents'];
-                            $record->note = $data['note'] ?? null;
-                            $record->save();
-
-                            Mail::raw("Pengujian selesai.", function ($message) use ($user) {
-                                $message->to($user->email)
-                                    ->subject('Pengujian selesai');
-                            });
-
-                            Notification::make()
-                                ->title('Pengujian selesai')
-                                ->body("Pengajuan oleh {$user->name} dengan kode pengajuan {$record->submission->code} telah selesai.")
-                                ->success()
-                                ->send();
-                        } else {
-                            Notification::make()
-                                ->title('Gagal mengubah pengujian ')
-                                ->body("Pengujian dengan kode {$record->code} gagal diubah.")
-                                ->danger()
-                                ->send();
-                        }
+                        $testingService = app(TestingService::class);
+                        $testingService->solved($data, $record);
                     })
                     ->requiresConfirmation()
                     ->color("success")
@@ -218,7 +195,7 @@ class TestingResource extends Resource
                     Tables\Actions\DeleteAction::make(),
                 ])
             ]);
-//            ->bulkActions([
+        //            ->bulkActions([
 //                Tables\Actions\BulkActionGroup::make([
 //                    Tables\Actions\DeleteBulkAction::make(),
 //                    Tables\Actions\ForceDeleteBulkAction::make(),

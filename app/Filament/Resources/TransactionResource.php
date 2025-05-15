@@ -28,14 +28,7 @@ class TransactionResource extends Resource
     protected static ?string $modelLabel = 'Transaksi';
     protected static ?string $navigationGroup = 'Manajemen Peminjaman';
     protected static ?string $navigationBadgeTooltip = 'Banyak transaksi yang diajukan';
-
-    private TransactionService $transactionService;
-
-    public function __construct()
-    {
-        $this->transactionService = app(TransactionService::class);
-    }
-
+    
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::where("status", "pending")->count();
@@ -170,6 +163,7 @@ class TransactionResource extends Resource
             ->headerActions(
                 [
                     Tables\Actions\ExportAction::make()
+                    ->color("success")
                         ->exporter(TransactionExporter::class)
                 ]
             )
@@ -239,7 +233,7 @@ class TransactionResource extends Resource
                     ->color("success")
                     ->visible(fn($record) => $record->status === 'pending')
                     ->action(function (Model $record) {
-                        $transactionService = app(\App\Services\TransactionService::class);
+                        $transactionService = app(TransactionService::class);
                         $transactionService->accept($record);
                     }),
 
@@ -254,7 +248,7 @@ class TransactionResource extends Resource
                     ->color("danger")
                     ->visible(fn($record) => $record->status === 'pending')
                     ->action(function (array $data, Model $record) {
-                        $transactionService = app(\App\Services\TransactionService::class);
+                        $transactionService = app(TransactionService::class);
                         $transactionService->reject($data, $record);
                     }),
 
