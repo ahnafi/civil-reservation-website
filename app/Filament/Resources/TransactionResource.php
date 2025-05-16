@@ -167,6 +167,7 @@ class TransactionResource extends Resource
                         ->exporter(TransactionExporter::class)
                 ]
             )
+            ->modifyQueryUsing(fn(Builder $query)=> $query->latest())
             ->recordUrl(null)
             ->columns([
                 Tables\Columns\TextColumn::make('code')

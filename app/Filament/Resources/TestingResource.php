@@ -116,6 +116,7 @@ class TestingResource extends Resource
                         ->exporter(TestingExporter::class)
                 ]
             )
+            ->modifyQueryUsing(fn(Builder $query)=> $query->latest())
             ->columns([
                 Tables\Columns\TextColumn::make('code')
                     ->label('Kode pengujian')
