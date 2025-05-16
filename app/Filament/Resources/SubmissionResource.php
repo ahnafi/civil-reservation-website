@@ -27,6 +27,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
+use \App\Services\BookingService;
 
 class SubmissionResource extends Resource
 {
@@ -115,7 +116,7 @@ class SubmissionResource extends Resource
                                 ->label('Catatan')
                                 ->columnSpanFull(),
 
-//                            paket
+                            //                            paket
 
                             Repeater::make("submissionPackages")
                                 ->label('Paket pengujian')
@@ -156,7 +157,7 @@ class SubmissionResource extends Resource
                                 })
                             ,
 
-//                            test
+                            //                            test
 
                             Repeater::make("submissionTests")
                                 ->label('Pengujian satuan')
@@ -208,7 +209,7 @@ class SubmissionResource extends Resource
 
                         ])->columns()->grow(false),
 
-//                    approval
+                    //                    approval
 
                     Forms\Components\Section::make([
                         ToggleButtons::make('status')
@@ -406,6 +407,13 @@ class SubmissionResource extends Resource
 
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make("Pengajuan ulang")
+                        ->action(function (Model $record) {
+                            $bookingService = app(BookingService::class);
+                            $bookingService->recreateSubmission($record);
+                        })
+                        ->icon("heroicon-s-arrow-path")
+                        ->visible(fn($record) => $record->status === "approved"),
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\DeleteAction::make(),
                     Tables\Actions\RestoreAction::make(),

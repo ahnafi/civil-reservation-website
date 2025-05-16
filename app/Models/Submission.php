@@ -69,12 +69,13 @@ class Submission extends Model
 
     public function tests(): BelongsToMany
     {
-        return $this->belongsToMany(Test::class)->withTimestamps()->withPivot("quantity");
+        return $this->belongsToMany(Test::class, 'submission_test')->withTimestamps()->withPivot('quantity');
     }
+
 
     public function packages(): BelongsToMany
     {
-        return $this->belongsToMany(Package::class)->withTimestamps();
+        return $this->belongsToMany(Package::class, 'submission_package')->withTimestamps();
     }
 
     public function submissionPackages(): HasMany
