@@ -51,6 +51,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('history/transactions', [HistoryController::class, "transactionsHistory"])->name('history-transactions');
     Route::get('history/transaction/{transaction:code}', [HistoryController::class, "transactionHistoryDetail"])->name('history-transactions-detail');
     Route::post('cart/add', [BookingController::class, 'addToCart'])->name('cart.add');
+
+    // Post Page
+    Route::post('cart/submit', [BookingController::class, 'submitSubmission'])->name('createSubmission');
+    Route::post('submission/payment', [BookingController::class, 'submitPayment'])->name('submitPayment');
+    Route::post('schedule/submit', [ScheduleController::class, 'getSchedule'])->name('schedule.submit');
 });
 
 require __DIR__ . '/settings.php';
