@@ -2,9 +2,9 @@
 
 namespace App\Filament\Editor\Resources;
 
-use App\Filament\Editor\Resources\TeamResource\Pages;
-use App\Filament\Editor\Resources\TeamResource\RelationManagers;
-use App\Models\Team;
+use App\Filament\Editor\Resources\NewsCategoryResource\Pages;
+use App\Filament\Editor\Resources\NewsCategoryResource\RelationManagers;
+use App\Models\NewsCategory;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,44 +13,23 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class TeamResource extends Resource
+class NewsCategoryResource extends Resource
 {
-    protected static ?string $model = Team::class;
+    protected static ?string $model = NewsCategory::class;
 
-    protected static ?string $navigationIcon = 'heroicon-s-users';
-    protected static ?string $navigationGroup = 'Manajemen Tim';
-    protected static ?string $navigationLabel = 'Pengurus';
-    protected static ?string $label = 'Pengurus';
+    protected static ?string $navigationIcon = 'heroicon-s-tag';
+    protected static ?string $title = 'Kategori Berita';
+    protected static ?string $navigationGroup = 'Manajemen Berita';
+    protected static ?string $navigationLabel = 'Kategori Berita';
+    protected static ?string $pluralLabel = 'Kategori Berita';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->label('Nama')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Select::make('position_id')
-                    ->createOptionForm([
-                        Forms\Components\TextInput::make('name')
-                            ->label('Nama Jabatan')
-                            ->required()
-                            ->maxLength(255),
-                    ])
-                    ->label('Jabatan')
-                    ->searchable()
-                    ->preload()
-                    ->relationship('position', 'name')
-                    ->required(),
-                Forms\Components\FileUpload::make('photo')
-                    ->avatar()
-                    ->label('Foto')
-                    ->directory('teams')
-                    ->preserveFilenames()
-                    ->enableOpen()
-                    ->enableDownload()
-                    ->required(),
-
             ]);
     }
 
@@ -59,14 +38,8 @@ class TeamResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Nama')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('position.name')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\ImageColumn::make('photo')
-                    ->rounded()
-                    ->label('Foto')
+                Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
@@ -86,7 +59,6 @@ class TeamResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -107,9 +79,9 @@ class TeamResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListTeams::route('/'),
-            'create' => Pages\CreateTeam::route('/create'),
-            'edit' => Pages\EditTeam::route('/{record}/edit'),
+            'index' => Pages\ListNewsCategories::route('/'),
+            'create' => Pages\CreateNewsCategory::route('/create'),
+            'edit' => Pages\EditNewsCategory::route('/{record}/edit'),
         ];
     }
 
