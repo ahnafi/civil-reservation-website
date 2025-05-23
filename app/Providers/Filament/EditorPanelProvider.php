@@ -29,13 +29,14 @@ class EditorPanelProvider extends PanelProvider
             ->id('editor')
             ->path('editor')
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Emerald,
             ])
             ->discoverResources(in: app_path('Filament/Editor/Resources'), for: 'App\\Filament\\Editor\\Resources')
             ->discoverPages(in: app_path('Filament/Editor/Pages'), for: 'App\\Filament\\Editor\\Pages')
             ->pages([
                 Pages\Dashboard::class,
             ])
+            ->collapsibleNavigationGroups(false)
             ->discoverWidgets(in: app_path('Filament/Editor/Widgets'), for: 'App\\Filament\\Editor\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,

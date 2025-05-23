@@ -2,9 +2,9 @@
 
 namespace App\Filament\Editor\Resources;
 
-use App\Filament\Editor\Resources\DownloadResource\Pages;
-use App\Filament\Editor\Resources\DownloadResource\RelationManagers;
-use App\Models\Download;
+use App\Filament\Editor\Resources\PositionResource\Pages;
+use App\Filament\Editor\Resources\PositionResource\RelationManagers;
+use App\Models\Position;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,36 +13,23 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class DownloadResource extends Resource
+class PositionResource extends Resource
 {
-    protected static ?string $model = Download::class;
+    protected static ?string $model = Position::class;
 
-    protected static ?string $navigationIcon = 'heroicon-s-document-arrow-down';
-    protected static ?string $navigationGroup = 'Manajemen Unduhan';
-    protected static ?string $navigationLabel = 'Unduhan';
-    protected static ?string $label = 'Unduhan';
+    protected static ?string $navigationIcon = 'heroicon-s-identification';
+    protected static ?string $navigationGroup = 'Manajemen Tim';
+    protected static ?string $navigationLabel = 'Jabatan';
+    protected static ?string $label = 'Jabatan';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('title')
-                    ->label('Judul')
-                    ->columnSpanFull()
+                Forms\Components\TextInput::make('name')
+                    ->label('Nama Jabatan')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('description')
-                    ->label('Deskripsi')
-                    ->columnSpanFull()
-                    ->required(),
-                Forms\Components\FileUpload::make('file')
-                    ->columnSpanFull()
-                    ->label('File')
-                    ->directory('downloads')
-                    ->preserveFilenames()
-                    ->enableOpen()
-                    ->enableDownload()
-                    ->required(),
             ]);
     }
 
@@ -50,17 +37,11 @@ class DownloadResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('title')
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Nama Jabatan')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('description')
-                ->limit(24)
+                Tables\Columns\TextColumn::make('slug')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('file')
-                    ->limit(10)
-                    ->label(label: 'File')
-                    ->url(fn($record) => \Storage::url($record->file))
-                    ->openUrlInNewTab()
-                    ->formatStateUsing(fn($state) => basename($state)),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
@@ -100,9 +81,9 @@ class DownloadResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDownloads::route('/'),
-            'create' => Pages\CreateDownload::route('/create'),
-            'edit' => Pages\EditDownload::route('/{record}/edit'),
+            'index' => Pages\ListPositions::route('/'),
+            'create' => Pages\CreatePosition::route('/create'),
+            'edit' => Pages\EditPosition::route('/{record}/edit'),
         ];
     }
 
