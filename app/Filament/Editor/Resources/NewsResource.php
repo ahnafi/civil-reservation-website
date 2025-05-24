@@ -80,9 +80,9 @@ class NewsResource extends Resource
                     ->preload()
                     ->required(),
 
-                Forms\Components\Toggle::make('is_featured')
-                ->columnSpanFull()
-                    ->label('Berita Unggulan'),
+                // Forms\Components\Toggle::make('is_featured')
+                // ->columnSpanFull()
+                //     ->label('Berita Unggulan'),
 
                 Forms\Components\RichEditor::make('content')
                     ->label('Konten')
@@ -107,8 +107,8 @@ class NewsResource extends Resource
                     ->label('Kategori')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\ToggleColumn::make('is_featured')
-                    ->label('Berita Unggulan'),
+                // Tables\Columns\ToggleColumn::make('is_featured')
+                //     ->label('Berita Unggulan'),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Dihapus Pada')
                     ->dateTime()

@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->string('slug')->unique();
             $table->text('content');
             $table->string('thumbnail')->nullable();
-            $table->boolean('is_featured')->default(false);
+            // $table->boolean('is_featured')->default(false);
             $table->foreignId('author_id')->constrained('authors')->onDelete('cascade');
             $table->foreignId('news_category_id')->constrained()->onDelete('cascade');
             $table->softDeletes();

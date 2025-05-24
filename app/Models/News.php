@@ -15,7 +15,7 @@ class News extends Model
         'slug',
         'content',
         'thumbnail',
-        'is_featured',
+        // 'is_featured',
         'author_id',
         'news_category_id',
     ];
