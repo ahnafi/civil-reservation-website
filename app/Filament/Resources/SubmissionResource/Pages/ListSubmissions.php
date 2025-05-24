@@ -22,13 +22,14 @@ class ListSubmissions extends ListRecords
     public function getTabs(): array
     {
         return [
-            'Semua' => Tab::make(),
+            'Semua' => Tab::make()
+                ->modifyQueryUsing(fn(Builder $query) => $query->latest()),
             'Diajukan' => Tab::make()
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('status', "submitted")),
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('status', "submitted")->latest()),
             'Diterima' => Tab::make()
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('status', "approved")),
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('status', "approved")->latest()),
             'Ditolak' => Tab::make()
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('status', "rejected")),
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('status', "rejected")->latest()),
         ];
     }
 }

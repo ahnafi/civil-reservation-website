@@ -19,9 +19,12 @@ class TestResource extends Resource
     protected static ?string $model = Test::class;
 
     protected static ?string $modelLabel = 'Pengujian';
-    protected static ?string $navigationIcon = 'heroicon-o-beaker';
-    protected static ?string $navigationGroup = 'Pengujian';
-
+    protected static ?string $navigationIcon = 'heroicon-s-beaker';
+    protected static ?string $navigationGroup = 'Manajemen Laboratorium';
+    protected static ?string $navigationLabel = 'Pengujian';
+    protected static ?string $title = 'Pengujian';
+    protected static ?string $label = 'Pengujian';
+    protected static ?string $pluralLabel = 'Pengujian';
 //    public static function getNavigationBadge(): ?string
 //    {
 //        return static::getModel()::count();

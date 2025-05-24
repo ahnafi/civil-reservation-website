@@ -26,21 +26,11 @@ class Package extends Model
         "images" => "array",
     ];
 
-    protected static function boot(): void
+    public function setNameAttribute($value)
     {
-        parent::boot();
-
-        static::creating(function ($model) {
-            $model->slug = Str::slug($model->name) . '-' . Str::lower(Str::random(4));
-        });
-
-        static::updating(function ($model) {
-            if ($model->isDirty('name')) {
-                $model->slug = Str::slug($model->name) . '-' . Str::lower(Str::random(4));
-            }
-        });
+        $this->attributes['name'] = $value;
+        $this->attributes['slug'] = Str::slug($value) . '-' . Str::lower(Str::random(4));
     }
-
 
     public function tests(): BelongsToMany
     {
