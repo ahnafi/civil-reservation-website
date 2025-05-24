@@ -17,7 +17,7 @@ class LaboratoryResource extends Resource
 {
     protected static ?string $model = Laboratory::class;
     protected static ?string $modelLabel = 'Lab';
-    protected static ?string $navigationIcon = 'heroicon-o-home-modern';
+    protected static ?string $navigationIcon = 'heroicon-s-home-modern';
     protected static ?string $navigationGroup = 'Manajemen Laboratorium';
     protected static ?string $navigationLabel = 'Laboratorium';
     protected static ?string $title = 'Laboratorium';

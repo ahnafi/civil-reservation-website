@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Editor\Resources;
 
 use App\Filament\Resources\TestResource\Pages;
 use App\Filament\Resources\TestResource\RelationManagers;
