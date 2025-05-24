@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
@@ -34,5 +35,15 @@ class Laboratory extends Model
     public function packages(): HasMany
     {
         return $this->hasMany(Package::class);
+    }
+
+    public function equipments(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Equipment::class,
+            'equipment_laboratory', 
+            'laboratory_id',       
+            'equipment_id'         
+        );
     }
 }
