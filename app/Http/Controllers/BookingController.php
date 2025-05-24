@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cart;
 use App\Models\Package;
 use App\Models\Submission;
 use App\Models\Test;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\Request;
+use App\Http\Requests\submitSubmissionRequest;
 use App\Services\BookingService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
@@ -18,31 +18,19 @@ use Exception;
 class BookingController extends Controller
 {
 
-    public function submitSubmission(Request $request, BookingService $bookingService)
+    public function submitSubmission(submitSubmissionRequest $request, BookingService $bookingService)
     {
-        $request->validate([
-            'company_name' => 'required|string|max:255',
-            'project_name' => 'required|string|max:255',
-            'project_address' => 'required|string|max:255',
-            'total_cost' => 'required|integer|min:0',
-            'test_submission_date' => 'required|date',
-            'submission_tests' => 'required|array',
-            'submission_tests.*.test_id' => 'required|exists:tests,id',
-            'submission_tests.*.quantity' => 'required|integer|min:1',
-            'submission_packages' => 'required|array',
-            'submission_packages.*' => 'exists:packages,id',
-        ]);
+        $validated = $request->validated();
 
         try {
             $bookingService->createSubmission(
                 auth()->id(),
-                $request->company_name,
-                $request->project_name,
-                $request->project_address,
-                $request->total_cost,
-                $request->test_submission_date,
-                $request->submission_tests,
-                $request->submission_packages
+                $validated['company_name'],
+                $validated['project_name'],
+                $validated['project_address'],
+                $validated['test_submission_date'],
+                $validated['submission_tests'],
+                $validated['submission_packages']
             );
 
             return redirect()->route('history-submissions')
@@ -55,5 +43,28 @@ class BookingController extends Controller
         }
     }
 
+    public function submitPayment(Request $request, BookingService $bookingService)
+    {
+        $validated = $request->validate([
+            'transaction_id' => 'required|integer|exists:transaction,id',
+            'payment_receipt' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'payment_method' => 'required|string|in:BANK JATENG,BANK MANDIRI,BANK BNI,BANK BRI,BANK BSI,BANK BTN',
+        ]);
 
+
+        try{
+            $bookingService->storePaymentReceipt(
+                $validated['transaction_id'],
+                $validated['payment_receipt'],
+                $validated['payment_method']
+            );
+
+            return redirect()->route('orders-status')
+                ->with('Success', 'Bukti Pembayaran Berhasil Diupload!');
+        } catch(Exception $e){
+            return redirect()->back()
+                ->withInput()
+                ->with('Error', 'Terjadi kesalahan saat mengupload bukti pembayaran. Silakan coba lagi.');
+        }
+    }
 }

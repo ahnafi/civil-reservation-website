@@ -63,11 +63,6 @@ class Test extends Model
         return $this->hasMany(SubmissionTest::class);
     }
 
-    public function carts(): MorphMany
-    {
-        return $this->morphMany(Cart::class, 'cartable');
-    }
-
     public function scopeActive($query)
     {
         return $query->where('is_active', true);

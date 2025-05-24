@@ -99,6 +99,9 @@ class SubmissionResource extends Resource
                                 ->prefix("Rp")
                                 ->default(0)
                                 ->reactive(),
+                            Forms\Components\DateTimePicker::make('test_submission_date')
+                                ->label('Tanggal pengujian')
+                                ->required(),
                             Forms\Components\FileUpload::make('document')
                                 ->label('Lampiran')
                                 ->preserveFilenames()

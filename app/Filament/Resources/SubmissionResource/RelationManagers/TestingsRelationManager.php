@@ -58,6 +58,7 @@ class TestingsRelationManager extends RelationManager
 
                 Forms\Components\DateTimePicker::make('test_date')
                     ->label('Tanggal Pengujian')
+                    ->default(fn() => $this->getOwnerRecord()->test_submission_date ?? now())
                     ->nullable(),
 
                 Forms\Components\DateTimePicker::make('completed_at')

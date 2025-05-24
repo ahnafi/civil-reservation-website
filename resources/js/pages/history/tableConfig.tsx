@@ -4,6 +4,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { format, parseISO } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { ArrowUpDown, Download } from 'lucide-react';
+import { Link } from '@inertiajs/react';
 
 // Submission Column Labels
 export const submissionColumnLabels: Record<string, string> = {
@@ -160,9 +161,9 @@ export const submissionColumns: ColumnDef<SubmissionSchedule>[] = [
         header: () => <div className="flex justify-center text-center">Detail</div>,
         cell: ({ row }) => (
             <div className="flex justify-center">
-                <Button className="small-font-size cursor-pointer" onClick={() => handleDetailClick(row.original)}>
+                <Link href={`/history/submission/${row.original.code}`} className="small-font-size cursor-pointer rounded-full bg-blue-base px-2 py-1 text-center font-medium text-light-base hover:bg-blue-600">
                     Lihat Detail
-                </Button>
+                </Link>
             </div>
         ),
     },
@@ -272,9 +273,9 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
         header: () => <div className="flex justify-center text-center">Detail</div>,
         cell: ({ row }) => (
             <div className="flex justify-center">
-                <Button className="cursor-pointer" onClick={() => handleDetailClick(row.original)}>
+                <Link href={`/history/transaction/${row.original.code}`} className="small-font-size cursor-pointer rounded-full bg-blue-base px-2 py-1 text-center font-medium text-light-base hover:bg-blue-600">
                     Lihat Detail
-                </Button>
+                </Link>
             </div>
         ),
     },
@@ -344,9 +345,9 @@ export const testingColumns: ColumnDef<Testing>[] = [
         header: () => <div className="flex justify-center text-center">Detail</div>,
         cell: ({ row }) => (
             <div className="flex justify-center">
-                <Button className="cursor-pointer" onClick={() => handleDetailClick(row.original)}>
+                <Link href={`/history/test/${row.original.code}`} className="small-font-size cursor-pointer rounded-full bg-blue-base px-2 py-1 text-center font-medium text-light-base hover:bg-blue-600">
                     Lihat Detail
-                </Button>
+                </Link>
             </div>
         ),
     },

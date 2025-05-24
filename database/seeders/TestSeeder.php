@@ -276,7 +276,7 @@ class TestSeeder extends Seeder
                 "name" => "Uji Penetrasi Aspal",
                 "description" => "Pemeriksaan ini dilakukan untuk mengetahui tingkat penetrasi aspal.",
                 "price" => 250000,
-                "images" => ["ujipenetrasiaspal.jpeg"],
+                "images" => ["ujipenetrasiaspal.jpg"],
                 "daily_slot" => 2,
                 "laboratory_id" => 1,
                 "category_id" => 1

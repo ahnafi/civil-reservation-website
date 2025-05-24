@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Services\BookingService;
 
 class Testing extends Model
 {
@@ -28,6 +29,11 @@ class Testing extends Model
         parent::boot();
 
         static::created(function ($testing) {
+            // Create ScheduleTesting record
+            $bookingService = new BookingService();
+            $bookingService->storeScheduleTesting($testing->id);
+
+            // Generate code based on the test date and submission ID
             $date = Carbon::parse($testing->test_date)->format('Ymd');
             $submissionId = str_pad($testing->submission_id ?? 0, 3, '0', STR_PAD_LEFT);
             $testingId = str_pad($testing->id ?? 0, 3, '0', STR_PAD_LEFT);
