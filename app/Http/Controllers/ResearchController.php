@@ -10,13 +10,13 @@ class ResearchController extends Controller
 {
     public function index(): LengthAwarePaginator
     {
-        return Research::paginate(10);
+        return Research::paginate(16);
     }
 
     public function search(Request $request): LengthAwarePaginator
     {
         $query = $request->input('q');
-        $perPage = $request->input('per_page', 10);
+        $perPage = $request->input('per_page', 16);
         $year = $request->input('year');
 
         $researchQuery = Research::query()

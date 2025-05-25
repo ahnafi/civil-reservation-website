@@ -12,7 +12,7 @@ class NewsController extends Controller
     public function index(): LengthAwarePaginator
     {
         return News::with(["author", "newsCategory"])->orderBy("created_at", "desc")
-            ->paginate(10);
+            ->paginate(16);
     }
 
     public function show(News $news): JsonResponse
@@ -25,7 +25,7 @@ class NewsController extends Controller
     // public function search(Request $request): LengthAwarePaginator
     // {
     //     $query = $request->input('q');
-    //     $perPage = $request->input('per_page', 10);
+    //     $perPage = $request->input('per_page', 16);
     //     $category = $request->input('category');
 
     //     $newsQuery = News::query()
