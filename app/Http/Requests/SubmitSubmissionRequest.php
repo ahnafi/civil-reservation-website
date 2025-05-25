@@ -28,6 +28,8 @@ class SubmitSubmissionRequest extends FormRequest
             'project_address' => 'required|string|max:255',
             'total_cost' => 'required|integer|min:0',
             'test_submission_date' => 'required|date',
+            'user_note' => 'nullable|string|max:512',
+            'admin_note' => 'nullable|string|max:512',
             'submission_tests' => 'required|array',
             'submission_tests.*.test_id' => 'required|exists:tests,id',
             'submission_tests.*.quantity' => 'required|integer',

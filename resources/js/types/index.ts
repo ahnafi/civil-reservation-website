@@ -196,15 +196,12 @@ export interface Transaction {
     created_at: string;
     updated_at: string;
     deleted_at?: string;
-}
-
-// Testing Types
-export type TestingStatus = 'testing' | 'completed';
+};
 
 export interface Testing {
     id: number;
     code?: string | null;
-    status: TestingStatus;
+    status: string;
     note?: string | null;
     documents?: string | null;
     test_date: string;
@@ -260,6 +257,7 @@ export interface PackageCart {
     package_id: number;
     slug: string;
     package: Package;
+    quantity: number;
 }
 
 export interface BookingForm {

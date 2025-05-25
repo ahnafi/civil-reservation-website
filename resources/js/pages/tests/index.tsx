@@ -18,7 +18,7 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
     const [isAdding, setIsAdding] = useState(false);
 
     useEffect(() => {
-        const savedTest = localStorage.getItem('test_cart');
+        const savedTest = localStorage.getItem('tests');
         if (savedTest) {
             const parsedTest = JSON.parse(savedTest);
             setTestCart(parsedTest);
@@ -37,10 +37,10 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                 slug: test.slug,
                 unit: test.minimum_unit,
                 test: test,
-            }
+            };
             setTestCart([...testCart, newTestCart]);
             alert('Test added to cart');
-            localStorage.setItem('test_cart', JSON.stringify([...testCart, newTestCart]));
+            localStorage.setItem('tests', JSON.stringify([...testCart, newTestCart]));
             setIsAdding(false);
         }
     };
@@ -60,7 +60,7 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
         const numberedLinks = links.filter((link) => !link.label.includes('Sebelumnya') && !link.label.includes('Berikutnya'));
 
         return (
-            <div className="mt-6 flex items-center justify-center gap-1 small-font-size">
+            <div className="small-font-size mt-6 flex items-center justify-center gap-1">
                 <Button variant="outline" size="icon" disabled={current_page === 1} asChild={current_page !== 1}>
                     {current_page !== 1 ? (
                         <Link href={tests.prev_page_url || '#'}>
@@ -103,7 +103,7 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
     };
 
     return (
-    <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Pengujian" />
             <div className="flex h-full flex-col gap-4 rounded-xl p-4">
                 <div className="grid auto-rows-min grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -174,7 +174,7 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                                         onClick={() => handleAddTestToCart(data)}
                                         variant="outline"
                                         disabled={isAdding}
-                                        className="cursor-pointer flex items-center justify-between gap-1 rounded-md px-3 py-2"
+                                        className="flex cursor-pointer items-center justify-between gap-1 rounded-md px-3 py-2"
                                     >
                                         <svg
                                             className="h-4 w-4 md:h-5 md:w-5"
@@ -199,7 +199,7 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                     ))}
                 </div>
                 {renderPaginationLinks()}
-                <span className="mt-4 small-font-size text-center text-gray-500 col">
+                <span className="small-font-size col mt-4 text-center text-gray-500">
                     Menampilkan {tests.from} hingga {tests.to} dari {tests.total} pengujian
                 </span>
             </div>

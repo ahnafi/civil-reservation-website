@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\LaboratoryController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\DashboardController;
@@ -26,12 +27,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('package/{package:slug}', [PackageController::class, "detail"])->name('packages-detail');
 
     // Get Booking Page
-    Route::get('orders/cart', function () {
-        return Inertia::render('orders/cart');
-    })->name('orders-cart');
-    Route::get('orders/cart/form', function () {
+    Route::get('orders/cart', [CartController::class, 'cart'])->name('orders-cart');
+    Route::get('orders/form', function () {
         return Inertia::render('orders/form');
     })->name('orders-cart-form');
+    Route::get('orders/checkout', function () {
+        return Inertia::render('orders/checkout');
+    })->name('orders-cart-checkout');
     Route::get('orders/status', function () {
         return Inertia::render('orders/status');
     })->name('orders-status');

@@ -26,7 +26,7 @@ export default function Detail({ test }: { test: Test }) {
     const [isAdding, setIsAdding] = useState(false);
 
     useEffect(() => {
-        const savedTest = localStorage.getItem('test_cart');
+        const savedTest = localStorage.getItem('tests');
         if (savedTest) {
             const parsedTest = JSON.parse(savedTest);
             setTestCart(parsedTest);
@@ -45,10 +45,10 @@ export default function Detail({ test }: { test: Test }) {
                 slug: test.slug,
                 unit: test.minimum_unit,
                 test: test,
-            }
+            };
             setTestCart([...testCart, newTestCart]);
             alert('Test added to cart');
-            localStorage.setItem('test_cart', JSON.stringify([...testCart, newTestCart]));
+            localStorage.setItem('tests', JSON.stringify([...testCart, newTestCart]));
             setIsAdding(false);
         }
     };
@@ -224,7 +224,7 @@ export default function Detail({ test }: { test: Test }) {
                                     variant="outline"
                                     disabled={isAdding}
                                     onClick={() => handleAddTestToCart(test)}
-                                    className="bg-blue-base text-light-base normal-font-size w-full rounded-md px-4 py-2 text-center font-semibold hover:bg-blue-600/90 md:py-4 h-full"
+                                    className="bg-blue-base text-light-base normal-font-size h-full w-full rounded-md px-4 py-2 text-center font-semibold hover:bg-blue-600/90 md:py-4"
                                 >
                                     Pesan Sekarang
                                 </Button>

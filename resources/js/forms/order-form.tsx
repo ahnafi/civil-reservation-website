@@ -5,66 +5,64 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { CloudUpload, X } from "lucide-react";
-import { useState } from "react";
-import { AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogFooter, AlertDialogTitle, AlertDialogDescription } from "@/components/ui/alert-dialog";
-
+    
 const formSchema = z.object({
-    companyName: z.string().min(1, "Nama perusahaan wajib diisi"),
-    projectName: z.string().min(1, "Nama proyek wajib diisi"),
-    projectAddress: z.string().min(1, "Alamat proyek wajib diisi"),
-    document: z.instanceof(FileList).refine(files => files.length > 0, "Dokumen wajib diunggah"),
-    notes: z.string().optional()
+    company_name: z.string().min(1, "Nama perusahaan wajib diisi"),
+    project_name: z.string().min(1, "Nama proyek wajib diisi"),
+    project_address: z.string().min(1, "Alamat proyek wajib diisi"),
+    test_submission_date: z.string(),
+    // document: z.instanceof(FileList).refine(files => files.length > 0, "Dokumen wajib diunggah"),
+    user_note: z.string().optional()
 });
 
 export default function OrderForm() {
     const form = useForm({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            companyName: "",
-            projectName: "",
-            projectAddress: "",
-            document: undefined,
-            notes: ""
+            company_name: "",
+            project_name: "",
+            project_address: "",
+            test_submission_date: "",
+            user_note: ""
         }
     });
 
-    const [files, setFiles] = useState<FileList | null>(null);
-    const [fileToRemove, setFileToRemove] = useState<File | null>(null);
+    // const [files, setFiles] = useState<FileList | null>(null);
+    // const [fileToRemove, setFileToRemove] = useState<File | null>(null);
 
     const onSubmit = (data: z.infer<typeof formSchema>) => {
         console.log("Form Data:", data);
     };
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const selectedFiles = event.target.files;
-        if (selectedFiles) {
-            setFiles(selectedFiles);
-            form.setValue("document", selectedFiles);
-        }
-    };
+    // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     const selectedFiles = event.target.files;
+    //     if (selectedFiles) {
+    //         setFiles(selectedFiles);
+    //         form.setValue("document", selectedFiles);
+    //     }
+    // };
 
-    const handleRemoveFile = (file: File) => {
-        setFileToRemove(file);
-    };
+    // const handleRemoveFile = (file: File) => {
+    //     setFileToRemove(file);
+    // };
 
-    const confirmRemoveFile = () => {
-        if (files && fileToRemove) {
-            const newFiles = Array.from(files).filter(f => f !== fileToRemove);
-            const dataTransfer = new DataTransfer();
-            newFiles.forEach(file => dataTransfer.items.add(file));
-            setFiles(dataTransfer.files);
-            form.setValue("document", dataTransfer.files);
-            setFileToRemove(null);
-        }
-    };
+    // const confirmRemoveFile = () => {
+    //     if (files && fileToRemove) {
+    //         const newFiles = Array.from(files).filter(f => f !== fileToRemove);
+    //         const dataTransfer = new DataTransfer();
+    //         newFiles.forEach(file => dataTransfer.items.add(file));
+    //         setFiles(dataTransfer.files);
+    //         form.setValue("document", dataTransfer.files);
+    //         setFileToRemove(null);
+    //     }
+    // };
 
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 rounded-lg p-4 shadow-sm">
                 <FormField
                     control={form.control}
-                    name="companyName"
+                    name="company_name"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>
@@ -79,7 +77,7 @@ export default function OrderForm() {
                 />
                 <FormField
                     control={form.control}
-                    name="projectName"
+                    name="project_name"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>
@@ -94,7 +92,7 @@ export default function OrderForm() {
                 />
                 <FormField
                     control={form.control}
-                    name="projectAddress"
+                    name="project_address"
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>
@@ -107,7 +105,7 @@ export default function OrderForm() {
                         </FormItem>
                     )}
                 />
-                <FormField
+                {/* <FormField
                     control={form.control}
                     name="document"
                     render={() => (
@@ -141,13 +139,13 @@ export default function OrderForm() {
                             )}
                         </FormItem>
                     )}
-                />
+                /> */}
                 <FormField
                     control={form.control}
-                    name="notes"
+                    name="user_note"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Catatan (Opsional)</FormLabel>
+                            <FormLabel>Catatan</FormLabel>
                             <FormControl>
                                 <Textarea placeholder="Tambahkan catatan (jika ada)" {...field} />
                             </FormControl>
@@ -158,7 +156,7 @@ export default function OrderForm() {
                 <Button type="submit">Kirim Pesanan</Button>
             </form>
 
-            {fileToRemove && (
+            {/* {fileToRemove && (
                 <AlertDialog open={!!fileToRemove} onOpenChange={() => setFileToRemove(null)}>
                     <AlertDialogTrigger asChild>
                         <button className="hidden">Trigger</button>
@@ -178,7 +176,7 @@ export default function OrderForm() {
                         </AlertDialogFooter>
                     </AlertDialogContent>
                 </AlertDialog>
-            )}
+            )} */}
         </Form>
     );
 }

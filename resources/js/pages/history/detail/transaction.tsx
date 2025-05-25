@@ -3,9 +3,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Transaction } from '@/types';
+import { parseAndFormatDate } from '@/utils/date-utils';
 import { Head, Link } from '@inertiajs/react';
-import { format, parseISO } from 'date-fns';
-import { id } from 'date-fns/locale';
 import { ArrowLeft, Calendar, Check, Clock, CreditCard, Download, FileText, Link2, Receipt, XCircle } from 'lucide-react';
 
 // Format currency helper
@@ -22,7 +21,7 @@ const formatCurrency = (amount: number) => {
 const formatDate = (dateString: string | undefined) => {
     if (!dateString) return 'Tanggal tidak tersedia';
     try {
-        return format(parseISO(dateString), 'd MMMM yyyy, HH:mm', { locale: id });
+        return parseAndFormatDate(new Date(dateString));
     } catch (error) {
         return `Format tanggal tidak valid: ${error}`;
     }
@@ -113,7 +112,7 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                     {/* Main content - 2/3 width on large screens */}
                     <div className="lg:col-span-2">
-                        <Card className="overflow-hidden p-0 gap-0">
+                        <Card className="gap-0 overflow-hidden p-0">
                             <CardHeader className="border-b bg-slate-50 p-4 dark:bg-slate-800">
                                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
@@ -217,7 +216,7 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
 
                     {/* Sidebar - 1/3 width on large screens */}
                     <div className="lg:col-span-1">
-                        <Card className="overflow-hidden p-0 gap-0">
+                        <Card className="gap-0 overflow-hidden p-0">
                             <CardHeader className="border-b bg-slate-50 p-4 dark:bg-slate-800">
                                 <CardTitle className="text-lg">Status Pembayaran</CardTitle>
                             </CardHeader>
@@ -268,7 +267,7 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                             </CardFooter>
                         </Card>
 
-                        <Card className="mt-6 overflow-hidden p-0 gap-0">
+                        <Card className="mt-6 gap-0 overflow-hidden p-0">
                             <CardHeader className="border-b bg-slate-50 p-4 dark:bg-slate-800">
                                 <CardTitle className="text-lg">Ringkasan Pembayaran</CardTitle>
                             </CardHeader>

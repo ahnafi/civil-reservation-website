@@ -5,7 +5,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Package as TestPackage, PackageCart } from '@/types';
+import { type BreadcrumbItem, PackageCart, Package as TestPackage } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { BarChart3, Building2, CheckCircle2, Clock, MapPin, Package } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -59,7 +59,7 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
     const [isAdding, setIsAdding] = useState(false);
 
     useEffect(() => {
-        const savedPackage = localStorage.getItem('package_cart');
+        const savedPackage = localStorage.getItem('packages');
         if (savedPackage) {
             const parsedPackage = JSON.parse(savedPackage);
             setPackageCart(parsedPackage);
@@ -77,10 +77,11 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                 package_id: selectedPackage.id,
                 slug: selectedPackage.slug,
                 package: selectedPackage,
-            }
+                quantity: 1,
+            };
             setPackageCart([...packageCart, newTestCart]);
             alert('Package added to cart');
-            localStorage.setItem('package_cart', JSON.stringify([...packageCart, newTestCart]));
+            localStorage.setItem('packages', JSON.stringify([...packageCart, newTestCart]));
             setIsAdding(false);
         }
     };

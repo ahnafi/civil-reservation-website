@@ -24,6 +24,8 @@ class Submission extends Model
         "total_cost",
         "document",
         "test_submission_date",
+        "user_note",
+        "admin_note",
         "status",
         "note",
         "approval_date"

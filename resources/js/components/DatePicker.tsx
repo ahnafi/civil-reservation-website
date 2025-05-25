@@ -1,17 +1,13 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon } from 'lucide-react';
+import * as React from 'react';
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
+import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { formatDate } from '@/utils/date-utils';
 
 interface DatePickerProps {
     placeholder?: string;
@@ -19,11 +15,7 @@ interface DatePickerProps {
     onDateSelect?: (date: Date | undefined) => void;
 }
 
-export function DatePicker({
-                               placeholder = "Pick a date",
-                               value,
-                               onDateSelect,
-                           }: DatePickerProps) {
+export function DatePicker({ placeholder = 'Pick a date', value, onDateSelect }: DatePickerProps) {
     const [date, setDate] = React.useState<Date | undefined>(value);
 
     // Sync internal state when external value changes
@@ -40,23 +32,19 @@ export function DatePicker({
         <Popover>
             <PopoverTrigger asChild>
                 <Button
-                    variant={"outline"}
+                    variant={'outline'}
                     className={cn(
-                        "justify-start text-left font-normal",
-                        !date && "w-full flex items-center justify-between px-4 py-2 border rounded-md bg-background text-foreground shadow-sm hover:bg-muted focus:outline-none small-font-size"
+                        'justify-start text-left font-normal',
+                        !date &&
+                            'bg-background text-foreground hover:bg-muted small-font-size flex w-full items-center justify-between rounded-md border px-4 py-2 shadow-sm focus:outline-none',
                     )}
                 >
-                    <CalendarIcon className="lg:mr-2 h-4 w-4" />
-                    {date ? format(date, "PPP") : <span>{placeholder}</span>}
+                    <CalendarIcon className="h-4 w-4 lg:mr-2" />
+                    {date ? formatDate(date) : <span>{placeholder}</span>}
                 </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={handleDateSelect}
-                    initialFocus
-                />
+                <Calendar mode="single" selected={date} onSelect={handleDateSelect} initialFocus />
             </PopoverContent>
         </Popover>
     );

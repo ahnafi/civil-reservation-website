@@ -1,9 +1,9 @@
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Package, PackageCart, PaginatedPackage, Test, TestCart } from '@/types';
+import { type BreadcrumbItem, Package, PackageCart, PaginatedPackage, Test } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,7 +17,7 @@ export default function Packages({ paginated }: { paginated: PaginatedPackage })
     const [isAdding, setIsAdding] = useState(false);
 
     useEffect(() => {
-        const savedPackage = localStorage.getItem('package_cart');
+        const savedPackage = localStorage.getItem('packages');
         if (savedPackage) {
             const parsedPackage = JSON.parse(savedPackage);
             setPackageCart(parsedPackage);
@@ -35,10 +35,11 @@ export default function Packages({ paginated }: { paginated: PaginatedPackage })
                 package_id: selectedPackage.id,
                 slug: selectedPackage.slug,
                 package: selectedPackage,
-            }
+                quantity: 1,
+            };
             setPackageCart([...packageCart, newTestCart]);
             alert('Package added to cart');
-            localStorage.setItem('package_cart', JSON.stringify([...packageCart, newTestCart]));
+            localStorage.setItem('packages', JSON.stringify([...packageCart, newTestCart]));
             setIsAdding(false);
         }
     };
@@ -98,7 +99,7 @@ export default function Packages({ paginated }: { paginated: PaginatedPackage })
                                     onClick={() => handleAddTestToCart(data)}
                                     disabled={isAdding}
                                     variant="outline"
-                                    className="text-blue-base border-blue-base w-full hover:bg-blue-base hover:text-light-base flex items-center justify-center gap-1 rounded-md border-2 px-3 py-2 transition duration-300"
+                                    className="text-blue-base border-blue-base hover:bg-blue-base hover:text-light-base flex w-full items-center justify-center gap-1 rounded-md border-2 px-3 py-2 transition duration-300"
                                 >
                                     <svg
                                         className="h-4 w-4 md:h-5 md:w-5"

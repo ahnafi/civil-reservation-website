@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Test;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 
 class TestController extends Controller
 {
