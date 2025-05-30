@@ -31,102 +31,140 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-type Submission = {
+type ReservationForm = {
     company_name: string;
     project_name: string;
     project_address: string;
     test_submission_date: Date | undefined;
     user_note: string;
+    total_cost: number;
+};
+
+type SimplifiedTest = {
+    test_id: number;
+    unit: number;
+};
+
+type SimplifiedPackage = {
+    package_id: number;
+};
+
+type SubmissionData = {
+    company_name: string;
+    project_name: string;
+    project_address: string;
+    test_submission_date: Date | undefined;
+    user_note: string;
+    total_cost: number;
+    submission_tests: SimplifiedTest[];
+    submission_packages: SimplifiedPackage[];
 };
 
 export default function ReservationForm() {
     const [cartEmpty, setCartEmpty] = useState(false);
     const { subtotal, tax, shipping, total } = calculateCartTotal();
-    const { data, setData, post, processing, errors, reset } = useForm<Submission>({
+    const [reservationForm, setReservationForm] = useState<ReservationForm>({
         company_name: '',
         project_name: '',
         project_address: '',
         test_submission_date: undefined,
         user_note: '',
+        total_cost: total,
+    });
+    const { data, setData, post, processing, errors, reset } = useForm<SubmissionData>({
+        company_name: '',
+        project_name: '',
+        project_address: '',
+        test_submission_date: undefined,
+        user_note: '',
+        total_cost: total,
+        submission_tests: [],
+        submission_packages: [],
     });
 
-    // Load saved values from localStorage
+    // Helper function untuk format tanggal ke YYYY-MM-DD
+    const formatDateForSubmission = (date: Date | undefined): string | undefined => {
+        if (!date) return undefined;
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        return `${year}-${month}-${day}`;
+    };
+
     useEffect(() => {
         const savedForm = localStorage.getItem('reservation_form');
         if (savedForm) {
             try {
                 const parsedForm = JSON.parse(savedForm);
-                // Use setData to update form values
-                setData({
-                    ...parsedForm,
-                    test_submission_date: parsedForm.test_submission_date ? new Date(parsedForm.test_submission_date) : undefined,
-                });
-            } catch (e) {
-                console.error('Error parsing saved form data:', e);
+                if (parsedForm.test_submission_date) {
+                    parsedForm.test_submission_date = new Date(parsedForm.test_submission_date);
+                }
+                setReservationForm(parsedForm);
+            } catch (error) {
+                console.error('Error parsing saved form data:', error);
+                localStorage.removeItem('reservation_form');
             }
         }
     }, []);
 
     useEffect(() => {
-        // Check if cart is empty
         const tests = JSON.parse(localStorage.getItem('tests') || '[]');
         const packages = JSON.parse(localStorage.getItem('packages') || '[]');
 
-        if (tests.length === 0 && packages.length === 0) {
+        if (Object.values(reservationForm).some((val) => val !== undefined && val !== '')) {
+            localStorage.setItem('reservation_form', JSON.stringify(reservationForm));
+        }
+
+        if (tests.length > 0 || packages.length > 0) {
+            setData({
+                ...reservationForm,
+                test_submission_date: reservationForm.test_submission_date,
+                submission_tests: tests.map((test: SimplifiedTest) => ({
+                    test_id: test.test_id,
+                    quantity: test.unit,
+                })),
+                submission_packages: packages.map((pkg: SimplifiedPackage) => ({
+                    package_id: pkg.package_id,
+                })),
+            });
+        } else {
             setCartEmpty(true);
         }
-    }, []);
+    }, [reservationForm]);
 
-    // Save form data to localStorage whenever it changes
-    useEffect(() => {
-        if (Object.values(data).some((val) => val !== undefined && val !== '')) {
-            localStorage.setItem('reservation_form', JSON.stringify(data));
-        }
-    }, [data]);
+    const handleChangeReservationForm = (field: keyof ReservationForm, value: string | Date | undefined) => {
+        setReservationForm((prev) => ({
+            ...prev,
+            [field]: value,
+        }));
+    };
 
     const handleSubmit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        // Convert date to ISO string for storage
-        const submissionDate = data.test_submission_date ? data.test_submission_date.toISOString() : undefined;
-        const formData = {
+        if (cartEmpty) {
+            return;
+        }
+
+        // Format data sebelum submit
+        const submissionData = {
             ...data,
-            test_submission_date: submissionDate,
+            test_submission_date: formatDateForSubmission(data.test_submission_date),
         };
 
-        // Get cart items from localStorage
-        const tests = JSON.parse(localStorage.getItem('tests') || '[]');
-        const packages = JSON.parse(localStorage.getItem('packages') || '[]');
+        console.info('Formatted submission data:', submissionData);
 
-        // Map tests to only include test_id and quantity (renamed from unit)
-        const simplifiedTests = tests.map((test: { test_id: number; unit: number }) => ({
-            test_id: test.test_id,
-            quantity: test.unit,
-        }));
-
-        const simplifiedPackages = packages.map((pkg: { package_id: number }) => ({
-            package_id: pkg.package_id,
-        }));
-
-        const orderData = {
-            submission: { ...formData, total },
-            tests: simplifiedTests,
-            packages: simplifiedPackages,
-        };
-
-        // Save complete order data to localStorage
-        localStorage.setItem('order_data', JSON.stringify(orderData));
-
-        post(route('orders.store'), {
-            data: orderData,
+        post(route('createSubmission'), {
             onSuccess: () => {
-                // Clear cart data from localStorage after successful submission
+                reset();
                 localStorage.removeItem('tests');
                 localStorage.removeItem('packages');
                 localStorage.removeItem('reservation_form');
             },
-            onError: (error) => {
-                console.error('Error submitting order:', error);
+            onError: (errors) => {
+                console.error('Submission errors:', errors);
             },
         });
     };
@@ -204,8 +242,8 @@ export default function ReservationForm() {
                                             </label>
                                             <Input
                                                 id="company_name"
-                                                value={data.company_name}
-                                                onChange={(e) => setData('company_name', e.target.value)}
+                                                value={reservationForm.company_name}
+                                                onChange={(e) => handleChangeReservationForm('company_name', e.target.value)}
                                                 placeholder="PT. Konstruksi Indonesia"
                                                 disabled={processing}
                                             />
@@ -218,8 +256,8 @@ export default function ReservationForm() {
                                             </label>
                                             <Input
                                                 id="project_name"
-                                                value={data.project_name}
-                                                onChange={(e) => setData('project_name', e.target.value)}
+                                                value={reservationForm.project_name}
+                                                onChange={(e) => handleChangeReservationForm('project_name', e.target.value)}
                                                 placeholder="Pembangunan Jembatan Suramadu"
                                                 disabled={processing}
                                             />
@@ -232,8 +270,8 @@ export default function ReservationForm() {
                                             </label>
                                             <Textarea
                                                 id="project_address"
-                                                value={data.project_address}
-                                                onChange={(e) => setData('project_address', e.target.value)}
+                                                value={reservationForm.project_address}
+                                                onChange={(e) => handleChangeReservationForm('project_address', e.target.value)}
                                                 placeholder="Jl. Raya Suramadu, Surabaya, Jawa Timur"
                                                 className="resize-none"
                                                 disabled={processing}
@@ -243,22 +281,22 @@ export default function ReservationForm() {
 
                                         <div className="space-y-2">
                                             <label htmlFor="test_submission_date" className="block text-sm font-medium">
-                                                Tanggal Pengujian
+                                                Tanggal Pengajuan
                                             </label>
                                             <Popover>
                                                 <PopoverTrigger asChild>
                                                     <Button
-                                                        variant="outline"
+                                                        id="test_submission_date"
+                                                        variant={'outline'}
                                                         className={cn(
-                                                            'w-full pl-3 text-left font-normal',
-                                                            !data.test_submission_date && 'text-muted-foreground',
+                                                            'w-[240px] pl-3 text-left font-normal',
+                                                            !reservationForm.test_submission_date && 'text-muted-foreground',
                                                         )}
-                                                        disabled={processing}
                                                     >
-                                                        {data.test_submission_date ? (
-                                                            formatDate(data.test_submission_date)
+                                                        {reservationForm.test_submission_date ? (
+                                                            formatDate(reservationForm.test_submission_date)
                                                         ) : (
-                                                            <span>Pilih tanggal</span>
+                                                            <span>Pilih Tanggal</span>
                                                         )}
                                                         <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                                     </Button>
@@ -266,20 +304,17 @@ export default function ReservationForm() {
                                                 <PopoverContent className="w-auto p-0" align="start">
                                                     <Calendar
                                                         mode="single"
-                                                        selected={data.test_submission_date}
-                                                        onSelect={(date) => setData('test_submission_date', date)}
-                                                        disabled={
-                                                            (date) =>
-                                                                date < new Date(new Date().setHours(0, 0, 0, 0)) || // Disable past dates
-                                                                date > new Date(new Date().setMonth(new Date().getMonth() + 3)) // Allow booking up to 3 months ahead
-                                                        }
-                                                        initialFocus
+                                                        onSelect={(date) => {
+                                                            setData('test_submission_date', date); // untuk submit form
+                                                            handleChangeReservationForm('test_submission_date', date); // untuk localStorage
+                                                        }}
+                                                        selected={reservationForm.test_submission_date}
+                                                        disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
+                                                        autoFocus
                                                     />
                                                 </PopoverContent>
                                             </Popover>
-                                            <p className="text-sm text-gray-500">
-                                                Pilih tanggal untuk melakukan pengujian (maksimal 3 bulan ke depan)
-                                            </p>
+                                            <p className="text-sm text-gray-500">Tanggal pengujian tidak boleh lebih dari 3 bulan</p>
                                             {errors.test_submission_date && <p className="text-sm text-red-500">{errors.test_submission_date}</p>}
                                         </div>
 
@@ -289,8 +324,8 @@ export default function ReservationForm() {
                                             </label>
                                             <Textarea
                                                 id="user_note"
-                                                value={data.user_note}
-                                                onChange={(e) => setData('user_note', e.target.value)}
+                                                value={reservationForm.user_note}
+                                                onChange={(e) => handleChangeReservationForm('user_note', e.target.value)}
                                                 placeholder="Tambahkan catatan khusus untuk pesanan Anda"
                                                 className="resize-none"
                                                 disabled={processing}

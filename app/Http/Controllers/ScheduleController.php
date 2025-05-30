@@ -14,29 +14,11 @@
 
     class ScheduleController extends Controller
     {
-    //  public function index(): Response
-    //  {
-    //      $submissions = Submission::withScheduleJoin()->get();
-    //      $tests = Test::select(['id', 'name'])->get();
-    //      $packages = Package::select(['id', 'name'])->get();
-    //      $laboratories = Laboratory::select(['id', 'code', 'name'])->get();
-    //
-    //
-    //      return Inertia::render("schedule/index", [
-    //          'submissions' => $submissions,
-    //          'tests' => $tests,
-    //          'packages' => $packages,
-    //          'laboratories' => $laboratories,
-    //      ]);
-    //  }
-
         public function index(): Response
         {
             $tests = Test::select(['id', 'name'])->get();
 
-            return Inertia::render('schedule/newIndex', [
-                'tests' => $tests,
-            ]);
+            return Inertia::render('schedule/index', compact('tests'));
         }
 
         public function getSchedule(Request $request)

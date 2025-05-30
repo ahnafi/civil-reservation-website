@@ -18,8 +18,12 @@ class LaboratoryResource extends Resource
     protected static ?string $model = Laboratory::class;
 
     protected static ?string $modelLabel = 'Lab';
-    protected static ?string $navigationIcon = 'heroicon-o-home-modern';
-    protected static ?string $navigationGroup = 'Pengujian';
+    protected static ?string $navigationIcon = 'heroicon-s-home-modern';
+    protected static ?string $navigationGroup = 'Manajemen Laboratorium';
+    protected static ?string $navigationLabel = 'Laboratorium';
+    protected static ?string $title = 'Laboratorium';
+    protected static ?string $label = 'Laboratorium';
+    protected static ?string $pluralLabel = 'Laboratorium';
 
     public static function form(Form $form): Form
     {
@@ -48,6 +52,17 @@ class LaboratoryResource extends Resource
                         ->required()
                         ->maxSize(2048)
                         ->directory('laboratories'),
+                    Forms\Components\BelongsToManyMultiSelect::make('equipments')
+                        ->relationship('equipments', 'name')
+                        ->label('Peralatan')
+                        ->preload()
+                        ->searchable()
+                        ->required()
+                        ->placeholder('Pilih Peralatan')
+                        ->reactive()
+                        ->afterStateUpdated(function ($state, callable $set) {
+                            $set('equipments', $state);
+                        }),
                 ])->columns(),
             ]);
     }

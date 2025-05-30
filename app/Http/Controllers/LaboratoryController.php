@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Laboratory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class LaboratoryController extends Controller
 {
@@ -11,6 +13,18 @@ class LaboratoryController extends Controller
     {
         return inertia("laboratories/index", [
             "laboratories" => Laboratory::get(),
+        ]);
+    }
+
+    public function apiIndex(): LengthAwarePaginator
+    {
+        return Laboratory::with(["equipments", "packages", "tests"])->paginate(16);
+    }
+
+    public function apiDetail(Laboratory $Laboratory): JsonResponse
+    {
+        return response()->json([
+            'data' => $Laboratory->load(["equipments", "packages", "tests"]),
         ]);
     }
 

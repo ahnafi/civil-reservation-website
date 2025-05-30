@@ -2,12 +2,14 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\SubmissionExporter;
 use App\Filament\Resources\SubmissionResource\Pages;
 use App\Filament\Resources\SubmissionResource\RelationManagers;
 use App\Models\Package;
 use App\Models\Submission;
 use App\Models\Test;
 use App\Models\User;
+use Filament\Tables\Actions\ExportAction;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -25,16 +27,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
-use function Laravel\Prompts\textarea;
+use \App\Services\BookingService;
 
 class SubmissionResource extends Resource
 {
     protected static ?string $model = Submission::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-pencil-square';
-    protected static ?string $modelLabel = 'Booking';
+    protected static ?string $navigationIcon = 'heroicon-s-pencil-square';
+    protected static ?string $modelLabel = 'Pengajuan Peminjaman';
     protected static ?string $navigationGroup = 'Manajemen Peminjaman';
-
+    protected static ?string $navigationBadgeTooltip = 'Banyak pengajuan yang diajukan';
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::where("status", "submitted")->count();
@@ -117,7 +119,7 @@ class SubmissionResource extends Resource
                                 ->label('Catatan')
                                 ->columnSpanFull(),
 
-//                            paket
+                            //                            paket
 
                             Repeater::make("submissionPackages")
                                 ->label('Paket pengujian')
@@ -158,7 +160,7 @@ class SubmissionResource extends Resource
                                 })
                             ,
 
-//                            test
+                            //                            test
 
                             Repeater::make("submissionTests")
                                 ->label('Pengujian satuan')
@@ -210,7 +212,7 @@ class SubmissionResource extends Resource
 
                         ])->columns()->grow(false),
 
-//                    approval
+                    //                    approval
 
                     Forms\Components\Section::make([
                         ToggleButtons::make('status')
@@ -258,7 +260,16 @@ class SubmissionResource extends Resource
             ->recordUrl(
                 fn(Submission $record): string => SubmissionResource::getUrl('view', ['record' => $record]),
             )
+            ->headerActions([
+                ExportAction::make()
+                    ->exporter(SubmissionExporter::class)
+                    ->color("success")
+                    ->label("Ekspor data ke Excel")
+            ])
             ->columns([
+                Tables\Columns\TextColumn::make('code')
+                    ->searchable()
+                    ->label('Kode Pengajuan'),
                 Tables\Columns\TextColumn::make('user.email')
                     ->label("Email pengguna")
                     ->searchable(),
@@ -344,10 +355,9 @@ class SubmissionResource extends Resource
                         }
 
                     })
-                    ->button()
                     ->color("success")
                     ->requiresConfirmation()
-                    ->icon("heroicon-o-check")
+                    ->icon("heroicon-o-check-circle")
                     ->visible(fn($record) => $record->status === 'submitted'),
 
                 Tables\Actions\Action::make("Tolak")
@@ -381,7 +391,6 @@ class SubmissionResource extends Resource
                         }
 
                     })
-                    ->button()
                     ->color("danger")
                     ->requiresConfirmation()
                     ->icon("heroicon-o-x-circle")
@@ -390,19 +399,24 @@ class SubmissionResource extends Resource
                 Tables\Actions\Action::make("Transaksi")
                     ->icon("heroicon-o-credit-card")
                     ->color("warning")
-                    ->button()
                     ->url(fn(Submission $record): string => route("filament.admin.resources.submissions.edit", [$record, "activeRelationManager" => 0]))
                     ->visible(fn($record) => $record->status === 'approved'),
 
                 Tables\Actions\Action::make("Pengujian")
                     ->icon("heroicon-o-beaker")
                     ->color("info")
-                    ->button()
                     ->url(fn(Submission $record): string => route("filament.admin.resources.submissions.edit", [$record, "activeRelationManager" => 1]))
                     ->visible(fn($record) => $record->status === 'approved'),
 
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make("Pengajuan ulang")
+                        ->action(function (Model $record) {
+                            $bookingService = app(BookingService::class);
+                            $bookingService->recreateSubmission($record);
+                        })
+                        ->icon("heroicon-s-arrow-path")
+                        ->visible(fn($record) => $record->status === "approved"),
                     Tables\Actions\ViewAction::make(),
                     Tables\Actions\DeleteAction::make(),
                     Tables\Actions\RestoreAction::make(),

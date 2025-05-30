@@ -18,10 +18,13 @@ class PackageResource extends Resource
 {
     protected static ?string $model = Package::class;
     protected static ?string $modelLabel = 'Paket Pengujian';
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-group';
-    protected static ?string $navigationGroup = 'Pengujian';
-
-//    public static function getNavigationBadge(): ?string
+    protected static ?string $navigationIcon = 'heroicon-s-rectangle-group';
+    protected static ?string $navigationGroup = 'Manajemen Laboratorium';
+    protected static ?string $navigationLabel = 'Paket Pengujian';
+    protected static ?string $title = 'Paket Pengujian';
+    protected static ?string $label = 'Paket Pengujian';
+    protected static ?string $pluralLabel = 'Paket Pengujian';
+    //    public static function getNavigationBadge(): ?string
 //    {
 //        return static::getModel()::count();
 //    }

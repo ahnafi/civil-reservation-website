@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->string("phone")->nullable();
             $table->string("photo")->nullable();
             $table->string("identity")->nullable();
-            $table->enum("role", ["admin", "external", "internal"])->nullable();
+            $table->enum("role", ["admin", "superadmin", "external", "internal"])->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

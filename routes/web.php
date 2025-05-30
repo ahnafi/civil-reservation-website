@@ -8,6 +8,7 @@ use App\Http\Controllers\TestController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\HistoryController;
+use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -15,7 +16,7 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', RoleMiddleware::class . ":internal,external"])->group(function () {
     // Get Main Page
     Route::get('dashboard', [DashboardController::class, "index"])->name('dashboard');
     Route::get('schedule', [ScheduleController::class, "index"])->name("schedule");
@@ -53,6 +54,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('history/transactions', [HistoryController::class, "transactionsHistory"])->name('history-transactions');
     Route::get('history/transaction/{transaction:code}', [HistoryController::class, "transactionHistoryDetail"])->name('history-transactions-detail');
     Route::post('cart/add', [BookingController::class, 'addToCart'])->name('cart.add');
+
+    // Post Page
+    Route::post('submission/payment', [BookingController::class, 'submitPayment'])->name('submitPayment');
+    Route::post('schedule/submit', [ScheduleController::class, 'getSchedule'])->name('schedule.submit');
+    Route::post('cart/submit', [BookingController::class, 'submitSubmission'])->name('createSubmission');
 });
 
 require __DIR__ . '/settings.php';
