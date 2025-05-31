@@ -25,7 +25,6 @@ class BookingService
         $project_address,
         $test_submission_date,
         $user_note,
-        $admin_note,
         array $submission_tests,
         array $submission_packages
     ) {
@@ -64,7 +63,6 @@ class BookingService
             $submission->total_cost = $total_cost;
             $submission->test_submission_date = $test_submission_date;
             $submission->user_note = $user_note;
-            $submission->admin_note = $admin_note;
             $submission->save();
 
             foreach ($submission_tests as $test) {

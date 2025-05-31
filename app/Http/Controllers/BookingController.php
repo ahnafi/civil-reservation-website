@@ -30,7 +30,6 @@ class BookingController extends Controller
                 $validated['project_address'],
                 $validated['test_submission_date'],
                 $validated['user_note'],
-                $validated['admin_note'],
                 $validated['submission_tests'],
                 $validated['submission_packages']
             );
