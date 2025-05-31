@@ -7,11 +7,14 @@ use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Package;
 use App\Models\Test;
+use Illuminate\Support\Facades\Log;
+
 use App\Models\Transaction;
 use App\Models\Testing;
 use App\Models\Schedule;
 use App\Models\ScheduleTesting;
 use Laravel\Pennant\Feature;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Services\FileNaming;
 
@@ -33,7 +36,7 @@ class BookingService
         try {
             // Extract IDs
             $testIds = collect($submission_tests)->pluck('test_id')->filter()->toArray();
-            $packageIds = $submission_packages;
+            $packageIds = collect($submission_packages)->pluck('package_id')->filter()->toArray();
 
             // Load data
             $tests = Test::whereIn('id', $testIds)->get()->keyBy('id');
@@ -53,6 +56,8 @@ class BookingService
                     $total_cost += $packageData->price;
                 }
             }
+
+            $test_submission_date = Carbon::parse($test_submission_date)->format('Y-m-d');
 
             // Create submission
             $submission = new Submission();
@@ -80,8 +85,18 @@ class BookingService
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();
+
+            Log::error('Error in BookingService@createSubmission', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => $user_id,
+                'submission_tests' => $submission_tests,
+                'submission_packages' => $submission_packages
+            ]);
+
             throw $e;
         }
+
     }
 
 
