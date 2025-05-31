@@ -16,7 +16,7 @@ Route::get('/', function () {
     return Inertia::render('welcome');
 })->name('home');
 
-Route::middleware(['auth', 'verified', RoleMiddleware::class . ":internal,external"])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     // Get Main Page
     Route::get('dashboard', [DashboardController::class, "index"])->name('dashboard');
     Route::get('schedule', [ScheduleController::class, "index"])->name("schedule");
