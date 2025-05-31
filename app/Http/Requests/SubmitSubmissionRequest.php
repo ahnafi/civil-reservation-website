@@ -48,10 +48,10 @@ class SubmitSubmissionRequest extends FormRequest
             foreach ($tests as $index => $submissionTest) {
                 $test = $loadedTests->get($submissionTest['test_id'] ?? null);
 
-                if ($test && isset($submissionTest['quantity'])) {
-                    if ($submissionTest['quantity'] < $test->minimum_unit) {
+                if ($test && isset($submissionTest['unit'])) {
+                    if ($submissionTest['unit'] < $test->minimum_unit) {
                         $validator->errors()->add(
-                            "submission_tests.$index.quantity",
+                            "submission_tests.$index.unit",
                             "Jumlah pengajuan untuk pengujian {$test->name} tidak boleh kurang dari {$test->minimum_unit} {$test->category->name}"
                         );
                     }
