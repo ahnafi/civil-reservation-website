@@ -57,8 +57,6 @@ class BookingService
                 }
             }
 
-            $test_submission_date = Carbon::parse($test_submission_date)->format('Y-m-d');
-
             // Create submission
             $submission = new Submission();
             $submission->user_id = $user_id;
