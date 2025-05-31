@@ -12,7 +12,7 @@ class SubmitSubmissionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -30,7 +30,7 @@ class SubmitSubmissionRequest extends FormRequest
             'user_note' => 'nullable|string|max:512',
             'submission_tests' => 'required|array',
             'submission_tests.*.test_id' => 'required|exists:tests,id',
-            'submission_tests.*.quantity' => 'required|integer',
+            'submission_tests.*.unit' => 'required|integer',
             'submission_packages' => 'required|array',
             'submission_packages.*' => 'exists:packages,id',
         ];

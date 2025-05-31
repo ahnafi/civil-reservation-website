@@ -31,30 +31,30 @@ class BookingService
         DB::beginTransaction();
 
         try {
-            $total_cost = 0;
-
+            // Extract IDs
             $testIds = collect($submission_tests)->pluck('test_id')->filter()->toArray();
-            $packageIds = collect($submission_packages)->pluck('package_id')->filter()->toArray();
+            $packageIds = $submission_packages;
 
+            // Load data
             $tests = Test::whereIn('id', $testIds)->get()->keyBy('id');
             $packages = Package::whereIn('id', $packageIds)->get()->keyBy('id');
 
             $total_cost = 0;
-
             foreach ($submission_tests as $test) {
                 $testData = $tests[$test['test_id']] ?? null;
                 if ($testData) {
-                    $total_cost += $test['quantity'] * $testData->price;
+                    $total_cost += $test['unit'] * $testData->price;
                 }
             }
 
-            foreach ($submission_packages as $package) {
-                $packageData = $packages[$package['package_id']] ?? null;
+            foreach ($packageIds as $packageId) {
+                $packageData = $packages[$packageId] ?? null;
                 if ($packageData) {
                     $total_cost += $packageData->price;
                 }
             }
 
+            // Create submission
             $submission = new Submission();
             $submission->user_id = $user_id;
             $submission->company_name = $company_name;
@@ -65,15 +65,17 @@ class BookingService
             $submission->user_note = $user_note;
             $submission->save();
 
+            if (!$submission->id) {
+                throw new \Exception('Submission was not saved to DB.');
+            }
+
             foreach ($submission_tests as $test) {
                 $submission->tests()->attach($test['test_id'], [
-                    'quantity' => $test['quantity']
+                    'quantity' => $test['unit']
                 ]);
             }
 
-            foreach ($submission_packages as $package) {
-                $submission->packages()->attach($submission_packages);
-            }
+            $submission->packages()->attach($packageIds);
 
             DB::commit();
         } catch (\Throwable $e) {
@@ -81,6 +83,8 @@ class BookingService
             throw $e;
         }
     }
+
+
 
     public function storePaymentReceipt($transaction_id, $file, $payment_method)
     {
