@@ -27,7 +27,7 @@ class SubmitSubmissionRequest extends FormRequest
             'company_name' => 'required|string|max:255',
             'project_name' => 'required|string|max:255',
             'project_address' => 'required|string|max:255',
-            'test_submission_date' => 'required|date',
+            'test_submission_date' => 'required|date_format:Y-m-d',
             'user_note' => 'nullable|string|max:512',
 
             // submission_tests is required if submission_packages is not present
@@ -64,4 +64,15 @@ class SubmitSubmissionRequest extends FormRequest
             }
         });
     }
+
+    public function attributes(): array
+    {
+        return [
+            'test_submission_date' => 'Tanggal pengajuan uji',
+            'submission_tests.*.unit' => 'Jumlah unit pengujian',
+            'submission_tests.*.test_id' => 'Jenis pengujian',
+            'submission_packages.*.package_id' => 'Paket pengujian',
+        ];
+    }
+
 }
