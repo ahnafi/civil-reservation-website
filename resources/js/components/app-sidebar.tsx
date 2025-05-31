@@ -10,11 +10,12 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { type NavItem, SharedData } from '@/types';
+import { Link , usePage} from '@inertiajs/react';
 import {
     BookOpen,
     CalendarDays,
+    PanelsTopLeft,
     FileText,
     FlaskConical,
     Folder,
@@ -84,20 +85,20 @@ const historyNavItems: NavItem[] = [
     },
 ];
 
-const footerNavItems: NavItem[] = [
+const adminItems: NavItem[] = [
     {
-        title: 'Repository',
-        url: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        url: 'https://laravel.com/docs/starter-kits',
-        icon: BookOpen,
-    },
+        title: 'Dashboard Admin',
+        url: '/admin',
+        icon: PanelsTopLeft,
+    }
 ];
 
+
 export function AppSidebar() {
+    const { auth } = usePage<SharedData>().props;
+    const user = auth.user;
+    const page = usePage();
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -120,10 +121,12 @@ export function AppSidebar() {
                 <NavMain label="Layanan" items={serviceNavItems} />
                 <NavMain label="Pesanan" items={orderNavItems} />
                 <NavMain label="Riwayat" items={historyNavItems} />
+                { user.role === 'admin' && (
+                    <NavMain label="Admin" items={adminItems} />
+                )}
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
