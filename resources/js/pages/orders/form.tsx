@@ -37,7 +37,6 @@ type ReservationForm = {
     project_address: string;
     test_submission_date: Date | undefined;
     user_note: string;
-    total_cost: number;
 };
 
 type SimplifiedTest = {
@@ -55,7 +54,6 @@ type SubmissionData = {
     project_address: string;
     test_submission_date: Date | undefined;
     user_note: string;
-    total_cost: number;
     submission_tests: SimplifiedTest[];
     submission_packages: SimplifiedPackage[];
 };
@@ -69,7 +67,6 @@ export default function ReservationForm() {
         project_address: '',
         test_submission_date: undefined,
         user_note: '',
-        total_cost: total,
     });
     const { data, setData, post, processing, errors, reset } = useForm<SubmissionData>({
         company_name: '',
@@ -77,7 +74,6 @@ export default function ReservationForm() {
         project_address: '',
         test_submission_date: undefined,
         user_note: '',
-        total_cost: total,
         submission_tests: [],
         submission_packages: [],
     });
@@ -302,16 +298,16 @@ export default function ReservationForm() {
                                                     </Button>
                                                 </PopoverTrigger>
                                                 <PopoverContent className="w-auto p-0" align="start">
-                                                    <Calendar
-                                                        mode="single"
-                                                        onSelect={(date) => {
-                                                            setData('test_submission_date', date); // untuk submit form
-                                                            handleChangeReservationForm('test_submission_date', date); // untuk localStorage
-                                                        }}
-                                                        selected={reservationForm.test_submission_date}
-                                                        disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
-                                                        autoFocus
-                                                    />
+                                                        <Calendar
+                                                            mode="single"
+                                                            onSelect={(date) => {
+                                                                setData('test_submission_date', date); // untuk submit form
+                                                                handleChangeReservationForm('test_submission_date', date); // untuk localStorage
+                                                            }}
+                                                            selected={reservationForm.test_submission_date}
+                                                            disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
+                                                            autoFocus
+                                                        />
                                                 </PopoverContent>
                                             </Popover>
                                             <p className="text-sm text-gray-500">Tanggal pengujian tidak boleh lebih dari 3 bulan</p>
