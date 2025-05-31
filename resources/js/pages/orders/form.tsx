@@ -123,7 +123,7 @@ export default function ReservationForm() {
                 test_submission_date: reservationForm.test_submission_date,
                 submission_tests: tests.map((test: SimplifiedTest) => ({
                     test_id: test.test_id,
-                    quantity: test.unit,
+                    unit: test.unit,
                 })),
                 submission_packages: packages.map((pkg: SimplifiedPackage) => ({
                     package_id: pkg.package_id,

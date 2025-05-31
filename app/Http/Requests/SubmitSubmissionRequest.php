@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Requests;
+
 use App\Models\Test;
 use Illuminate\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
@@ -28,10 +29,14 @@ class SubmitSubmissionRequest extends FormRequest
             'project_address' => 'required|string|max:255',
             'test_submission_date' => 'required|date',
             'user_note' => 'nullable|string|max:512',
-            'submission_tests' => 'required|array',
+
+            // submission_tests is required if submission_packages is not present
+            'submission_tests' => 'required_without:submission_packages|array',
             'submission_tests.*.test_id' => 'required|exists:tests,id',
             'submission_tests.*.unit' => 'required|integer',
-            'submission_packages' => 'required|array',
+
+            // submission_packages is required if submission_tests is not present
+            'submission_packages' => 'required_without:submission_tests|array',
             'submission_packages.*' => 'exists:packages,id',
         ];
     }
@@ -48,10 +53,10 @@ class SubmitSubmissionRequest extends FormRequest
             foreach ($tests as $index => $submissionTest) {
                 $test = $loadedTests->get($submissionTest['test_id'] ?? null);
 
-                if ($test && isset($submissionTest['quantity'])) {
-                    if ($submissionTest['quantity'] < $test->minimum_unit) {
+                if ($test && isset($submissionTest['unit'])) {
+                    if ($submissionTest['unit'] < $test->minimum_unit) {
                         $validator->errors()->add(
-                            "submission_tests.$index.quantity",
+                            "submission_tests.$index.unit",
                             "Jumlah pengajuan untuk pengujian {$test->name} tidak boleh kurang dari {$test->minimum_unit} {$test->category->name}"
                         );
                     }
@@ -59,5 +64,4 @@ class SubmitSubmissionRequest extends FormRequest
             }
         });
     }
-
 }
