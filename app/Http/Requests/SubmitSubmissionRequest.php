@@ -37,7 +37,7 @@ class SubmitSubmissionRequest extends FormRequest
 
             // submission_packages is required if submission_tests is not present
             'submission_packages' => 'required_without:submission_tests|array',
-            'submission_packages.*' => 'exists:packages,id',
+            'submission_packages.*.package_id' => 'required|exists:packages,id',
         ];
     }
 
