@@ -37,6 +37,7 @@ type ReservationForm = {
     project_address: string;
     test_submission_date: Date | undefined;
     user_note: string;
+    total_cost: number;
 };
 
 type SimplifiedTest = {
@@ -52,8 +53,9 @@ type SubmissionData = {
     company_name: string;
     project_name: string;
     project_address: string;
-    test_submission_date: Date | undefined;
+    test_submission_date: string | undefined;
     user_note: string;
+    total_cost: number;
     submission_tests: SimplifiedTest[];
     submission_packages: SimplifiedPackage[];
 };
@@ -67,6 +69,7 @@ export default function ReservationForm() {
         project_address: '',
         test_submission_date: undefined,
         user_note: '',
+        total_cost: total,
     });
     const { data, setData, post, processing, errors, reset } = useForm<SubmissionData>({
         company_name: '',
@@ -74,6 +77,7 @@ export default function ReservationForm() {
         project_address: '',
         test_submission_date: undefined,
         user_note: '',
+        total_cost: total,
         submission_tests: [],
         submission_packages: [],
     });
@@ -95,8 +99,11 @@ export default function ReservationForm() {
             try {
                 const parsedForm = JSON.parse(savedForm);
                 if (parsedForm.test_submission_date) {
-                    parsedForm.test_submission_date = new Date(parsedForm.test_submission_date);
+                    // Asumsikan datanya dalam format YYYY-MM-DD, buat Date dari string lokal
+                    const [year, month, day] = parsedForm.test_submission_date.split('-');
+                    parsedForm.test_submission_date = new Date(Number(year), Number(month) - 1, Number(day));
                 }
+
                 setReservationForm(parsedForm);
             } catch (error) {
                 console.error('Error parsing saved form data:', error);
@@ -110,13 +117,23 @@ export default function ReservationForm() {
         const packages = JSON.parse(localStorage.getItem('packages') || '[]');
 
         if (Object.values(reservationForm).some((val) => val !== undefined && val !== '')) {
-            localStorage.setItem('reservation_form', JSON.stringify(reservationForm));
+            const sanitized = {
+                ...reservationForm,
+                test_submission_date: reservationForm.test_submission_date
+                    ? formatDateForSubmission(reservationForm.test_submission_date)
+                    : undefined,
+            };
+            localStorage.setItem('reservation_form', JSON.stringify(sanitized));
         }
 
         if (tests.length > 0 || packages.length > 0) {
             setData({
-                ...reservationForm,
-                test_submission_date: reservationForm.test_submission_date,
+                company_name: reservationForm.company_name,
+                project_name: reservationForm.project_name,
+                project_address: reservationForm.project_address,
+                test_submission_date: formatDateForSubmission(reservationForm.test_submission_date),
+                user_note: reservationForm.user_note,
+                total_cost: reservationForm.total_cost,
                 submission_tests: tests.map((test: SimplifiedTest) => ({
                     test_id: test.test_id,
                     unit: test.unit,
@@ -125,6 +142,7 @@ export default function ReservationForm() {
                     package_id: pkg.package_id,
                 })),
             });
+            console.log(data.test_submission_date);
         } else {
             setCartEmpty(true);
         }
@@ -143,14 +161,6 @@ export default function ReservationForm() {
         if (cartEmpty) {
             return;
         }
-
-        // Format data sebelum submit
-        const submissionData = {
-            ...data,
-            test_submission_date: formatDateForSubmission(data.test_submission_date),
-        };
-
-        console.info('Formatted submission data:', submissionData);
 
         post(route('createSubmission'), {
             onSuccess: () => {
@@ -288,6 +298,7 @@ export default function ReservationForm() {
                                                             'w-[240px] pl-3 text-left font-normal',
                                                             !reservationForm.test_submission_date && 'text-muted-foreground',
                                                         )}
+                                                        disabled={processing}
                                                     >
                                                         {reservationForm.test_submission_date ? (
                                                             formatDate(reservationForm.test_submission_date)
@@ -298,19 +309,23 @@ export default function ReservationForm() {
                                                     </Button>
                                                 </PopoverTrigger>
                                                 <PopoverContent className="w-auto p-0" align="start">
-                                                        <Calendar
-                                                            mode="single"
-                                                            onSelect={(date) => {
-                                                                setData('test_submission_date', date); // untuk submit form
-                                                                handleChangeReservationForm('test_submission_date', date); // untuk localStorage
-                                                            }}
-                                                            selected={reservationForm.test_submission_date}
-                                                            disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
-                                                            autoFocus
-                                                        />
+                                                    <Calendar
+                                                        mode="single"
+                                                        onSelect={(date) => {
+                                                            handleChangeReservationForm('test_submission_date', date);
+                                                        }}
+                                                        selected={reservationForm.test_submission_date}
+                                                        disabled={(date) => {
+                                                            const today = new Date();
+                                                            const threeMonthsFromNow = new Date();
+                                                            threeMonthsFromNow.setMonth(today.getMonth() + 3);
+                                                            return date < today || date > threeMonthsFromNow;
+                                                        }}
+                                                        autoFocus
+                                                    />
                                                 </PopoverContent>
                                             </Popover>
-                                            <p className="text-sm text-gray-500">Tanggal pengujian tidak boleh lebih dari 3 bulan</p>
+                                            <p className="text-sm text-gray-500">Pilih tanggal dalam 3 bulan ke depan</p>
                                             {errors.test_submission_date && <p className="text-sm text-red-500">{errors.test_submission_date}</p>}
                                         </div>
 
