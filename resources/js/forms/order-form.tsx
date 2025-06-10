@@ -11,7 +11,6 @@ const formSchema = z.object({
     project_name: z.string().min(1, "Nama proyek wajib diisi"),
     project_address: z.string().min(1, "Alamat proyek wajib diisi"),
     test_submission_date: z.string(),
-    // document: z.instanceof(FileList).refine(files => files.length > 0, "Dokumen wajib diunggah"),
     user_note: z.string().optional()
 });
 
@@ -27,35 +26,9 @@ export default function OrderForm() {
         }
     });
 
-    // const [files, setFiles] = useState<FileList | null>(null);
-    // const [fileToRemove, setFileToRemove] = useState<File | null>(null);
-
     const onSubmit = (data: z.infer<typeof formSchema>) => {
         console.log("Form Data:", data);
     };
-
-    // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     const selectedFiles = event.target.files;
-    //     if (selectedFiles) {
-    //         setFiles(selectedFiles);
-    //         form.setValue("document", selectedFiles);
-    //     }
-    // };
-
-    // const handleRemoveFile = (file: File) => {
-    //     setFileToRemove(file);
-    // };
-
-    // const confirmRemoveFile = () => {
-    //     if (files && fileToRemove) {
-    //         const newFiles = Array.from(files).filter(f => f !== fileToRemove);
-    //         const dataTransfer = new DataTransfer();
-    //         newFiles.forEach(file => dataTransfer.items.add(file));
-    //         setFiles(dataTransfer.files);
-    //         form.setValue("document", dataTransfer.files);
-    //         setFileToRemove(null);
-    //     }
-    // };
 
     return (
         <Form {...form}>
@@ -105,41 +78,6 @@ export default function OrderForm() {
                         </FormItem>
                     )}
                 />
-                {/* <FormField
-                    control={form.control}
-                    name="document"
-                    render={() => (
-                        <FormItem>
-                            <FormLabel>
-                                Unggah File <span className="text-red-base">*</span>
-                            </FormLabel>
-                            <FormControl>
-                                <div className="rounded-lg border border-dashed border-gray-400 p-4 text-center">
-                                    <label className="cursor-pointer">
-                                        <input type="file" multiple className="hidden" onChange={handleFileChange} />
-                                        <div className="flex flex-col items-center">
-                                            <CloudUpload className="h-10 w-10 text-gray-500" />
-                                            <p className="mb-1 text-sm text-gray-500">Click to upload or drag and drop</p>
-                                            <p className="text-xs text-gray-500">SVG, PNG, JPG, or GIF</p>
-                                        </div>
-                                    </label>
-                                </div>
-                            </FormControl>
-                            {files && files.length > 0 && (
-                                <ul className="mt-2 text-sm text-gray-700">
-                                    {Array.from(files).map((file: File, index: number) => (
-                                        <li key={index} className="w-fit flex items-center gap-2 truncate rounded-md bg-gray-100 px-2 py-1">
-                                            <span>{file.name}</span>
-                                            <button type="button" className="text-red-base font-semibold cursor-pointer" onClick={() => handleRemoveFile(file)}>
-                                                <X className="w-4"/>
-                                            </button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </FormItem>
-                    )}
-                /> */}
                 <FormField
                     control={form.control}
                     name="user_note"
@@ -155,28 +93,6 @@ export default function OrderForm() {
                 />
                 <Button type="submit">Kirim Pesanan</Button>
             </form>
-
-            {/* {fileToRemove && (
-                <AlertDialog open={!!fileToRemove} onOpenChange={() => setFileToRemove(null)}>
-                    <AlertDialogTrigger asChild>
-                        <button className="hidden">Trigger</button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                        <AlertDialogHeader>
-                            <AlertDialogTitle>Konfirmasi Hapus File</AlertDialogTitle>
-                            <AlertDialogDescription>Apakah Anda yakin ingin menghapus file ini?</AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                            <Button className="cursor-pointer" variant="outline" onClick={() => setFileToRemove(null)}>
-                                Batal
-                            </Button>
-                            <Button className="cursor-pointer" variant="destructive" onClick={confirmRemoveFile}>
-                                Hapus
-                            </Button>
-                        </AlertDialogFooter>
-                    </AlertDialogContent>
-                </AlertDialog>
-            )} */}
         </Form>
     );
 }

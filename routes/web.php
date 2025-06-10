@@ -42,6 +42,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('orders/history');
     })->name('orders-history');
 
+    // Get Payment Page
+    Route::get('payment/{transaction:code}', [BookingController::class, "payment"])->name('orders-payment');
+
     // Get Submission History
     Route::get('history/submissions', [HistoryController::class, "submissionsHistory"])->name('history-submissions');
     Route::get('history/submission/{submission:code}', [HistoryController::class, "submissionHistoryDetail"])->name('history-submission-detail');
@@ -56,7 +59,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('cart/add', [BookingController::class, 'addToCart'])->name('cart.add');
 
     // Post Page
-    Route::post('submission/payment', [BookingController::class, 'submitPayment'])->name('submitPayment');
+    Route::post('payment', [BookingController::class, 'submitPayment'])->name('submit-payment');
     Route::post('schedule/submit', [ScheduleController::class, 'getSchedule'])->name('schedule.submit');
     Route::post('cart/submit', [BookingController::class, 'submitSubmission'])->name('createSubmission');
 });

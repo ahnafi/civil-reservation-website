@@ -244,7 +244,9 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                                 Silakan selesaikan pembayaran Anda sebelum {formatDate(transaction.payment_deadline)}.
                                             </p>
                                         </div>
-                                        <Button className="w-full">Upload Bukti Pembayaran</Button>
+                                        <Link href={`/payment/${transaction.code}`} className="mt-4">
+                                            <Button className="w-full">Upload Bukti Pembayaran</Button>
+                                        </Link>
                                     </>
                                 )}
 

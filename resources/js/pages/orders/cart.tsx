@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, PackageCart, TestCart } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { AlertCircle, Beaker, Building2, ClipboardList, CreditCard, Minus, PackageIcon, Plus, ShoppingCart, Trash2 } from 'lucide-react';
+import { AlertCircle, Beaker, Building2, CheckCircle2, ClipboardList, CreditCard, Minus, PackageIcon, Plus, ShoppingCart, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -128,298 +128,350 @@ export default function Cart() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Keranjang" />
 
-            <div className="container mx-auto py-6">
-                {isEmpty ? (
-                    <EmptyCart />
-                ) : (
-                    <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-                        <div className="space-y-6 lg:col-span-2">
-                            <div className="mb-8 p-4">
-                                <div className="relative">
-                                    <div className="absolute inset-0 flex items-center">
-                                        <div className="w-full border-t border-gray-200 dark:border-gray-800"></div>
-                                    </div>
-                                    <div className="relative flex justify-between">
-                                        <div className="flex flex-col items-center">
-                                            <div className="bg-primary flex h-12 w-12 items-center justify-center rounded-full text-white">
-                                                <ShoppingCart className="h-6 w-6" />
-                                            </div>
-                                            <span className="mt-2 text-sm font-medium">Keranjang</span>
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+                <div className="container mx-auto px-4 py-8">
+                    {isEmpty ? (
+                        <EmptyCart />
+                    ) : (
+                        <div className="mx-auto max-w-7xl">
+                            {/* Progress Steps */}
+                            {/* <div className="mb-8">
+                                <div className="flex items-center justify-center space-x-8 md:space-x-16">
+                                    <div className="flex flex-col items-center">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg">
+                                            <ShoppingCart className="h-5 w-5" />
                                         </div>
-                                        <div className="flex flex-col items-center">
-                                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-gray-500 dark:bg-gray-800">
+                                        <span className="mt-2 text-sm font-medium text-blue-600">Keranjang</span>
+                                    </div>
+                                    <div className="hidden h-px flex-1 bg-gray-300 md:block dark:bg-gray-700"></div>
+                                    <div className="flex flex-col items-center">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-gray-500 dark:bg-gray-800">
+                                            <ClipboardList className="h-5 w-5" />
+                                        </div>
+                                        <span className="mt-2 text-sm text-gray-500">Formulir</span>
+                                    </div>
+                                    <div className="hidden h-px flex-1 bg-gray-300 md:block dark:bg-gray-700"></div>
+                                    <div className="flex flex-col items-center">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-gray-500 dark:bg-gray-800">
+                                            <CreditCard className="h-5 w-5" />
+                                        </div>
+                                        <span className="mt-2 text-sm text-gray-500">Pembayaran</span>
+                                    </div>
+                                </div>
+                            </div> */}
+                            <div className="mb-12">
+                                <div className="relative">
+                                    <div className="absolute top-6 left-0 h-0.5 w-full bg-gray-200 dark:bg-gray-700"></div>
+                                    <div className="relative mx-auto flex max-w-2xl justify-between">
+                                        <div className="group flex flex-col items-center">
+                                            <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg">
+                                                <CheckCircle2 className="h-6 w-6" />
+                                            </div>
+                                            <span className="mt-3 text-sm font-semibold text-blue-600 dark:text-blue-400">Keranjang</span>
+                                            <Badge className="mt-1 text-xs">
+                                                Sedang Aktif
+                                            </Badge>
+                                        </div>
+                                        <div className="group flex flex-col items-center">
+                                            <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-gray-400 dark:bg-gray-700 dark:text-gray-500">
                                                 <ClipboardList className="h-6 w-6" />
                                             </div>
-                                            <span className="mt-2 text-sm font-medium text-gray-500">Formulir Pesanan</span>
+                                            <span className="mt-3 text-sm font-medium text-gray-500">Formulir Pesanan</span>
+                                            <Badge variant="outline" className="mt-1 text-xs">Menunggu</Badge>
                                         </div>
-                                        <div className="flex flex-col items-center">
-                                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-gray-500 dark:bg-gray-800">
+                                        <div className="group flex flex-col items-center">
+                                            <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-gray-400 dark:bg-gray-700 dark:text-gray-500">
                                                 <CreditCard className="h-6 w-6" />
                                             </div>
-                                            <span className="mt-2 text-sm font-medium text-gray-500">Checkout</span>
+                                            <span className="mt-3 text-sm font-medium text-gray-500">Checkout</span>
+                                            <Badge variant="outline" className="mt-1 text-xs">
+                                                Menunggu
+                                            </Badge>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Tests Section */}
-                            {testsCart.length > 0 && (
-                                <Card className="overflow-hidden">
-                                    <CardHeader className="bg-gray-50 px-6 py-4 dark:bg-gray-900">
-                                        <CardTitle className="flex items-center text-lg">
-                                            <Beaker className="mr-2 h-5 w-5" />
-                                            Pengujian Individual
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="p-0">
-                                        {testsCart.map((testItem: TestCart, index) => (
-                                            <div
-                                                key={`test-${testItem.test_id}`}
-                                                className={`p-6 ${index !== testsCart.length - 1 ? 'border-b' : ''}`}
-                                            >
-                                                <div className="flex flex-col gap-6 md:flex-row">
-                                                    <div className="h-40 w-full overflow-hidden rounded-lg bg-gray-100 md:w-1/4 dark:bg-gray-800">
-                                                        <img
-                                                            src={`/storage/test_image/${testItem.test.images[0]}`}
-                                                            alt={testItem.test.name}
-                                                            className="h-full w-full object-cover"
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <div className="flex flex-col justify-between md:flex-row">
-                                                            <div>
-                                                                <h3 className="text-lg font-semibold">{testItem.test.name}</h3>
-                                                                <div className="mt-2 flex flex-wrap gap-2">
-                                                                    {testItem.test.laboratory && (
-                                                                        <Badge variant="outline" className="flex items-center gap-1">
-                                                                            <Building2 className="h-3 w-3" />
-                                                                            {testItem.test.laboratory.name}
-                                                                        </Badge>
-                                                                    )}
-                                                                    {testItem.test.category && (
-                                                                        <Badge variant="outline" className="flex items-center gap-1">
-                                                                            <Beaker className="h-3 w-3" />
-                                                                            {testItem.test.category.name}
-                                                                        </Badge>
-                                                                    )}
-                                                                </div>
-                                                                <p className="mt-3 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
-                                                                    {testItem.test.description}
-                                                                </p>
-                                                            </div>
-                                                            <div className="mt-4 md:mt-0 md:text-right">
-                                                                <div className="text-lg font-semibold">
-                                                                    {formatRupiah(testItem.test.price * testItem.unit)}
-                                                                </div>
-                                                                <div className="mt-1 text-sm text-gray-500">
-                                                                    {formatRupiah(testItem.test.price)} / {testItem.test.category.name.toLowerCase()}
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+                                {/* Cart Items */}
+                                <div className="space-y-6 lg:col-span-2">
+                                    <div className="rounded-xl bg-white p-2 shadow-sm dark:bg-gray-800">
+                                        <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">Item Keranjang</h2>
 
-                                                        <div className="mt-4 flex items-center justify-between border-t pt-4">
-                                                            <div className="flex items-center">
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="icon"
-                                                                    className="h-8 w-8 rounded-full"
-                                                                    onClick={() => updateTestQuantity(testItem.test_id, testItem.unit - 1)}
-                                                                    disabled={testItem.unit <= testItem.test.minimum_unit}
-                                                                >
-                                                                    <Minus className="h-3 w-3" />
-                                                                </Button>
-                                                                <span className="mx-3 w-8 text-center">{testItem.unit}</span>
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="icon"
-                                                                    className="h-8 w-8 rounded-full"
-                                                                    onClick={() => updateTestQuantity(testItem.test_id, testItem.unit + 1)}
-                                                                >
-                                                                    <Plus className="h-3 w-3" />
-                                                                </Button>
-                                                                <span className="ml-3 text-xs text-gray-500">
-                                                                    Min. unit: {testItem.test.minimum_unit}
-                                                                </span>
-                                                            </div>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                className="text-red-500 hover:bg-red-50 hover:text-red-700"
-                                                                onClick={() => removeTest(testItem.test_id)}
-                                                            >
-                                                                <Trash2 className="mr-1 h-4 w-4" />
-                                                                Hapus
-                                                            </Button>
-                                                        </div>
-                                                    </div>
+                                        {/* Tests Section */}
+                                        {testsCart.length > 0 && (
+                                            <div className="mb-8">
+                                                <div className="mb-4 flex items-center gap-2">
+                                                    <Beaker className="h-5 w-5 text-blue-600" />
+                                                    <h3 className="font-semibold text-gray-900 dark:text-white">Pengujian Individual</h3>
+                                                    <Badge variant="secondary">{testsCart.length}</Badge>
                                                 </div>
-                                            </div>
-                                        ))}
-                                    </CardContent>
-                                </Card>
-                            )}
-
-                            {/* Packages Section */}
-                            {packagesCart.length > 0 && (
-                                <Card className="overflow-hidden">
-                                    <CardHeader className="bg-gray-50 px-6 py-4 dark:bg-gray-900">
-                                        <CardTitle className="flex items-center text-lg">
-                                            <PackageIcon className="mr-2 h-5 w-5" />
-                                            Paket Pengujian
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent className="p-0">
-                                        {packagesCart.map((packageItem: PackageCart, index) => (
-                                            <div
-                                                key={`package-${packageItem.package_id}`}
-                                                className={`p-6 ${index !== packagesCart.length - 1 ? 'border-b' : ''}`}
-                                            >
-                                                <div className="flex flex-col gap-6 md:flex-row">
-                                                    <div className="h-40 w-full overflow-hidden rounded-lg bg-gray-100 md:w-1/4 dark:bg-gray-800">
-                                                        <img
-                                                            src={`/storage/package_image/${packageItem.package.images ? packageItem.package.images[0] : 'default.jpg'}`}
-                                                            alt={packageItem.package.name}
-                                                            className="h-full w-full object-cover"
-                                                        />
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <div className="flex flex-col justify-between md:flex-row">
-                                                            <div>
-                                                                <h3 className="text-lg font-semibold">{packageItem.package.name}</h3>
-                                                                {packageItem.package.laboratory && (
-                                                                    <Badge variant="outline" className="mt-2 flex items-center gap-1">
-                                                                        <Building2 className="h-3 w-3" />
-                                                                        {packageItem.package.laboratory.name}
-                                                                    </Badge>
-                                                                )}
-                                                                <p className="mt-3 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
-                                                                    {packageItem.package.description}
-                                                                </p>
-                                                            </div>
-                                                            <div className="mt-4 md:mt-0 md:text-right">
-                                                                <div className="text-lg font-semibold">
-                                                                    {formatRupiah(packageItem.package.price * (packageItem.quantity || 1))}
+                                                <div className="space-y-4">
+                                                    {testsCart.map((testItem: TestCart, index) => (
+                                                        <div
+                                                            key={`test-${index}`}
+                                                            className="rounded-lg border border-gray-200 p-4 transition-shadow hover:shadow-md dark:border-gray-700"
+                                                        >
+                                                            <div className="flex gap-4">
+                                                                <div className="h-20 w-20 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700">
+                                                                    <img
+                                                                        src={`/storage/test_image/${testItem.test.images[0]}`}
+                                                                        alt={testItem.test.name}
+                                                                        className="h-full w-full object-cover"
+                                                                    />
                                                                 </div>
-                                                                {packageItem.quantity > 1 && (
-                                                                    <div className="mt-1 text-sm text-gray-500">
-                                                                        {formatRupiah(packageItem.package.price)} / paket
+                                                                <div className="flex-1">
+                                                                    <div className="flex items-start justify-between">
+                                                                        <div>
+                                                                            <h4 className="font-semibold text-gray-900 dark:text-white">
+                                                                                {testItem.test.name}
+                                                                            </h4>
+                                                                            <div className="mt-1 flex flex-wrap gap-1">
+                                                                                {testItem.test.laboratory && (
+                                                                                    <Badge variant="outline" className="text-xs">
+                                                                                        <Building2 className="mr-1 h-3 w-3" />
+                                                                                        {testItem.test.laboratory.name}
+                                                                                    </Badge>
+                                                                                )}
+                                                                                {testItem.test.category && (
+                                                                                    <Badge variant="outline" className="text-xs">
+                                                                                        {testItem.test.category.name}
+                                                                                    </Badge>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="text-right">
+                                                                            <div className="font-semibold text-gray-900 dark:text-white">
+                                                                                {formatRupiah(testItem.test.price * testItem.unit)}
+                                                                            </div>
+                                                                            <div className="text-xs text-gray-500">
+                                                                                {formatRupiah(testItem.test.price)} / unit
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
-                                                                )}
+
+                                                                    <div className="mt-3 flex items-center justify-between">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                size="sm"
+                                                                                className="h-8 w-8 p-0"
+                                                                                onClick={() =>
+                                                                                    updateTestQuantity(testItem.test_id, testItem.unit - 1)
+                                                                                }
+                                                                                disabled={testItem.unit <= testItem.test.minimum_unit}
+                                                                            >
+                                                                                <Minus className="h-3 w-3" />
+                                                                            </Button>
+                                                                            <span className="w-8 text-center text-sm font-medium">
+                                                                                {testItem.unit}
+                                                                            </span>
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                size="sm"
+                                                                                className="h-8 w-8 p-0"
+                                                                                onClick={() =>
+                                                                                    updateTestQuantity(testItem.test_id, testItem.unit + 1)
+                                                                                }
+                                                                            >
+                                                                                <Plus className="h-3 w-3" />
+                                                                            </Button>
+                                                                            <span className="ml-2 text-xs text-gray-500">
+                                                                                Min: {testItem.test.minimum_unit}
+                                                                            </span>
+                                                                        </div>
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="sm"
+                                                                            className="text-red-500 hover:bg-red-50 hover:text-red-700"
+                                                                            onClick={() => removeTest(testItem.test_id)}
+                                                                        >
+                                                                            <Trash2 className="h-4 w-4" />
+                                                                        </Button>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
-
-                                                        {packageItem.package.tests && packageItem.package.tests.length > 0 && (
-                                                            <div className="mt-4 rounded-lg bg-gray-50 dark:bg-gray-800">
-                                                                <h4 className="mb-2 text-sm font-medium">Isi Paket:</h4>
-                                                                <ScrollArea className="h-24">
-                                                                    <ul className="space-y-1">
-                                                                        {packageItem.package.tests.map((test, testIndex) => (
-                                                                            <li key={testIndex} className="flex justify-between text-sm">
-                                                                                <Link
-                                                                                    href={`/tests/${test.slug}`}
-                                                                                    className="text-blue-600 hover:underline"
-                                                                                >
-                                                                                    {test.name}
-                                                                                </Link>
-                                                                                <span>{formatRupiah(test.price)}</span>
-                                                                            </li>
-                                                                        ))}
-                                                                    </ul>
-                                                                </ScrollArea>
-                                                            </div>
-                                                        )}
-
-                                                        <div className="mt-4 flex items-center justify-between border-t pt-4">
-                                                            <div className="flex items-center">
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="icon"
-                                                                    className="h-8 w-8 rounded-full"
-                                                                    onClick={() =>
-                                                                        updatePackageQuantity(packageItem.package_id, (packageItem.quantity || 1) - 1)
-                                                                    }
-                                                                    disabled={(packageItem.quantity || 1) <= 1}
-                                                                >
-                                                                    <Minus className="h-3 w-3" />
-                                                                </Button>
-                                                                <span className="mx-3 w-8 text-center">{packageItem.quantity || 1}</span>
-                                                                <Button
-                                                                    variant="outline"
-                                                                    size="icon"
-                                                                    className="h-8 w-8 rounded-full"
-                                                                    onClick={() =>
-                                                                        updatePackageQuantity(packageItem.package_id, (packageItem.quantity || 1) + 1)
-                                                                    }
-                                                                >
-                                                                    <Plus className="h-3 w-3" />
-                                                                </Button>
-                                                            </div>
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                className="text-red-500 hover:bg-red-50 hover:text-red-700"
-                                                                onClick={() => removePackage(packageItem.package_id)}
-                                                            >
-                                                                <Trash2 className="mr-1 h-4 w-4" />
-                                                                Hapus
-                                                            </Button>
-                                                        </div>
-                                                    </div>
+                                                    ))}
                                                 </div>
                                             </div>
-                                        ))}
-                                    </CardContent>
-                                </Card>
-                            )}
+                                        )}
+
+                                        {/* Packages Section */}
+                                        {packagesCart.length > 0 && (
+                                            <div>
+                                                <div className="mb-4 flex items-center gap-2">
+                                                    <PackageIcon className="h-5 w-5 text-green-600" />
+                                                    <h3 className="font-semibold text-gray-900 dark:text-white">Paket Pengujian</h3>
+                                                    <Badge variant="secondary">{packagesCart.length}</Badge>
+                                                </div>
+                                                <div className="space-y-4">
+                                                    {packagesCart.map((packageItem: PackageCart, index) => (
+                                                        <div
+                                                            key={`package-${index}`}
+                                                            className="rounded-lg border border-gray-200 p-4 transition-shadow hover:shadow-md dark:border-gray-700"
+                                                        >
+                                                            <div className="flex gap-4">
+                                                                <div className="h-20 w-20 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700">
+                                                                    <img
+                                                                        src={`/storage/package_image/${packageItem.package.images ? packageItem.package.images[0] : 'default.jpg'}`}
+                                                                        alt={packageItem.package.name}
+                                                                        className="h-full w-full object-cover"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <div className="flex items-start justify-between">
+                                                                        <div>
+                                                                            <h4 className="font-semibold text-gray-900 dark:text-white">
+                                                                                {packageItem.package.name}
+                                                                            </h4>
+                                                                            {packageItem.package.laboratory && (
+                                                                                <Badge variant="outline" className="mt-1 text-xs">
+                                                                                    <Building2 className="mr-1 h-3 w-3" />
+                                                                                    {packageItem.package.laboratory.name}
+                                                                                </Badge>
+                                                                            )}
+                                                                        </div>
+                                                                        <div className="text-right">
+                                                                            <div className="font-semibold text-gray-900 dark:text-white">
+                                                                                {formatRupiah(
+                                                                                    packageItem.package.price * (packageItem.quantity || 1),
+                                                                                )}
+                                                                            </div>
+                                                                            {packageItem.quantity > 1 && (
+                                                                                <div className="text-xs text-gray-500">
+                                                                                    {formatRupiah(packageItem.package.price)} / paket
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {packageItem.package.tests && packageItem.package.tests.length > 0 && (
+                                                                        <div className="mt-2 rounded-md bg-gray-50 p-2 dark:bg-gray-700">
+                                                                            <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                                                                Termasuk:
+                                                                            </div>
+                                                                            <ScrollArea className="mt-1 h-16">
+                                                                                <div className="space-y-1">
+                                                                                    {packageItem.package.tests.map((test, testIndex) => (
+                                                                                        <div
+                                                                                            key={testIndex}
+                                                                                            className="text-xs text-gray-600 dark:text-gray-400"
+                                                                                        >
+                                                                                            • {test.name}
+                                                                                        </div>
+                                                                                    ))}
+                                                                                </div>
+                                                                            </ScrollArea>
+                                                                        </div>
+                                                                    )}
+
+                                                                    <div className="mt-3 flex items-center justify-between">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                size="sm"
+                                                                                className="h-8 w-8 p-0"
+                                                                                onClick={() =>
+                                                                                    updatePackageQuantity(
+                                                                                        packageItem.package_id,
+                                                                                        (packageItem.quantity || 1) - 1,
+                                                                                    )
+                                                                                }
+                                                                                disabled={(packageItem.quantity || 1) <= 1}
+                                                                            >
+                                                                                <Minus className="h-3 w-3" />
+                                                                            </Button>
+                                                                            <span className="w-8 text-center text-sm font-medium">
+                                                                                {packageItem.quantity || 1}
+                                                                            </span>
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                size="sm"
+                                                                                className="h-8 w-8 p-0"
+                                                                                onClick={() =>
+                                                                                    updatePackageQuantity(
+                                                                                        packageItem.package_id,
+                                                                                        (packageItem.quantity || 1) + 1,
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                <Plus className="h-3 w-3" />
+                                                                            </Button>
+                                                                        </div>
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="sm"
+                                                                            className="text-red-500 hover:bg-red-50 hover:text-red-700"
+                                                                            onClick={() => removePackage(packageItem.package_id)}
+                                                                        >
+                                                                            <Trash2 className="h-4 w-4" />
+                                                                        </Button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Order Summary Sidebar */}
+                                <div className="lg:col-span-1">
+                                    <div className="sticky top-6">
+                                        <Card className="overflow-hidden shadow-sm">
+                                            <CardHeader className="bg-gray-50 dark:bg-gray-800">
+                                                <CardTitle className="text-lg text-gray-900 dark:text-white">Ringkasan Pesanan</CardTitle>
+                                            </CardHeader>
+                                            <CardContent className="p-6">
+                                                <div className="space-y-4">
+                                                    <div className="flex justify-between text-sm">
+                                                        <span className="text-gray-600 dark:text-gray-400">
+                                                            Subtotal ({testsCart.length + packagesCart.length} item)
+                                                        </span>
+                                                        <span className="font-medium">{formatRupiah(subtotal)}</span>
+                                                    </div>
+                                                    <div className="flex justify-between text-sm">
+                                                        <span className="text-gray-600 dark:text-gray-400">Pajak (10%)</span>
+                                                        <span className="font-medium">{formatRupiah(tax)}</span>
+                                                    </div>
+                                                    <div className="flex justify-between text-sm">
+                                                        <span className="text-gray-600 dark:text-gray-400">Biaya Penanganan</span>
+                                                        <span className="font-medium">{formatRupiah(shipping)}</span>
+                                                    </div>
+
+                                                    <Separator />
+
+                                                    <div className="flex justify-between">
+                                                        <span className="text-lg font-semibold text-gray-900 dark:text-white">Total</span>
+                                                        <span className="text-lg font-bold text-blue-600">{formatRupiah(total)}</span>
+                                                    </div>
+
+                                                    <Alert className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
+                                                        <AlertCircle className="h-4 w-4" />
+                                                        <AlertDescription className="text-sm">
+                                                            Harga sudah termasuk pajak dan biaya penanganan. Pastikan data yang dimasukkan sudah benar
+                                                            sebelum melanjutkan.
+                                                        </AlertDescription>
+                                                    </Alert>
+                                                </div>
+                                            </CardContent>
+                                            <CardFooter className="p-6 pt-0">
+                                                <Link href="/orders/form" className="w-full">
+                                                    <Button className="w-full bg-blue-600 py-3 text-base font-semibold hover:bg-blue-700">
+                                                        Lanjutkan ke Formulir Pesanan
+                                                    </Button>
+                                                </Link>
+                                            </CardFooter>
+                                        </Card>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-                        {/* Order Summary Card */}
-                        <Card className="sticky h-fit p-4">
-                            <CardHeader className="p-0">
-                                <CardTitle>Ringkasan Pesanan</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-2 p-0">
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-500">Subtotal</span>
-                                        <span>{formatRupiah(subtotal)}</span>
-                                    </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-500">Pajak (10%)</span>
-                                        <span>{formatRupiah(tax)}</span>
-                                    </div>
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-500">Biaya Pengiriman</span>
-                                        <span>{formatRupiah(shipping)}</span>
-                                    </div>
-                                </div>
-
-                                <Separator />
-
-                                <div className="flex justify-between text-lg font-medium">
-                                    <span>Total</span>
-                                    <span>{formatRupiah(total)}</span>
-                                </div>
-
-                                <Alert className="border-blue-200 bg-blue-50 text-blue-800">
-                                    <AlertCircle className="h-4 w-4" />
-                                    <AlertDescription className="text-xs">
-                                        Reservasi akan diproses setelah pembayaran selesai. Pastikan data yang dimasukkan sudah benar.
-                                    </AlertDescription>
-                                </Alert>
-                            </CardContent>
-                            <CardFooter className="p-0">
-                                <Link
-                                    href="/orders/form"
-                                    disabled={isEmpty}
-                                    className="w-full rounded-md bg-blue-600 py-2 text-center text-base font-semibold text-white transition duration-300 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
-                                >
-                                    Lanjutkan ke Formulir
-                                </Link>
-                            </CardFooter>
-                        </Card>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </AppLayout>
     );
@@ -427,17 +479,22 @@ export default function Cart() {
 
 function EmptyCart() {
     return (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-gray-100">
-                <ShoppingCart className="h-12 w-12 text-gray-400" />
+        <div className="container mx-auto">
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="mb-8 flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20">
+                    <ShoppingCart className="h-16 w-16 text-blue-500" />
+                </div>
+                <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white">Keranjang Kosong</h2>
+                <p className="mb-8 max-w-lg text-lg text-gray-600 dark:text-gray-300">
+                    Anda belum menambahkan item apapun ke keranjang. Mulai jelajahi layanan pengujian yang tersedia.
+                </p>
+                <Link href="/tests">
+                    <Button size="lg" className="px-8 py-3">
+                        <ShoppingCart className="mr-2 h-5 w-5" />
+                        Jelajahi Pengujian
+                    </Button>
+                </Link>
             </div>
-            <h2 className="mb-2 text-2xl font-semibold">Keranjang Anda Kosong</h2>
-            <p className="mb-8 max-w-md text-gray-500">
-                Anda belum menambahkan pengujian atau paket apapun ke keranjang. Silakan jelajahi layanan pengujian yang tersedia.
-            </p>
-            <Link href="/tests">
-                <Button size="lg">Jelajahi Pengujian</Button>
-            </Link>
         </div>
     );
 }
