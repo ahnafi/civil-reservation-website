@@ -1,7 +1,9 @@
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Package, PaginatedPackage, Test } from '@/types';
+import { type BreadcrumbItem, Package, PackageCart, PaginatedPackage, Test } from '@/types';
 import { Head, Link } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -11,6 +13,37 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Packages({ paginated }: { paginated: PaginatedPackage }) {
+    const [packageCart, setPackageCart] = useState<PackageCart[]>([]);
+    const [isAdding, setIsAdding] = useState(false);
+
+    useEffect(() => {
+        const savedPackage = localStorage.getItem('packages');
+        if (savedPackage) {
+            const parsedPackage = JSON.parse(savedPackage);
+            setPackageCart(parsedPackage);
+        }
+    }, []);
+
+    const handleAddTestToCart = (selectedPackage: Package) => {
+        setIsAdding(true);
+        const existingTest: PackageCart | undefined = packageCart.find((item) => item.package_id === selectedPackage.id);
+        if (existingTest) {
+            alert('Package already exists in the cart');
+            setIsAdding(false);
+        } else {
+            const newTestCart: PackageCart = {
+                package_id: selectedPackage.id,
+                slug: selectedPackage.slug,
+                package: selectedPackage,
+                quantity: 1,
+            };
+            setPackageCart([...packageCart, newTestCart]);
+            alert('Package added to cart');
+            localStorage.setItem('packages', JSON.stringify([...packageCart, newTestCart]));
+            setIsAdding(false);
+        }
+    };
+
     const formatRupiah = (value: number, currency = 'IDR') => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -62,9 +95,11 @@ export default function Packages({ paginated }: { paginated: PaginatedPackage })
                                         </li>
                                     ))}
                                 </ul>
-                                <Link
-                                    href={'/package/' + data.slug}
-                                    className="text-blue-base border-blue-base hover:bg-blue-base hover:text-light-base flex items-center justify-center gap-1 rounded-md border-2 px-3 py-2 transition duration-300"
+                                <Button
+                                    onClick={() => handleAddTestToCart(data)}
+                                    disabled={isAdding}
+                                    variant="outline"
+                                    className="text-blue-base border-blue-base hover:bg-blue-base hover:text-light-base flex w-full items-center justify-center gap-1 rounded-md border-2 px-3 py-2 transition duration-300"
                                 >
                                     <svg
                                         className="h-4 w-4 md:h-5 md:w-5"
@@ -82,7 +117,7 @@ export default function Packages({ paginated }: { paginated: PaginatedPackage })
                                         ></path>
                                     </svg>
                                     <p>Tambah ke Keranjang</p>
-                                </Link>
+                                </Button>
                                 <small>
                                     <span className="text-red-base">*</span> Rekomendasi: Untuk kebutuhan dasar sebelum produksi atau riset awal.
                                 </small>

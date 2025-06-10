@@ -24,6 +24,8 @@ class Submission extends Model
         "total_cost",
         "document",
         "test_submission_date",
+        "user_note",
+        "admin_note",
         "status",
         "note",
         "approval_date"
@@ -34,13 +36,18 @@ class Submission extends Model
         parent::boot();
 
         static::created(function ($submission) {
-            $paddedUserId = str_pad($submission->user_id, 3, '0', STR_PAD_LEFT);
-            $paddedId = str_pad($submission->id, 3, '0', STR_PAD_LEFT);
-            $date = Carbon::parse($submission->test_submission_date)->format('Ymd');
+            try {
+                $paddedUserId = str_pad($submission->user_id, 3, '0', STR_PAD_LEFT);
+                $paddedId = str_pad($submission->id, 3, '0', STR_PAD_LEFT);
+                $date = Carbon::parse($submission->test_submission_date)->format('Ymd');
 
-            $submission->code = 'SBM-' . $paddedUserId . $paddedId;
-            $submission->saveQuietly();
+                $submission->code = 'SBM-' . $paddedUserId . $paddedId;
+                $submission->saveQuietly();
+            } catch (\Throwable $e) {
+                \Log::error('Submission code generation failed', ['error' => $e->getMessage()]);
+            }
         });
+
 
     }
 

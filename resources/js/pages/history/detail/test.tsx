@@ -2,16 +2,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, Testing } from '@/types';
+import { parseAndFormatDate } from '@/utils/date-utils';
 import { Head, Link } from '@inertiajs/react';
-import { format, parseISO } from 'date-fns';
-import { id } from 'date-fns/locale';
 import { ArrowLeft, Beaker, Calendar, Check, ClipboardCheck, Clock, Download, FileText, Info, Link2, XCircle } from 'lucide-react';
 
 // Format date helper
 const formatDate = (dateString: string | null | undefined) => {
     if (!dateString) return '-';
     try {
-        return format(parseISO(dateString), 'd MMMM yyyy', { locale: id });
+        return parseAndFormatDate(new Date(dateString));
     } catch (error) {
         return `Format tanggal tidak valid: ${error}`;
     }
@@ -37,7 +36,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     }
 
     return (
-        <div className={`inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 small-font-size font-medium ${colorClasses}`}>
+        <div className={`small-font-size inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 font-medium ${colorClasses}`}>
             {icon}
             {status === 'testing' ? 'Dalam Proses' : status.charAt(0).toUpperCase() + status.slice(1)}
         </div>
@@ -324,7 +323,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                 </div>
                             </CardContent>
                             <CardFooter className="border-t bg-slate-50 p-2 dark:bg-slate-800">
-                                <div className="w-full text-center small-font-size text-gray-500">
+                                <div className="small-font-size w-full text-center text-gray-500">
                                     Terakhir diperbarui: {formatDate(testRecord.updated_at)}
                                 </div>
                             </CardFooter>
@@ -341,7 +340,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                             <ClipboardCheck className="h-5 w-5 text-blue-600" />
                                             Hal yang Perlu Diperhatikan
                                         </h4>
-                                        <ul className="list-inside list-disc space-y-1 small-font-size text-blue-700 dark:text-blue-400">
+                                        <ul className="small-font-size list-inside list-disc space-y-1 text-blue-700 dark:text-blue-400">
                                             <li>Pastikan sampel pengujian telah disiapkan dengan baik</li>
                                             <li>Datang tepat waktu sesuai jadwal yang ditentukan</li>
                                             <li>Hasil pengujian akan tersedia setelah proses selesai</li>
@@ -361,7 +360,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                 <CardTitle className="text-lg">Bantuan</CardTitle>
                             </CardHeader>
                             <CardContent className="p-4">
-                                <div className="space-y-4 small-font-size">
+                                <div className="small-font-size space-y-4">
                                     <p>Jika Anda memiliki pertanyaan tentang pengujian ini, silakan hubungi tim dukungan kami.</p>
                                     <Button variant="outline" className="w-full">
                                         Hubungi Dukungan

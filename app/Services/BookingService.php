@@ -7,11 +7,14 @@ use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Package;
 use App\Models\Test;
+use Illuminate\Support\Facades\Log;
+
 use App\Models\Transaction;
 use App\Models\Testing;
 use App\Models\Schedule;
 use App\Models\ScheduleTesting;
 use Laravel\Pennant\Feature;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Services\FileNaming;
 
@@ -24,36 +27,37 @@ class BookingService
         $project_name,
         $project_address,
         $test_submission_date,
+        $user_note,
         array $submission_tests,
         array $submission_packages
     ) {
         DB::beginTransaction();
 
         try {
-            $total_cost = 0;
-
+            // Extract IDs
             $testIds = collect($submission_tests)->pluck('test_id')->filter()->toArray();
             $packageIds = collect($submission_packages)->pluck('package_id')->filter()->toArray();
 
+            // Load data
             $tests = Test::whereIn('id', $testIds)->get()->keyBy('id');
             $packages = Package::whereIn('id', $packageIds)->get()->keyBy('id');
 
             $total_cost = 0;
-
             foreach ($submission_tests as $test) {
                 $testData = $tests[$test['test_id']] ?? null;
                 if ($testData) {
-                    $total_cost += $test['quantity'] * $testData->price;
+                    $total_cost += $test['unit'] * $testData->price;
                 }
             }
 
-            foreach ($submission_packages as $package) {
-                $packageData = $packages[$package['package_id']] ?? null;
+            foreach ($packageIds as $packageId) {
+                $packageData = $packages[$packageId] ?? null;
                 if ($packageData) {
                     $total_cost += $packageData->price;
                 }
             }
 
+            // Create submission
             $submission = new Submission();
             $submission->user_id = $user_id;
             $submission->company_name = $company_name;
@@ -61,24 +65,39 @@ class BookingService
             $submission->project_address = $project_address;
             $submission->total_cost = $total_cost;
             $submission->test_submission_date = $test_submission_date;
+            $submission->user_note = $user_note;
             $submission->save();
+
+            if (!$submission->id) {
+                throw new \Exception('Submission was not saved to DB.');
+            }
 
             foreach ($submission_tests as $test) {
                 $submission->tests()->attach($test['test_id'], [
-                    'quantity' => $test['quantity']
+                    'quantity' => $test['unit']
                 ]);
             }
 
-            foreach ($submission_packages as $package) {
-                $submission->packages()->attach($submission_packages);
-            }
+            $submission->packages()->attach($packageIds);
 
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();
+
+            Log::error('Error in BookingService@createSubmission', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => $user_id,
+                'submission_tests' => $submission_tests,
+                'submission_packages' => $submission_packages
+            ]);
+
             throw $e;
         }
+
     }
+
+
 
     public function storePaymentReceipt($transaction_id, $file, $payment_method)
     {

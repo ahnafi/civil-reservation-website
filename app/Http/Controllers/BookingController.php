@@ -10,6 +10,7 @@ use Inertia\Response;
 use Illuminate\Http\Request;
 use App\Http\Requests\submitSubmissionRequest;
 use App\Services\BookingService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Exception;
@@ -17,7 +18,6 @@ use Exception;
 
 class BookingController extends Controller
 {
-
     public function submitSubmission(submitSubmissionRequest $request, BookingService $bookingService)
     {
         $validated = $request->validated();
@@ -37,12 +37,21 @@ class BookingController extends Controller
             return redirect()->route('history-submissions')
                 ->with('Success', 'Pengajuan Berhasil Dibuat!');
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
+            // 🪵 Log error message and data
+            Log::error('Submission failed:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => auth()->id(),
+                'input' => $validated
+            ]);
+
             return redirect()->back()
                 ->withInput()
                 ->with('Error', 'Terjadi kesalahan saat membuat pengajuan. Silakan coba lagi.');
         }
     }
+
 
     public function submitPayment(Request $request, BookingService $bookingService)
     {

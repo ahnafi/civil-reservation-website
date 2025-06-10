@@ -196,15 +196,12 @@ export interface Transaction {
     created_at: string;
     updated_at: string;
     deleted_at?: string;
-}
-
-// Testing Types
-export type TestingStatus = 'testing' | 'completed';
+};
 
 export interface Testing {
     id: number;
     code?: string | null;
-    status: TestingStatus;
+    status: string;
     note?: string | null;
     documents?: string | null;
     test_date: string;
@@ -238,6 +235,38 @@ export interface scheduleForSchedule {
     available_slots: number;
     approved_count: number;
     pending_count: number;
+}
+
+export interface Booking {
+    company_name: string;
+    project_name: string;
+    project_address: string;
+    test_submission_date: string;
+    submission_tests: Test[];
+    submission_packages: Package[];
+}
+
+export interface TestCart {
+    test_id: number;
+    slug: string;
+    unit: number;
+    test: Test;
+}
+
+export interface PackageCart {
+    package_id: number;
+    slug: string;
+    package: Package;
+    quantity: number;
+}
+
+export interface BookingForm {
+    company_name: string;
+    project_name: string;
+    project_address: string;
+    test_submission_date: string;
+    note: string;
+    total_cost: number;
 }
 
 export type PaginatedTests = Pagination<Test>;
