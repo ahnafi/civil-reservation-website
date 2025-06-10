@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Package extends Model
@@ -25,6 +26,40 @@ class Package extends Model
     protected $casts = [
         "images" => "array",
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::updating(function ($model) {
+            if ($model->isDirty('name')) {
+                $model->slug = Str::slug($model->name, '-');
+            }
+
+            if ($model->isDirty('images')) {
+                $originalImages = $model->getOriginal('images') ?? [];
+                $newImages = $model->images ?? [];
+
+                $removedImages = array_diff($originalImages, $newImages);
+
+                foreach ($removedImages as $removedImage) {
+                    if (Storage::disk('public')->exists($removedImage)) {
+                        Storage::disk('public')->delete($removedImage);
+                    }
+                }
+            }
+        });
+
+        static::deleting(function ($model) {
+            if (!empty($model->images)) {
+                foreach ($model->images as $filename) {
+                    if (Storage::disk('public')->exists($filename)) {
+                        Storage::disk('public')->delete($filename);
+                    }
+                }
+            }
+        });
+    }
 
     public function setNameAttribute($value)
     {

@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Services\BookingService;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Testing extends Model
 {
@@ -38,8 +40,33 @@ class Testing extends Model
             $submissionId = str_pad($testing->submission_id ?? 0, 3, '0', STR_PAD_LEFT);
             $testingId = str_pad($testing->id ?? 0, 3, '0', STR_PAD_LEFT);
 
-            $testing->code = 'UJI-' . $date . '-' . $submissionId . $testingId;
+            $testing->code = 'UJI-' . $submissionId . '-' . $testingId . $date . '-' ;
             $testing->saveQuietly();
+        });
+
+        static::updating(function ($model) {
+              if ($model->isDirty('documents')) {
+                $originalDocuments = $model->getOriginal('documents') ?? [];
+                $newDocuments = $model->documents ?? [];
+
+                $removedDocuments = array_diff($originalDocuments, $newDocuments);
+
+                foreach ($removedDocuments as $removedDocument) {
+                    if (Storage::disk('public')->exists($removedDocument)) {
+                        Storage::disk('public')->delete($removedDocument);
+                    }
+                }
+             }
+        });
+
+        static::deleting(function ($model) {
+            if (!empty($model->documents)) {
+                foreach ($model->documents as $filename) {
+                    if (Storage::disk('public')->exists($filename)) {
+                        Storage::disk('public')->delete($filename);
+                    }
+                }
+            }
         });
 
     }

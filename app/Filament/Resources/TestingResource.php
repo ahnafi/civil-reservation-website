@@ -6,6 +6,7 @@ use App\Filament\Exports\TestingExporter;
 use App\Filament\Resources\TestingResource\Pages;
 use App\Filament\Resources\TestingResource\RelationManagers;
 use App\Models\Testing;
+use App\Services\FileNaming;
 use App\Services\TestingService;
 use Filament\Forms;
 use Filament\Forms\Components\ToggleButtons;
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class TestingResource extends Resource
 {
@@ -103,6 +105,14 @@ class TestingResource extends Resource
                     ->openable()
                     ->helperText('Format file yang diterima: PDF, DOC, DOCX.')
                     ->columnSpanFull()
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {
+                        $extension = $file->getClientOriginalExtension();
+
+                        $record = $component->getLivewire()->getRecord();
+                        $id = $record?->id ?? -1;
+
+                        return FileNaming::generateTestingResult($id, $extension);
+                    })
             ]);
     }
 
