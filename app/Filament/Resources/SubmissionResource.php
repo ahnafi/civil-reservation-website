@@ -60,6 +60,7 @@ class SubmissionResource extends Resource
                                 ->searchable()
                                 ->required()
                                 ->reactive()
+                                ->preload()
                                 ->live()
                                 ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                     $user = User::find($state);
@@ -133,6 +134,7 @@ class SubmissionResource extends Resource
                                         ->relationship("package", "name")
                                         ->reactive()
                                         ->live()
+                                        ->preload()
                                         ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                             $package = Package::find($state);
 
@@ -175,6 +177,7 @@ class SubmissionResource extends Resource
                                         ->relationship('test', 'name')
                                         ->reactive()
                                         ->live()
+                                        ->preload()
                                         ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                             $test = Test::find($state);
                                             if ($test) {

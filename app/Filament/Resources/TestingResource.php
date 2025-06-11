@@ -44,6 +44,7 @@ class TestingResource extends Resource
                     ->label('Kode Pengajuan')
                     ->relationship('submission', 'code')
                     ->searchable()
+                    ->preload()
                     ->required(),
 
                 ToggleButtons::make('status')
