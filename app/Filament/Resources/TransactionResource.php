@@ -47,6 +47,7 @@ class TransactionResource extends Resource
                     ->columnSpanFull()
                     ->live()
                     ->required()
+                    ->preload()
                     ->afterStateUpdated(function ($state, Set $set) {
                         $submission = Submission::find($state);
                         if ($submission) {

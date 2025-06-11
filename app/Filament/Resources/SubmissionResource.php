@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use \App\Services\BookingService;
+use \App\Services\SubmissionService;
 
 class SubmissionResource extends Resource
 {
@@ -59,6 +60,7 @@ class SubmissionResource extends Resource
                                 ->searchable()
                                 ->required()
                                 ->reactive()
+                                ->preload()
                                 ->live()
                                 ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                     $user = User::find($state);
@@ -132,6 +134,7 @@ class SubmissionResource extends Resource
                                         ->relationship("package", "name")
                                         ->reactive()
                                         ->live()
+                                        ->preload()
                                         ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                             $package = Package::find($state);
 
@@ -174,6 +177,7 @@ class SubmissionResource extends Resource
                                         ->relationship('test', 'name')
                                         ->reactive()
                                         ->live()
+                                        ->preload()
                                         ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                             $test = Test::find($state);
                                             if ($test) {
@@ -331,29 +335,8 @@ class SubmissionResource extends Resource
             ->actions([
                 Tables\Actions\Action::make("Terima")
                     ->action(function (Model $record) {
-                        if ($record->user && $record->user->email) {
-                            $record->status = 'approved';
-                            $record->approval_date = Carbon::now()->format('Y-m-d\TH:i:s');
-                            $record->save();
-
-                            Mail::raw('Pengajuan Anda telah disetujui.', function ($message) use ($record) {
-                                $message->to($record->user->email)
-                                    ->subject('Pengajuan Disetujui');
-                            });
-
-                            Notification::make()
-                                ->title('Pengajuan berhasil disetujui')
-                                ->body("Pengajuan oleh {$record->user->name} telah disetujui.")
-                                ->success()
-                                ->send();
-                        } else {
-                            Notification::make()
-                                ->title('Gagal mengubah pengajuan ')
-                                ->body("Pengajuan oleh {$record->user->name} gagal diubah.")
-                                ->danger()
-                                ->send();
-                        }
-
+                        $service = app(SubmissionService::class);
+                        $service->accept($record);
                     })
                     ->color("success")
                     ->requiresConfirmation()
@@ -367,29 +350,8 @@ class SubmissionResource extends Resource
                             ->label("Perihal"),
                     ])
                     ->action(function (array $data, Model $record) {
-                        if ($record->user && $record->user->email) {
-
-                            $record->status = 'rejected';
-                            $record->save();
-
-                            Mail::raw("Pengajuan Anda ditolak." . $data["reason"], function ($message) use ($record) {
-                                $message->to($record->user->email)
-                                    ->subject('Pengajuan Ditolak');
-                            });
-
-                            Notification::make()
-                                ->title('Pengajuan Ditolak')
-                                ->body("Pengajuan oleh {$record->user->name} telah ditolak.")
-                                ->success()
-                                ->send();
-                        } else {
-                            Notification::make()
-                                ->title('Gagal mengubah pengajuan ')
-                                ->body("Pengajuan oleh {$record->user->name} gagal diubah.")
-                                ->danger()
-                                ->send();
-                        }
-
+                        $service = app(SubmissionService::class);
+                        $service->reject($data, $record);
                     })
                     ->color("danger")
                     ->requiresConfirmation()
