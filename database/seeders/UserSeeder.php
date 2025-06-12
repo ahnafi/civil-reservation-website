@@ -16,6 +16,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Admin User',
                 'email' => 'admin@example.com',
+                'email_verified_at' => now(),
                 'password' => Hash::make('qwerty123'),
                 'phone' => '1234567890',
                 'photo' => 'user_profile\/default-user_profile.jpg',
@@ -26,6 +27,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'External User',
                 'email' => 'external@example.com',
+                'email_verified_at' => now(),
                 'password' => Hash::make('qwerty123'),
                 'phone' => '1234567891',
                 'photo' => 'user_profile\/default-user_profile.jpg',
@@ -36,6 +38,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Internal User',
                 'email' => 'internal@example.com',
+                'email_verified_at' => now(),
                 'password' => Hash::make('qwerty123'),
                 'phone' => '1234567892',
                 'photo' => 'user_profile\/default-user_profile.jpg',
