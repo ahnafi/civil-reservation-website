@@ -75,7 +75,7 @@ class FileNaming
         $shortUuid = substr(str_replace('-', '', $uuid), 0, 6);
         $slug = Str::slug($test_name, '-');
 
-        return 'civil-test-' . $paddedId . '-' . $slug . $shortUuid . now()->format('YmdHis') . '.' . $extension;
+        return 'civil-test-' . $paddedId . '-' . $slug . '-' . $shortUuid . '-' . now()->format('YmdHis') . '.' . $extension;
     }
 
     public static function generatePackageName($package_id, $package_name, $extension): string
@@ -93,7 +93,7 @@ class FileNaming
         $shortUuid = substr(str_replace('-', '', $uuid), 0, 6);
         $slug = Str::slug($package_name, '-');
 
-        return 'civil-package-' . $paddedId . '-' . $slug . $shortUuid . now()->format('YmdHis') . '.' . $extension;
+        return 'civil-package-' . $paddedId . '-' . $slug . '-' . $shortUuid . '-' . now()->format('YmdHis') . '.' . $extension;
     }
 
     public static function generateTestingResult($testing_id, $extension): string
@@ -110,7 +110,7 @@ class FileNaming
         $uuid = Str::uuid()->toString();
         $shortUuid = substr(str_replace('-', '', $uuid), 0, 6);
 
-        return 'civil-testing_result-' . $paddedId . '-' . $shortUuid . now()->format('YmdHis') . '.' . $extension;
+        return 'civil-testing_result-' . $paddedId . '-' . $shortUuid . '-' . now()->format('YmdHis') . '.' . $extension;
     }
 
     public static function generateLaboratoryName($lab_id, $lab_name, $extension): string
@@ -128,7 +128,7 @@ class FileNaming
         $shortUuid = substr(str_replace('-', '', $uuid), 0, 6);
         $slug = Str::slug($lab_name, '-');
 
-        return 'civil-lab-' . $paddedId . '-' . $slug . $shortUuid . now()->format('YmdHis') . '.' . $extension;
+        return 'civil-lab-' . $paddedId . '-' . $slug . '-' . $shortUuid . '-' . now()->format('YmdHis') . '.' . $extension;
     }
 
     public static function generateSubmissionName($submission_id, $extension): string
@@ -145,7 +145,7 @@ class FileNaming
         $uuid = Str::uuid()->toString();
         $shortUuid = substr(str_replace('-', '', $uuid), 0, 6);
 
-        return 'civil-submission-' . $paddedId . '-' . $shortUuid . now()->format('YmdHis') . '.' . $extension;
+        return 'civil-submission-' . $paddedId . '-' . $shortUuid . '-' . now()->format('YmdHis') . '.' . $extension;
     }
 
     public static function generateDownloadName($download_id, $download_title, $extension): string
@@ -163,7 +163,7 @@ class FileNaming
         $uuid = Str::uuid()->toString();
         $shortUuid = substr(str_replace('-', '', $uuid), 0, 6);
 
-        return 'civil-download-' . $paddedId . '-' . $slug . '-' . $shortUuid . now()->format('YmdHis') . '.' . $extension;
+        return 'civil-download-' . $paddedId . '-' . $slug . '-' . $shortUuid . '-' . now()->format('YmdHis') . '.' . $extension;
     }
 
     public static function generateTeamName($team_id, $team_name, $extension): string
@@ -181,7 +181,7 @@ class FileNaming
         $uuid = Str::uuid()->toString();
         $shortUuid = substr(str_replace('-', '', $uuid), 0, 6);
 
-        return 'civil-team-' . $paddedId . '-' . $slug . '-' . $shortUuid . now()->format('YmdHis') . '.' . $extension;
+        return 'civil-team-' . $paddedId . '-' . $slug . '-' . $shortUuid . '-' . now()->format('YmdHis') . '.' . $extension;
     }
 
     public static function generateAuthorName($author_id, $author_name, $extension): string
@@ -199,7 +199,7 @@ class FileNaming
         $uuid = Str::uuid()->toString();
         $shortUuid = substr(str_replace('-', '', $uuid), 0, 6);
 
-        return 'civil-author-' . $paddedId . '-' . $slug . '-' . $shortUuid . now()->format('YmdHis') . '.' . $extension;
+        return 'civil-author-' . $paddedId . '-' . $slug . '-' . $shortUuid . '-' . now()->format('YmdHis') . '.' . $extension;
     }
 
     public static function generateEquipmentName($equipment_id, $equipment_name, $extension): string
@@ -217,7 +217,7 @@ class FileNaming
         $uuid = Str::uuid()->toString();
         $shortUuid = substr(str_replace('-', '', $uuid), 0, 6);
 
-        return 'civil-equipment-' . $paddedId . '-' . $slug . '-' . $shortUuid . now()->format('YmdHis') . '.' . $extension;
+        return 'civil-equipment-' . $paddedId . '-' . $slug . '-' . $shortUuid . '-' . now()->format('YmdHis') . '.' . $extension;
     }
 
     public static function generateNewsName($news_id, $news_title, $extension): string
@@ -235,7 +235,7 @@ class FileNaming
         $uuid = Str::uuid()->toString();
         $shortUuid = substr(str_replace('-', '', $uuid), 0, 6);
 
-        return 'civil-news-' . $paddedId . '-' . $slug . '-' . $shortUuid . now()->format('YmdHis') . '.' . $extension;
+        return 'civil-news-' . $paddedId . '-' . $slug . '-' . $shortUuid . '-' . now()->format('YmdHis') . '.' . $extension;
     }
 
     public static function generateNewsContentAttachmentName($news_id, $news_title, $extension): string
@@ -253,6 +253,6 @@ class FileNaming
         $uuid = Str::uuid()->toString();
         $shortUuid = substr(str_replace('-', '', $uuid), 0, 6);
 
-        return 'civil-news-content-' . $paddedId . '-' . $slug . '-' . $shortUuid . now()->format('YmdHis') . '.' . $extension;
+        return 'civil-news-content-' . $paddedId . '-' . $slug . '-' . $shortUuid . '-' . now()->format('YmdHis') . '.' . $extension;
     }
 }
