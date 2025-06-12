@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Mail\TransactionPending;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class Transaction extends Model
@@ -41,6 +43,11 @@ class Transaction extends Model
             if (is_null($transaction->payment_deadline)) {
                 $transaction->payment_deadline = now()->addDay();
             }
+        });
+
+        static::created(function ($transaction) {
+            $userEmail = $transaction->submission->user->email;
+            Mail::to($userEmail)->send(new TransactionPending($transaction->id));
         });
     }
 
