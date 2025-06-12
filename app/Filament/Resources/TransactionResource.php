@@ -140,7 +140,7 @@ class TransactionResource extends Resource
                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                     ])
                     ->visibility('public')
-                    ->directory('payment_invoice')
+                    ->directory('payment_invoice_files')
                     ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {
                         $extension = $file->getClientOriginalExtension();
 
@@ -160,7 +160,7 @@ class TransactionResource extends Resource
                     ->previewable(true)
                     ->imagePreviewHeight('150')
                     ->visibility('public')
-                    ->directory('payment_receipt')
+                    ->directory('payment_receipt_images')
                     ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {
                         $extension = $file->getClientOriginalExtension();
 

@@ -6,6 +6,7 @@ use App\Filament\Resources\PackageResource\Pages;
 use App\Filament\Resources\PackageResource\RelationManagers;
 use App\Models\Package;
 use App\Models\Test;
+use App\Services\FileNaming;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class PackageResource extends Resource
 {
@@ -36,9 +38,23 @@ class PackageResource extends Resource
                 Forms\Components\FileUpload::make('images')
                     ->label("Foto Paket Pengujian")
                     ->directory("package_images")
+                    ->reorderable()
                     ->image()
+                    ->imageEditor()
+                    ->previewable(true)
+                    ->imagePreviewHeight('150')
+                    ->visibility('public')
                     ->multiple()
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {
+                        $extension = $file->getClientOriginalExtension();
+
+                        $record = $component->getLivewire()->getRecord();
+                        $id = $record?->id ?? -1;
+                        $name = $record?->name ?? 'package';
+
+                        return FileNaming::generatePackageName($id, $name, $extension);
+                    }),
                 Forms\Components\TextInput::make('name')
                     ->label('Nama Paket')
                     ->required()

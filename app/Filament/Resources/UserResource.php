@@ -111,7 +111,7 @@ class UserResource extends Resource
                     ->imageEditor()
                     ->previewable(true)
                     ->avatar()
-                    ->directory('user_profile')
+                    ->directory('user_photos')
                     ->imagePreviewHeight('150')
                     ->visibility('public')
                     ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {

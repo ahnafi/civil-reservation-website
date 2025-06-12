@@ -16,9 +16,9 @@ class SubmissionService
     public function accept(Model $record): void
     {
         if ($record->user && $record->user->email) {
-            // $record->status = 'approved';
-            // $record->approval_date = Carbon::now()->format('Y-m-d\TH:i:s');
-            // $record->save();
+             $record->status = 'approved';
+             $record->approval_date = Carbon::now()->format('Y-m-d\TH:i:s');
+             $record->save();
 
             //            Mail::raw('Pengajuan Anda telah disetujui.', function ($message) use ($record) {
 //                $message->to($record->user->email)
@@ -45,8 +45,8 @@ class SubmissionService
     {
         if ($record->user && $record->user->email) {
 
-            // $record->status = 'rejected';
-            // $record->save();
+             $record->status = 'rejected';
+             $record->save();
 
             // Mail::raw("Pengajuan Anda ditolak." . $data["reason"], function ($message) use ($record) {
             //     $message->to($record->user->email)

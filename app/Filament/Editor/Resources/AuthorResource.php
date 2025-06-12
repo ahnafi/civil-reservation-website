@@ -5,6 +5,7 @@ namespace App\Filament\Editor\Resources;
 use App\Filament\Editor\Resources\AuthorResource\Pages;
 use App\Filament\Editor\Resources\AuthorResource\RelationManagers;
 use App\Models\Author;
+use App\Services\FileNaming;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class AuthorResource extends Resource
 {
@@ -40,11 +42,21 @@ class AuthorResource extends Resource
                     ->label('Biografi')
                     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('avatar')
+                    ->label('Avatar')
                     ->avatar()
                     ->directory('authors-avatars')
                     ->imageEditor()
                     ->image()
-                    ->label('Avatar'),
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {
+                        $extension = $file->getClientOriginalExtension();
+
+                        $record = $component->getLivewire()->getRecord();
+                        $id = $record?->id ?? -1;
+                        $name = $record?->name ?? 'author';
+
+                        return FileNaming::generateAuthorName($id, $name, $extension);
+                    })
+
             ]);
     }
 

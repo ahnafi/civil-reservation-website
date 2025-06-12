@@ -55,7 +55,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 
         static::creating(function ($model) {
             if (empty($model->photo)) {
-                $model->photo = 'user_profile\/default-user_profile.jpg';
+                $model->photo = 'user_photos\/default-user_profile.jpg';
             }
         });
 
@@ -84,7 +84,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
                 if (
                     $oldImage &&
                     $oldImage !== $newImage &&
-                    $oldImage !== 'user_profile\/default-user_profile.jpg' &&
+                    $oldImage !== 'user_photos\/default-user_profile.jpg' &&
                     Storage::disk('public')->exists($oldImage)
                 ) {
                     Storage::disk('public')->delete($oldImage);
@@ -95,7 +95,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         static::deleting(function ($model) {
             if (
                 $model->photo &&
-                $model->photo !== 'user_profile\/default-user_profile.jpg' &&
+                $model->photo !== 'user_photos\/default-user_profile.jpg' &&
                 Storage::disk('public')->exists($model->photo)
             ) {
                 Storage::disk('public')->delete($model->photo);
