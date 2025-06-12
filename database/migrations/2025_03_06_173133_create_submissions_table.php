@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->string("project_name");
             $table->string("project_address");
             $table->unsignedInteger("total_cost")->default(0)->nullable();
-            $table->string("document")->nullable();
+            $table->text("documents")->nullable();
             $table->date("test_submission_date");
             $table->enum("status", ["submitted", "approved", "rejected"])->default("submitted");
             $table->text("user_note")->nullable();
