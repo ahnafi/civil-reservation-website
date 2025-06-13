@@ -54,7 +54,7 @@ export interface Laboratory {
     code: string;
     room: string;
     slug: string;
-    image: string;
+    images: string[];
     daily_slot?: number;
     description: string;
     created_at: Date;
@@ -173,7 +173,7 @@ export interface LaboratorySimple {
     slug: string;
     name: string;
     description: string;
-    image: string;
+    images: string[];
 }
 
 // Transaction Types

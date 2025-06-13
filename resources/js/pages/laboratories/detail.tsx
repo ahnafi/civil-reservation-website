@@ -46,7 +46,7 @@ export default function Laboratory() {
                     <div className="lg:col-span-2">
                         <Card className="overflow-hidden py-0">
                             <div className="relative h-80 w-full">
-                                <img src={`/storage/${laboratory?.image}`} alt={`${laboratory?.name}`} className="h-full w-full object-cover" />
+                                <img src={`/storage/${laboratory?.images[0]}`} alt={`${laboratory?.name}`} className="h-full w-full object-cover" />
                                 <div className="absolute top-4 left-4">
                                     <Badge className="bg-blue-600 px-3 py-1 text-white">{laboratory?.code}</Badge>
                                 </div>
