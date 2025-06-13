@@ -5,6 +5,7 @@ namespace App\Filament\Editor\Resources;
 use App\Filament\Editor\Resources\TeamResource\Pages;
 use App\Filament\Editor\Resources\TeamResource\RelationManagers;
 use App\Models\Team;
+use App\Services\FileNaming;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class TeamResource extends Resource
 {
@@ -45,11 +47,19 @@ class TeamResource extends Resource
                 Forms\Components\FileUpload::make('photo')
                     ->avatar()
                     ->label('Foto')
-                    ->directory('teams')
+                    ->directory('team_photos')
                     ->preserveFilenames()
                     ->enableOpen()
                     ->enableDownload()
-                    ->required(),
+                    ->required()
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                        $extension = $file->getClientOriginalExtension();
+
+                        $id   = $get('id') ?? -1;
+                        $name = $get('name') ?? 'team';
+
+                        return FileNaming::generateTeamName($id, $name, $extension);
+                    })
 
             ]);
     }

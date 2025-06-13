@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\LaboratoryResource\Pages;
 use App\Filament\Resources\LaboratoryResource\RelationManagers;
 use App\Models\Laboratory;
+use App\Services\FileNaming;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class LaboratoryResource extends Resource
 {
@@ -46,12 +48,26 @@ class LaboratoryResource extends Resource
                         ->label('Deskripsi laboratorium')
                         ->required()
                         ->maxLength(65535),
-                    Forms\Components\FileUpload::make('image')
+                    Forms\Components\FileUpload::make('images')
                         ->label('Gambar laboratorium')
                         ->image()
+                        ->reorderable()
                         ->required()
+                        ->imageEditor()
+                        ->previewable(true)
+                        ->imagePreviewHeight('150')
+                        ->visibility('public')
+                        ->multiple()
                         ->maxSize(2048)
-                        ->directory('laboratories'),
+                        ->directory('laboratory_images')
+                        ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                            $extension = $file->getClientOriginalExtension();
+
+                            $id   = $get('id') ?? -1;
+                            $name = $get('name') ?? 'laboratory';
+
+                            return FileNaming::generateLaboratoryName($id, $name, $extension);
+                        }),
                     Forms\Components\BelongsToManyMultiSelect::make('equipments')
                         ->relationship('equipments', 'name')
                         ->label('Peralatan')

@@ -35,7 +35,7 @@ class DashboardController extends Controller
         $submissions = Submission::withScheduleJoin()->get();
         $tests = Test::select(['id', 'name'])->get();
         $packages = Package::select(['id', 'name'])->get();
-        $laboratories = Laboratory::select(['id', 'code', 'name', 'description', 'image', 'slug'])->get();
+        $laboratories = Laboratory::select(['id', 'code', 'name', 'description', 'images', 'slug'])->get();
 
         return Inertia::render('dashboard/index', [
             'userSubmissions' => $userSubmissions,

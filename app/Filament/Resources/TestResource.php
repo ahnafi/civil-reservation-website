@@ -6,6 +6,7 @@ use App\Filament\Resources\TestResource\Pages;
 use App\Filament\Resources\TestResource\RelationManagers;
 use App\Filament\Resources\TestResource\Widgets\TestOverview;
 use App\Models\Test;
+use App\Services\FileNaming;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,6 +14,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class TestResource extends Resource
 {
@@ -37,11 +39,24 @@ class TestResource extends Resource
                 Forms\Components\Split::make([
                     Forms\Components\Section::make([
                         Forms\Components\FileUpload::make('images')
-                            ->directory('test_images')
                             ->label('Foto pengujian')
+                            ->reorderable()
                             ->image()
+                            ->imageEditor()
+                            ->previewable(true)
+                            ->imagePreviewHeight('150')
+                            ->visibility('public')
                             ->multiple()
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->directory('test_image')
+                            ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                                $extension = $file->getClientOriginalExtension();
+
+                                $id   = $get('id') ?? -1;
+                                $name = $get('name') ?? 'test';
+
+                                return FileNaming::generateTestName($id, $name, $extension);
+                            }),
                         Forms\Components\TextInput::make('name')
                             ->label('Nama pegujian')
                             ->required()

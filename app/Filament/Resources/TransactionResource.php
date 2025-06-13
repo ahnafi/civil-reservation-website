@@ -7,6 +7,7 @@ use App\Filament\Resources\TransactionResource\Pages;
 use App\Filament\Resources\TransactionResource\RelationManagers;
 use App\Models\Submission;
 use App\Models\Transaction;
+use App\Services\FileNaming;
 use App\Services\TransactionService;
 use Filament\Actions\ExportAction;
 use Filament\Forms;
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class TransactionResource extends Resource
 {
@@ -28,7 +30,7 @@ class TransactionResource extends Resource
     protected static ?string $modelLabel = 'Transaksi';
     protected static ?string $navigationGroup = 'Manajemen Peminjaman';
     protected static ?string $navigationBadgeTooltip = 'Banyak transaksi yang diajukan';
-    
+
     public static function getNavigationBadge(): ?string
     {
         return static::getModel()::where("status", "pending")->count();
@@ -45,6 +47,7 @@ class TransactionResource extends Resource
                     ->columnSpanFull()
                     ->live()
                     ->required()
+                    ->preload()
                     ->afterStateUpdated(function ($state, Set $set) {
                         $submission = Submission::find($state);
                         if ($submission) {
@@ -136,14 +139,34 @@ class TransactionResource extends Resource
                         'application/msword',
                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                     ])
-                    ->directory('payment_invoice'),
+                    ->visibility('public')
+                    ->directory('payment_invoice_files')
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                        $extension = $file->getClientOriginalExtension();
+
+                        $id   = $get('id') ?? -1;
+
+                        return FileNaming::generateInvoiceName($id, $extension);
+                    }),
+
 
                 Forms\Components\FileUpload::make('payment_receipt_image')
                     ->hiddenOn("create")
                     ->columnSpanFull()
                     ->label('Bukti Pembayaran')
                     ->image()
-                    ->directory('payment_receipts'),
+                    ->imageEditor()
+                    ->previewable(true)
+                    ->imagePreviewHeight('150')
+                    ->visibility('public')
+                    ->directory('payment_receipt_images')
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                        $extension = $file->getClientOriginalExtension();
+
+                        $id   = $get('id') ?? -1;
+
+                        return FileNaming::generatePaymentReceiptName($id, $extension);
+                    }),
 
                 Forms\Components\DateTimePicker::make('payment_date')
                     ->hiddenOn("create")

@@ -218,7 +218,7 @@ export default function MainDashboard({
                                     <CardHeader className="px-0">
                                         <Link href={`/laboratory/${data.slug}`}>
                                             <img
-                                                src={`/storage/${data.image}`}
+                                                src={`/storage/${data.images[0]}`}
                                                 alt={`${data.name} Foto`}
                                                 className="h-28 w-full rounded-md object-cover md:h-48"
                                             />

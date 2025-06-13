@@ -5,6 +5,7 @@ namespace App\Filament\Editor\Resources;
 use App\Filament\Editor\Resources\DownloadResource\Pages;
 use App\Filament\Editor\Resources\DownloadResource\RelationManagers;
 use App\Models\Download;
+use App\Services\FileNaming;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class DownloadResource extends Resource
 {
@@ -38,11 +40,19 @@ class DownloadResource extends Resource
                 Forms\Components\FileUpload::make('file')
                     ->columnSpanFull()
                     ->label('File')
-                    ->directory('downloads')
+                    ->directory('downloadable_files')
                     ->preserveFilenames()
                     ->enableOpen()
                     ->enableDownload()
-                    ->required(),
+                    ->required()
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                        $extension = $file->getClientOriginalExtension();
+
+                        $id   = $get('id') ?? -1;
+                        $name = $get('title') ?? 'download';
+
+                        return FileNaming::generateDownloadName($id, $name, $extension);
+                    })
             ]);
     }
 

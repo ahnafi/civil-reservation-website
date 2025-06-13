@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class Transaction extends Model
@@ -13,8 +14,8 @@ class Transaction extends Model
 
     protected $fillable = [
         "code",
-        "payment_invoice_file",
-        "payment_receipt_image",
+        "payment_invoice_files",
+        "payment_receipt_images",
         "amount",
         "payment_method",
         "status",
@@ -22,6 +23,11 @@ class Transaction extends Model
         "payment_date",
         "submission_id",
         "note"
+    ];
+
+    protected $casts = [
+        "payment_invoice_files" => "array",
+        "payment_receipt_images" => "array",
     ];
 
     protected static function boot(): void
@@ -37,11 +43,65 @@ class Transaction extends Model
             $transactionCount = $submission ? $submission->transactions()->withTrashed()->count() + 1 : 1;
             $transaction->code = 'CVL-' . now()->format('Ymd') . $submissionId . $userId . $transactionCount;
 
-            // Set the payment deadline to 1 day from now
             if (is_null($transaction->payment_deadline)) {
                 $transaction->payment_deadline = now()->addDay();
             }
         });
+
+        static::updating(function ($transaction) {
+            if ($transaction->isDirty('payment_invoice_files')) {
+                $original = $transaction->getOriginal('payment_invoice_files') ?? [];
+                $new = $transaction->payment_invoice_files ?? [];
+
+                $originalFiles = is_array($original) ? $original : [$original];
+                $newFiles = is_array($new) ? $new : [$new];
+
+                $removedFiles = array_diff($originalFiles, $newFiles);
+
+                foreach ($removedFiles as $file) {
+                    if (Storage::disk('public')->exists($file)) {
+                        Storage::disk('public')->delete($file);
+                    }
+                }
+            }
+
+            if ($transaction->isDirty('payment_receipt_images')) {
+                $original = $transaction->getOriginal('payment_receipt_images') ?? [];
+                $new = $transaction->payment_receipt_images ?? [];
+
+                $originalFiles = is_array($original) ? $original : [$original];
+                $newFiles = is_array($new) ? $new : [$new];
+
+                $removedFiles = array_diff($originalFiles, $newFiles);
+
+                foreach ($removedFiles as $file) {
+                    if (Storage::disk('public')->exists($file)) {
+                        Storage::disk('public')->delete($file);
+                    }
+                }
+            }
+        });
+
+        static::deleting(function ($transaction) {
+            $invoiceFiles = $transaction->payment_invoice_files ?? [];
+            $invoiceFiles = is_array($invoiceFiles) ? $invoiceFiles : [$invoiceFiles];
+
+            foreach ($invoiceFiles as $file) {
+                if (Storage::disk('public')->exists($file)) {
+                    Storage::disk('public')->delete($file);
+                }
+            }
+
+            $receiptFiles = $transaction->payment_receipt_images ?? [];
+            $receiptFiles = is_array($receiptFiles) ? $receiptFiles : [$receiptFiles];
+
+            foreach ($receiptFiles as $file) {
+                if (Storage::disk('public')->exists($file)) {
+                    Storage::disk('public')->delete($file);
+                }
+            }
+        });
+
     }
 
     public function submission(): BelongsTo

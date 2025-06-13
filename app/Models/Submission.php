@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Submission extends Model
 {
@@ -22,13 +25,17 @@ class Submission extends Model
         "project_name",
         "project_address",
         "total_cost",
-        "document",
+        "documents",
         "test_submission_date",
         "user_note",
         "admin_note",
         "status",
         "note",
         "approval_date"
+    ];
+
+    protected $casts = [
+        'document' => 'array',
     ];
 
     protected static function boot(): void
@@ -44,11 +51,34 @@ class Submission extends Model
                 $submission->code = 'SBM-' . $paddedUserId . $paddedId;
                 $submission->saveQuietly();
             } catch (\Throwable $e) {
-                \Log::error('Submission code generation failed', ['error' => $e->getMessage()]);
+                Log::error('Submission code generation failed', ['error' => $e->getMessage()]);
             }
         });
 
+        static::updating(function ($model) {
+            if ($model->isDirty('documents')) {
+                $originalDocuments = $model->getOriginal('documents') ?? [];
+                $newDocuments = $model->documents ?? [];
 
+                $removedDocuments = array_diff($originalDocuments, $newDocuments);
+
+                foreach ($removedDocuments as $removedDocument) {
+                    if (Storage::disk('public')->exists($removedDocument)) {
+                        Storage::disk('public')->delete($removedDocument);
+                    }
+                }
+            }
+        });
+
+        static::deleting(function ($model) {
+            if (!empty($model->documents)) {
+                foreach ($model->documents as $filename) {
+                    if (Storage::disk('public')->exists($filename)) {
+                        Storage::disk('public')->delete($filename);
+                    }
+                }
+            }
+        });
     }
 
 

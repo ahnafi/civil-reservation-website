@@ -9,6 +9,7 @@ use App\Models\Package;
 use App\Models\Submission;
 use App\Models\Test;
 use App\Models\User;
+use App\Services\FileNaming;
 use Filament\Tables\Actions\ExportAction;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
@@ -28,6 +29,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use \App\Services\BookingService;
+use \App\Services\SubmissionService;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class SubmissionResource extends Resource
 {
@@ -59,6 +62,7 @@ class SubmissionResource extends Resource
                                 ->searchable()
                                 ->required()
                                 ->reactive()
+                                ->preload()
                                 ->live()
                                 ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                     $user = User::find($state);
@@ -102,8 +106,9 @@ class SubmissionResource extends Resource
                             Forms\Components\DateTimePicker::make('test_submission_date')
                                 ->label('Tanggal pengujian')
                                 ->required(),
-                            Forms\Components\FileUpload::make('document')
+                            Forms\Components\FileUpload::make('documents')
                                 ->label('Lampiran')
+                                ->multiple()
                                 ->preserveFilenames()
                                 ->acceptedFileTypes([
                                     'application/pdf',
@@ -114,7 +119,14 @@ class SubmissionResource extends Resource
                                 ->directory("submission")
                                 ->helperText('Format file yang diterima: PDF, DOC, DOCX. Maksimal ukuran file: 2MB.')
                                 ->openable()
-                                ->columnSpanFull(),
+                                ->columnSpanFull()
+                                ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                                    $extension = $file->getClientOriginalExtension();
+
+                                    $id   = $get('id') ?? -1;
+
+                                    return FileNaming::generateSubmissionName($id, $extension);
+                                }),
                             Forms\Components\Textarea::make('note')
                                 ->label('Catatan')
                                 ->columnSpanFull(),
@@ -132,6 +144,7 @@ class SubmissionResource extends Resource
                                         ->relationship("package", "name")
                                         ->reactive()
                                         ->live()
+                                        ->preload()
                                         ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                             $package = Package::find($state);
 
@@ -174,6 +187,7 @@ class SubmissionResource extends Resource
                                         ->relationship('test', 'name')
                                         ->reactive()
                                         ->live()
+                                        ->preload()
                                         ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                             $test = Test::find($state);
                                             if ($test) {
@@ -331,29 +345,8 @@ class SubmissionResource extends Resource
             ->actions([
                 Tables\Actions\Action::make("Terima")
                     ->action(function (Model $record) {
-                        if ($record->user && $record->user->email) {
-                            $record->status = 'approved';
-                            $record->approval_date = Carbon::now()->format('Y-m-d\TH:i:s');
-                            $record->save();
-
-                            Mail::raw('Pengajuan Anda telah disetujui.', function ($message) use ($record) {
-                                $message->to($record->user->email)
-                                    ->subject('Pengajuan Disetujui');
-                            });
-
-                            Notification::make()
-                                ->title('Pengajuan berhasil disetujui')
-                                ->body("Pengajuan oleh {$record->user->name} telah disetujui.")
-                                ->success()
-                                ->send();
-                        } else {
-                            Notification::make()
-                                ->title('Gagal mengubah pengajuan ')
-                                ->body("Pengajuan oleh {$record->user->name} gagal diubah.")
-                                ->danger()
-                                ->send();
-                        }
-
+                        $service = app(SubmissionService::class);
+                        $service->accept($record);
                     })
                     ->color("success")
                     ->requiresConfirmation()
@@ -367,29 +360,8 @@ class SubmissionResource extends Resource
                             ->label("Perihal"),
                     ])
                     ->action(function (array $data, Model $record) {
-                        if ($record->user && $record->user->email) {
-
-                            $record->status = 'rejected';
-                            $record->save();
-
-                            Mail::raw("Pengajuan Anda ditolak." . $data["reason"], function ($message) use ($record) {
-                                $message->to($record->user->email)
-                                    ->subject('Pengajuan Ditolak');
-                            });
-
-                            Notification::make()
-                                ->title('Pengajuan Ditolak')
-                                ->body("Pengajuan oleh {$record->user->name} telah ditolak.")
-                                ->success()
-                                ->send();
-                        } else {
-                            Notification::make()
-                                ->title('Gagal mengubah pengajuan ')
-                                ->body("Pengajuan oleh {$record->user->name} gagal diubah.")
-                                ->danger()
-                                ->send();
-                        }
-
+                        $service = app(SubmissionService::class);
+                        $service->reject($data, $record);
                     })
                     ->color("danger")
                     ->requiresConfirmation()
