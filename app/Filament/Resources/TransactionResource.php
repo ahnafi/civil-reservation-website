@@ -141,11 +141,10 @@ class TransactionResource extends Resource
                     ])
                     ->visibility('public')
                     ->directory('payment_invoice_files')
-                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                         $extension = $file->getClientOriginalExtension();
 
-                        $record = $component->getLivewire()->getRecord();
-                        $id = $record?->id ?? -1;
+                        $id   = $get('id') ?? -1;
 
                         return FileNaming::generateInvoiceName($id, $extension);
                     }),
@@ -161,11 +160,10 @@ class TransactionResource extends Resource
                     ->imagePreviewHeight('150')
                     ->visibility('public')
                     ->directory('payment_receipt_images')
-                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                         $extension = $file->getClientOriginalExtension();
 
-                        $record = $component->getLivewire()->getRecord();
-                        $id = $record?->id ?? -1;
+                        $id   = $get('id') ?? -1;
 
                         return FileNaming::generatePaymentReceiptName($id, $extension);
                     }),

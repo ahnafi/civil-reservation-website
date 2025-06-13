@@ -59,12 +59,11 @@ class LaboratoryResource extends Resource
                         ->multiple()
                         ->maxSize(2048)
                         ->directory('laboratory_images')
-                        ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {
+                        ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                             $extension = $file->getClientOriginalExtension();
 
-                            $record = $component->getLivewire()->getRecord();
-                            $id = $record?->id ?? -1;
-                            $name = $record?->name ?? 'laboratory';
+                            $id   = $get('id') ?? -1;
+                            $name = $get('name') ?? 'laboratory';
 
                             return FileNaming::generateLaboratoryName($id, $name, $extension);
                         }),

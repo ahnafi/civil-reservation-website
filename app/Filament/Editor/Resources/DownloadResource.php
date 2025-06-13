@@ -45,12 +45,11 @@ class DownloadResource extends Resource
                     ->enableOpen()
                     ->enableDownload()
                     ->required()
-                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                         $extension = $file->getClientOriginalExtension();
 
-                        $record = $component->getLivewire()->getRecord();
-                        $id = $record?->id ?? -1;
-                        $name = $record?->title ?? 'download';
+                        $id   = $get('id') ?? -1;
+                        $name = $get('title') ?? 'download';
 
                         return FileNaming::generateDownloadName($id, $name, $extension);
                     })

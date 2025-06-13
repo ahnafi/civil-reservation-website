@@ -48,12 +48,11 @@ class PackageResource extends Resource
                     ->multiple()
                     ->columnSpanFull()
                     ->directory("package_image")
-                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                         $extension = $file->getClientOriginalExtension();
 
-                        $record = $component->getLivewire()->getRecord();
-                        $id = $record?->id ?? -1;
-                        $name = $record?->name ?? 'package';
+                        $id   = $get('id') ?? -1;
+                        $name = $get('name') ?? 'package';
 
                         return FileNaming::generatePackageName($id, $name, $extension);
                     }),

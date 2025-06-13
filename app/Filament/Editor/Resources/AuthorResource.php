@@ -44,15 +44,14 @@ class AuthorResource extends Resource
                 Forms\Components\FileUpload::make('avatar')
                     ->label('Avatar')
                     ->avatar()
-                    ->directory('authors-avatars')
+                    ->directory('author_avatars')
                     ->imageEditor()
                     ->image()
-                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                         $extension = $file->getClientOriginalExtension();
 
-                        $record = $component->getLivewire()->getRecord();
-                        $id = $record?->id ?? -1;
-                        $name = $record?->name ?? 'author';
+                        $id   = $get('id') ?? -1;
+                        $name = $get('name') ?? 'author';
 
                         return FileNaming::generateAuthorName($id, $name, $extension);
                     })
@@ -64,14 +63,14 @@ class AuthorResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('avatar')
+                    ->label('Foto')
+                    ->circular(),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->label('Email')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('avatar')
-                    ->label('Avatar')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Dihapus Pada')

@@ -106,11 +106,10 @@ class TestingResource extends Resource
                     ->openable()
                     ->helperText('Format file yang diterima: PDF, DOC, DOCX.')
                     ->columnSpanFull()
-                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                         $extension = $file->getClientOriginalExtension();
 
-                        $record = $component->getLivewire()->getRecord();
-                        $id = $record?->id ?? -1;
+                        $id   = $get('id') ?? -1;
 
                         return FileNaming::generateTestingResult($id, $extension);
                     })

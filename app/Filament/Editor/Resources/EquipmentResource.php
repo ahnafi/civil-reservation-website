@@ -34,15 +34,14 @@ class EquipmentResource extends Resource
                     ->preserveFilenames()
                     ->enableOpen()
                     ->enableDownload()
-                    ->directory('equipment')
+                    ->directory('equipment_images')
                     ->maxSize(2048)
                     ->columnSpanFull()
-                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                         $extension = $file->getClientOriginalExtension();
 
-                        $record = $component->getLivewire()->getRecord();
-                        $id = $record?->id ?? -1;
-                        $name = $record?->name ?? 'equipment';
+                        $id   = $get('id') ?? -1;
+                        $name = $get('name') ?? 'equipment';
 
                         return FileNaming::generateEquipmentName($id, $name, $extension);
                     }),

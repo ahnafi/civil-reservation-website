@@ -114,13 +114,13 @@ class UserResource extends Resource
                     ->directory('user_photos')
                     ->imagePreviewHeight('150')
                     ->visibility('public')
-                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                         $extension = $file->getClientOriginalExtension();
 
-                        $record = $component->getLivewire()->getRecord();
-                        $id = $record?->id ?? -1;
+                        $id   = $get('id') ?? -1;
+                        $name = $get('name') ?? 'user';
 
-                        return FileNaming::generateUserProfileName($id, $extension);
+                        return FileNaming::generateUserProfileName($id, $name, $extension);
                     })
                     ->default('default-user_profile.jpg')
             ]);

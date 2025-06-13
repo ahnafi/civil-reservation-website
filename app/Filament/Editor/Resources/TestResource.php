@@ -49,12 +49,11 @@ class TestResource extends Resource
                             ->multiple()
                             ->columnSpanFull()
                             ->directory('test_image')
-                            ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {
+                            ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                                 $extension = $file->getClientOriginalExtension();
 
-                                $record = $component->getLivewire()->getRecord();
-                                $id = $record?->id ?? -1;
-                                $name = $record?->name ?? 'test';
+                                $id   = $get('id') ?? -1;
+                                $name = $get('name') ?? 'test';
 
                                 return FileNaming::generateTestName($id, $name, $extension);
                             }),

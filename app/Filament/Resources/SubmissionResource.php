@@ -120,11 +120,10 @@ class SubmissionResource extends Resource
                                 ->helperText('Format file yang diterima: PDF, DOC, DOCX. Maksimal ukuran file: 2MB.')
                                 ->openable()
                                 ->columnSpanFull()
-                                ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {
+                                ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                                     $extension = $file->getClientOriginalExtension();
 
-                                    $record = $component->getLivewire()->getRecord();
-                                    $id = $record?->id ?? -1;
+                                    $id   = $get('id') ?? -1;
 
                                     return FileNaming::generateSubmissionName($id, $extension);
                                 }),

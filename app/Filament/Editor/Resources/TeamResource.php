@@ -52,12 +52,11 @@ class TeamResource extends Resource
                     ->enableOpen()
                     ->enableDownload()
                     ->required()
-                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $component) {
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                         $extension = $file->getClientOriginalExtension();
 
-                        $record = $component->getLivewire()->getRecord();
-                        $id = $record?->id ?? -1;
-                        $name = $record?->name ?? 'team';
+                        $id   = $get('id') ?? -1;
+                        $name = $get('name') ?? 'team';
 
                         return FileNaming::generateTeamName($id, $name, $extension);
                     })

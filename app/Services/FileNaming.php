@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class FileNaming
 {
-    public static function generateUserProfileName($user_id, $extension): string
+    public static function generateUserProfileName($user_id, $user_name, $extension): string
     {
         if ($user_id != -1) {
             $code = 'up-' . str_pad($user_id, 3, '0', STR_PAD_LEFT);
@@ -21,10 +21,11 @@ class FileNaming
             $code = 'up-' . str_pad($nextId, 3, '0', STR_PAD_LEFT);
         }
 
+        $slug = Str::slug($user_name, '-');
         $uuid = Str::uuid()->toString();
         $shortUuid = substr(str_replace('-', '', $uuid), 0, 6);
 
-        return 'civil-user_profile-' . $code . '-' . $shortUuid . '-' . now()->format('YmdHis') . '.' . $extension;
+        return 'civil-user_profile-' . $code . '-' . $slug . $shortUuid . '-' . now()->format('YmdHis') . '.' . $extension;
     }
 
     public static function generateInvoiceName($transaction_id, $extension): string
