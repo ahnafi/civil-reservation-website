@@ -21,7 +21,7 @@
                     </div>
                 @endif
 
-                <p>Berikut adalah rincian pengajuan yang diajukan:</p>
+                <p>Berikut adalah rincian pengujian yang diajukan:</p>
             </div>
         </td>
     </tr>

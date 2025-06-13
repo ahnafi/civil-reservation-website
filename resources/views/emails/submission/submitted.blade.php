@@ -14,7 +14,7 @@
                         style="padding: 2px 4px; background-color:#dbeafe; border-radius: 4px; font-weight: bold; display: inline-block; color: #1d4ed8;">{{ $submission->code }}</span>
                     dari <strong>{{ $submission->user->name }}</strong>.
                 </p>
-                <p>Berikut adalah rincian pengajuan yang diajukan:</p>
+                <p>Berikut adalah rincian pengujian yang diajukan:</p>
             </div>
         </td>
     </tr>
