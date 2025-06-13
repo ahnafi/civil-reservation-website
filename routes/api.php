@@ -30,5 +30,5 @@ Route::get("tests", [TestController::class, "apiIndex"])->name("tests.api.index"
 Route::get("tests/{test:slug}", [TestController::class, "apiDetail"])->name("tests.api.detail");
 Route::get("tests/search", [TestController::class, "apiSearch"])->name("tests.api.search");
 
-Route::get("labs", [LaboratoryController::class, "apiLabs"])->name("labs.api.index");
+Route::get("labs", [LaboratoryController::class, "apiIndex"])->name("labs.api.index");
 Route::get("labs/{laboratory:slug}", [LaboratoryController::class, "apiDetail"])->name("labs.api.detail");
