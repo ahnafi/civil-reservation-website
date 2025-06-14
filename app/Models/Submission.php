@@ -174,7 +174,7 @@ class Submission extends Model
                 DB::raw('COALESCE(test_labs.name, package_labs.name) as lab_name'),
             )
             ->where('submissions.user_id', auth()->user()->id)
-            ->orderBy('submissions.test_submission_date', 'desc');
+            ->orderBy('submissions.created_at', 'desc');
     }
 
 

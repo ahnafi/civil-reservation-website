@@ -74,7 +74,7 @@ export default function Detail({ test }: { test: Test }) {
                             <CardContent className="p-0">
                                 <div className="relative aspect-square w-full overflow-hidden">
                                     <img
-                                        src={'/storage/test_image/' + mainImage}
+                                        src={'/storage/' + mainImage}
                                         alt={test.name}
                                         className="h-full w-full object-cover transition-all duration-300 hover:scale-105"
                                     />
@@ -93,7 +93,7 @@ export default function Detail({ test }: { test: Test }) {
                                                         onClick={() => setMainImage(image)}
                                                     >
                                                         <img
-                                                            src={'/storage/test_image/' + image}
+                                                            src={'/storage/' + image}
                                                             alt={`${test.name} ${index + 1}`}
                                                             className="aspect-square h-full w-full object-cover"
                                                         />
@@ -193,7 +193,7 @@ export default function Detail({ test }: { test: Test }) {
                                                             <div className="flex items-center gap-4">
                                                                 <div className="h-16 w-16 overflow-hidden rounded-md">
                                                                     <img
-                                                                        src={`/storage/test_image/${pkg.images[0]}`}
+                                                                        src={`/storage/${pkg.images[0]}`}
                                                                         alt={pkg.name}
                                                                         className="h-full w-full object-cover"
                                                                     />
@@ -246,7 +246,7 @@ export default function Detail({ test }: { test: Test }) {
                                 <div className="w-full md:w-1/4">
                                     <div className="overflow-hidden rounded-lg">
                                         <img
-                                            src={`/storage/${test.laboratory.image}`}
+                                            src={`/storage/${test.laboratory.images}`}
                                             alt={test.laboratory.name}
                                             className="h-full w-full object-cover"
                                         />

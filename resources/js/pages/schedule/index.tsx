@@ -254,7 +254,7 @@ export default function Schedule({ tests }: { tests: SimpleOption[] }) {
                                     <div className="test-image w-full md:w-1/3 flex items-center justify-center rounded-lg bg-gray-50 dark:bg-zinc-800 p-4 border border-gray-200 dark:border-zinc-700">
                                         {testData.images && testData.images.length > 0 ? (
                                             <img
-                                                src={'/storage/test_image/' + testData.images[0]}
+                                                src={'/storage/' + testData.images[0]}
                                                 alt={testData.name}
                                                 className="w-full h-auto max-h-64 object-contain rounded-lg"
                                             />
