@@ -11,40 +11,59 @@ use App\Models\Test;
 use Inertia\Inertia;
 use Inertia\Response;
 
+
 class DashboardController extends Controller
 {
     public function index(): Response
     {
-        $userSubmissions = Submission::withUserScheduleJoin()->get();
+        $userSubmissions = Submission::WithUserScheduleJoin()
+            ->limit(5)
+            ->get();
+
+        $userSubmissionsCount = Submission::query()
+            ->where('user_id', auth()->id())
+            ->count();
+
+        $userSubmissionsIds = Submission::query()
+            ->where('user_id', auth()->id())
+            ->orderBy('created_at', 'desc')
+            ->pluck('id');
 
         $userTransactions = Transaction::query()
-        ->join('submissions', 'transactions.submission_id', '=', 'submissions.id')
-        ->where('submissions.user_id', auth()->id())
-        ->orderBy('transactions.created_at', 'desc')
-        ->select('transactions.*')
-        ->get();
+            ->whereIn('submission_id', $userSubmissionsIds)
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
 
+        $userTransactionsCount = Transaction::query()
+            ->whereIn('submission_id', $userSubmissionsIds)
+            ->count();
 
         $userTestings = Testing::query()
-        ->join('submissions', 'testings.submission_id', '=', 'submissions.id')
-        ->where('submissions.user_id', auth()->id())
-        ->orderBy('testings.created_at', 'desc')
-        ->select('testings.*')
-        ->get();
+            ->whereIn('submission_id', $userSubmissionsIds)
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
 
-        $submissions = Submission::withScheduleJoin()->get();
-        $tests = Test::select(['id', 'name'])->get();
-        $packages = Package::select(['id', 'name'])->get();
-        $laboratories = Laboratory::select(['id', 'code', 'name', 'description', 'images', 'slug'])->get();
+        $userUpcomingTestings = Testing::query()
+            ->whereIn('submission_id', $userSubmissionsIds)
+            ->where('status', 'testing')
+            ->where('test_date', '>', now())
+            ->orderBy('test_date', 'asc')
+            ->get();
+
+        $userTestingCount = Testing::query()
+            ->whereIn('submission_id', $userSubmissionsIds)
+            ->count();
 
         return Inertia::render('dashboard/index', [
             'userSubmissions' => $userSubmissions,
             'userTransactions' => $userTransactions,
             'userTestings' => $userTestings,
-            'schedule' => $submissions,
-            'tests' => $tests,
-            'packages' => $packages,
-            'laboratories' => $laboratories,
+            'userUpcomingTestings' => $userUpcomingTestings,
+            'userSubmissionsCount' => $userSubmissionsCount,
+            'userTransactionsCount' => $userTransactionsCount,
+            'userTestingCount' => $userTestingCount,
         ]);
     }
 }
