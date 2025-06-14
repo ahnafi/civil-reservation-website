@@ -2,15 +2,11 @@
 
 namespace App\Filament\Resources\SubmissionResource\RelationManagers;
 
-use App\Models\Submission;
-use App\Models\Transaction;
 use App\Services\TransactionService;
 use Filament\Forms;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
-use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -18,8 +14,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Str;
 
 class TransactionsRelationManager extends RelationManager
 {
@@ -27,13 +21,6 @@ class TransactionsRelationManager extends RelationManager
 
     protected static ?string $title = "Transaksi";
     protected static ?string $modelLabel = 'Transaksi';
-
-    private TransactionService $transactionService;
-
-    public function __construct()
-    {
-        $this->transactionService = app(TransactionService::class);
-    }
 
     public function form(Form $form): Form
     {
@@ -177,7 +164,8 @@ class TransactionsRelationManager extends RelationManager
                     ->color("success")
                     ->visible(fn($record) => $record->status === 'pending')
                     ->action(function (Model $record) {
-                        $this->transactionService->accept($record);
+                        $transactionService = app(TransactionService::class);
+                        $transactionService->accept($record);
                     }),
 
                 Tables\Actions\Action::make("Tolak")
@@ -191,7 +179,8 @@ class TransactionsRelationManager extends RelationManager
                     ->color("danger")
                     ->visible(fn($record) => $record->status === 'pending')
                     ->action(function (array $data, Model $record) {
-                        $this->transactionService->reject($data, $record);
+                        $transactionService = app(TransactionService::class);
+                        $transactionService->reject($data, $record);
                     }),
 
                 Tables\Actions\ActionGroup::make([
@@ -201,9 +190,13 @@ class TransactionsRelationManager extends RelationManager
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make()
             ])
-            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make(),
-                Tables\Actions\ForceDeleteBulkAction::make(),
-                Tables\Actions\RestoreBulkAction::make(),]),])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
+                ]),
+            ])
             ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([SoftDeletingScope::class,]));
     }
 }

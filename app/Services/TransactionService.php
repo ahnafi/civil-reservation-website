@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Mail\TransactionSuccess;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
@@ -23,14 +24,16 @@ class TransactionService
         }
 
         if ($user && $user->email) {
-            $record->status = 'success';
-            $record->payment_date = Carbon::now()->format('Y-m-d\TH:i:s');
-            $record->save();
+            // $record->status = 'success';
+            // $record->payment_date = Carbon::now()->format('Y-m-d\TH:i:s');
+            // $record->save();
 
-            Mail::raw("Pembayaran Anda telah disetujui dengan kode pembayaran {$record->code}.", function ($message) use ($user) {
-                $message->to($user->email)
-                    ->subject('Pembayaran Disetujui');
-            });
+            // Mail::raw("Pembayaran Anda telah disetujui dengan kode pembayaran {$record->code}.", function ($message) use ($user) {
+            //     $message->to($user->email)
+            //         ->subject('Pembayaran Disetujui');
+            // });
+
+            Mail::to($user->email)->send(new TransactionSuccess($record->id));
 
             Notification::make()
                 ->title('Pengajuan berhasil disetujui')
