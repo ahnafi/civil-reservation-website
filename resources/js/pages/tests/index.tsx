@@ -112,7 +112,7 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                             <CardHeader className="px-0">
                                 <Link href={'/test/' + data.slug}>
                                     <img
-                                        src={'/storage/test_image/' + data.images}
+                                        src={'/storage/' + data.images}
                                         alt={data.name}
                                         className="h-48 w-full rounded-md object-cover md:h-54 lg:h-60"
                                     />

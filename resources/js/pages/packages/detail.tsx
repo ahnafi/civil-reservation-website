@@ -146,7 +146,7 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                                 <CardContent className="p-0">
                                     <div className="relative aspect-video w-full overflow-hidden">
                                         <img
-                                            src={'/storage/package_image/' + mainImage}
+                                            src={'/storage/' + mainImage}
                                             alt={data.name}
                                             className="h-full w-full object-cover transition-all duration-300 hover:scale-105"
                                         />
@@ -164,7 +164,7 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                                                             onClick={() => setMainImage(image)}
                                                         >
                                                             <img
-                                                                src={'/storage/package_image/' + image}
+                                                                src={'/storage/' + image}
                                                                 alt={`${data.name} ${index + 1}`}
                                                                 className="aspect-square h-full w-full object-cover"
                                                             />

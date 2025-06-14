@@ -215,7 +215,7 @@ export default function Cart() {
                                                             <div className="flex gap-4">
                                                                 <div className="h-20 w-20 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700">
                                                                     <img
-                                                                        src={`/storage/test_image/${testItem.test.images[0]}`}
+                                                                        src={`/storage/${testItem.test.images[0]}`}
                                                                         alt={testItem.test.name}
                                                                         className="h-full w-full object-cover"
                                                                     />
@@ -314,7 +314,7 @@ export default function Cart() {
                                                             <div className="flex gap-4">
                                                                 <div className="h-20 w-20 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700">
                                                                     <img
-                                                                        src={`/storage/package_image/${packageItem.package.images ? packageItem.package.images[0] : 'default.jpg'}`}
+                                                                        src={`/storage/${packageItem.package.images ? packageItem.package.images[0] : 'default.jpg'}`}
                                                                         alt={packageItem.package.name}
                                                                         className="h-full w-full object-cover"
                                                                     />
