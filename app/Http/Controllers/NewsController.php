@@ -12,7 +12,7 @@ class NewsController extends Controller
     public function index(): LengthAwarePaginator
     {
         return News::with(["author", "newsCategory"])->orderBy("created_at", "desc")
-            ->paginate(16);
+            ->paginate(8);
     }
 
     public function show(News $news): JsonResponse
@@ -22,25 +22,25 @@ class NewsController extends Controller
         ]);
     }
 
-    // public function search(Request $request): LengthAwarePaginator
-    // {
-    //     $query = $request->input('q');
-    //     $perPage = $request->input('per_page', 16);
-    //     $category = $request->input('category');
+    public function search(Request $request): LengthAwarePaginator
+    {
+        $query = $request->input('q');
+        $perPage = $request->input('per_page', 16);
+        $category = $request->input('category');
 
-    //     $newsQuery = News::query()
-    //         ->where(function ($q) use ($query) {
-    //             $q->where('title', 'like', "%{$query}%")
-    //                 ->orWhere('content', 'like', "%{$query}%");
-    //         });
+        $newsQuery = News::query()
+            ->where(function ($q) use ($query) {
+                $q->where('title', 'like', "%{$query}%")
+                    ->orWhere('content', 'like', "%{$query}%");
+            });
 
-    //     if ($category) {
-    //         $newsQuery->whereHas('newsCategory', function ($q) use ($category) {
-    //             $q->where('slug', $category)
-    //               ->orWhere('name', 'like', "%{$category}%");
-    //         });
-    //     }
+        if ($category) {
+            $newsQuery->whereHas('newsCategory', function ($q) use ($category) {
+                $q->where('slug', $category)
+                  ->orWhere('name', 'like', "%{$category}%");
+            });
+        }
 
-    //     return $newsQuery->with(['author', 'newsCategory'])->paginate($perPage);
-    // }
+        return $newsQuery->with(['author', 'newsCategory'])->paginate($perPage);
+    }
 }
