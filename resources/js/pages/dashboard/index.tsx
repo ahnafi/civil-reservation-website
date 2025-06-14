@@ -13,6 +13,7 @@ import {
     XCircle,
     FileText,
     CreditCard,
+    ClipboardList,
 } from "lucide-react"
 import { ToastContainer } from "react-toastify"
 
@@ -28,6 +29,7 @@ export default function MainDashboard({
                                           userTransactions,
                                           userTestings,
                                           userUpcomingTestings,
+                                          userWaitResultTestings,
                                           userSubmissionsCount,
                                           userTransactionsCount,
                                           userTestingCount,
@@ -36,6 +38,7 @@ export default function MainDashboard({
     userTransactions: Transaction[]
     userTestings: Testing[]
     userUpcomingTestings: Testing[]
+    userWaitResultTestings: Testing[]
     userSubmissionsCount: number
     userTransactionsCount: number
     userTestingCount: number
@@ -223,7 +226,7 @@ export default function MainDashboard({
                             <div className="flex items-center gap-3 mb-4">
                                 <AlertCircle className="size-5 text-yellow-700 dark:text-yellow-300" />
                                 <h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-100">
-                                    ⚠️ Transaksi Menunggu Pembayaran
+                                    Transaksi Menunggu Pembayaran
                                 </h3>
                                 <span className="bg-yellow-300 dark:bg-yellow-700 text-yellow-900 dark:text-yellow-100 text-xs font-medium px-2 py-1 rounded-full">
                   {userTransactions?.filter((transaction) => transaction.status === "pending").length} item
@@ -265,15 +268,15 @@ export default function MainDashboard({
                         </div>
                     )}
 
-                    {/* Testing Status Reminder */}
+                    {/* Upcoming Testing Reminder */}
                     {userUpcomingTestings && userUpcomingTestings.length > 0 ? (
-                        <div className="rounded-xl border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-950/40 p-6 shadow-lg">
+                        <div className="rounded-xl border border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/40 p-6 shadow-lg">
                             <div className="flex items-center gap-3 mb-4">
-                                <HardHat className="size-5 text-yellow-700 dark:text-yellow-300" />
-                                <h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-100">
+                                <HardHat className="size-5 text-blue-700 dark:text-blue-300" />
+                                <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100">
                                     Pengujian Yang Akan Datang
                                 </h3>
-                                <span className="bg-yellow-300 dark:bg-yellow-700 text-yellow-900 dark:text-yellow-100 text-xs font-medium px-2 py-1 rounded-full">
+                                <span className="bg-blue-300 dark:bg-blue-700 text-blue-900 dark:text-blue-100 text-xs font-medium px-2 py-1 rounded-full">
                   {userUpcomingTestings.length} item
                 </span>
                             </div>
@@ -281,16 +284,16 @@ export default function MainDashboard({
                                 {userUpcomingTestings.map((testing) => (
                                     <div
                                         key={testing.id}
-                                        className="bg-white dark:bg-neutral-800 rounded-lg p-4 border border-yellow-300 dark:border-yellow-600 shadow-sm"
+                                        className="bg-white dark:bg-neutral-800 rounded-lg p-4 border border-blue-300 dark:border-blue-600 shadow-sm"
                                     >
                                         <div className="flex items-start justify-between mb-2">
                                             <div className="flex items-center gap-2">
-                                                <Hammer className="size-4 text-yellow-700 dark:text-yellow-300" />
+                                                <Hammer className="size-4 text-blue-700 dark:text-blue-300" />
                                                 <span className="font-medium text-neutral-900 dark:text-white text-sm">
                           {testing.code || testing.submission_code}
                         </span>
                                             </div>
-                                            <span className="bg-yellow-200 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 text-xs px-2 py-1 rounded-full">
+                                            <span className="bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-200 text-xs px-2 py-1 rounded-full">
                         Upcoming
                       </span>
                                         </div>
@@ -319,6 +322,55 @@ export default function MainDashboard({
                                 <div className="text-gray-500 dark:text-gray-400 text-sm">
                                     Tidak ada pengujian yang dijadwalkan dalam waktu dekat. Semua pengujian Anda sudah selesai atau belum
                                     ada yang direncanakan.
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Tests Waiting for Results Reminder */}
+                    {userWaitResultTestings && userWaitResultTestings.length > 0 ? (
+                        <div className="rounded-xl border border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-950/40 p-6 shadow-lg">
+                            <div className="flex items-center gap-3 mb-4">
+                                <ClipboardList className="size-5 text-blue-700 dark:text-blue-300" />
+                                <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100"> Pengujian Menunggu Hasil</h3>
+                                <span className="bg-blue-300 dark:bg-blue-700 text-blue-900 dark:text-blue-100 text-xs font-medium px-2 py-1 rounded-full">
+                  {userWaitResultTestings.length} item
+                </span>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {userWaitResultTestings.map((testing) => (
+                                    <div
+                                        key={testing.id}
+                                        className="bg-white dark:bg-neutral-800 rounded-lg p-4 border border-blue-300 dark:border-blue-600 shadow-sm"
+                                    >
+                                        <div className="flex items-start justify-between mb-2">
+                                            <div className="flex items-center gap-2">
+                                                <Clock className="size-4 text-blue-700 dark:text-blue-300" />
+                                                <span className="font-medium text-neutral-900 dark:text-white text-sm">
+                          {testing.code || testing.submission_code}
+                        </span>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <div className="text-sm font-medium text-neutral-900 dark:text-white">Tanggal Pengujian</div>
+                                            <div className="text-sm text-neutral-600 dark:text-neutral-400">
+                                                {formatDateTimeWithWeekday(testing.test_date)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/40 p-6 shadow-sm">
+                            <div className="flex items-center gap-3 mb-4">
+                                <ClipboardList className="size-5 text-gray-500 dark:text-gray-400" />
+                                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300">Pengujian Menunggu Hasil</h3>
+                            </div>
+                            <div className="text-center py-8">
+                                <div className="text-gray-500 dark:text-gray-400 text-sm">
+                                    Tidak ada pengujian yang sedang menunggu hasil. Semua pengujian sudah memiliki hasil atau belum ada
+                                    yang selesai diuji.
                                 </div>
                             </div>
                         </div>

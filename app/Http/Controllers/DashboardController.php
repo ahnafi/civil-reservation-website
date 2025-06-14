@@ -45,6 +45,14 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        $userWaitResultTestings = Testing::query()
+            ->whereIn('submission_id', $userSubmissionsIds)
+            ->where('status', 'testing')
+            ->where('test_date', '<', now())
+            ->orderBy('test_date', 'asc')
+            ->limit(5)
+            ->get();
+
         $userUpcomingTestings = Testing::query()
             ->whereIn('submission_id', $userSubmissionsIds)
             ->where('status', 'testing')
@@ -61,6 +69,7 @@ class DashboardController extends Controller
             'userTransactions' => $userTransactions,
             'userTestings' => $userTestings,
             'userUpcomingTestings' => $userUpcomingTestings,
+            'userWaitResultTestings' => $userWaitResultTestings,
             'userSubmissionsCount' => $userSubmissionsCount,
             'userTransactionsCount' => $userTransactionsCount,
             'userTestingCount' => $userTestingCount,
