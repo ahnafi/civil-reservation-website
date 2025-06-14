@@ -38,10 +38,14 @@ class Transaction extends Model
 
             // Generate a unique code for the transaction
             $submission = $transaction->submission;
-            $submissionId = $submission?->id ?? '000';
+            $submissionCode = $submission?->code ?? '000';
             $userId = $submission?->user_id ?? '000';
             $transactionCount = $submission ? $submission->transactions()->withTrashed()->count() + 1 : 1;
-            $transaction->code = 'CVL-' . now()->format('Ymd') . $submissionId . $userId . $transactionCount;
+
+            $uuid = Str::uuid()->toString();
+            $shortUuid = substr(str_replace('-', '', $uuid), 0, 6);
+
+            $transaction->code = 'CVL-U' . $userId . '-' . $submissionCode . '-' . $shortUuid . '-' . now()->format('Ymd');
 
             if (is_null($transaction->payment_deadline)) {
                 $transaction->payment_deadline = now()->addDay();

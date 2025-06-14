@@ -35,12 +35,13 @@ class Testing extends Model
             $bookingService = new BookingService();
             $bookingService->storeScheduleTesting($testing->id);
 
-            // Generate code based on the test date and submission ID
-            $date = Carbon::parse($testing->test_date)->format('Ymd');
-            $submissionId = str_pad($testing->submission_id ?? 0, 3, '0', STR_PAD_LEFT);
-            $testingId = str_pad($testing->id ?? 0, 3, '0', STR_PAD_LEFT);
+            $submission = $testing->submission;
 
-            $testing->code = 'UJI-' . $submissionId . '-' . $testingId . $date . '-' ;
+            // Generate code based on the test date and submission Code
+            $date = Carbon::parse($testing->test_date)->format('Ymd');
+            $submissionCode = $submission->code;
+
+            $testing->code = 'UJI-' . $submissionCode . '-' . $date;
             $testing->saveQuietly();
         });
 
