@@ -180,7 +180,16 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
     {
         accessorKey: 'code',
         header: () => <div className="flex w-[7rem] justify-center text-center">Kode Transaksi</div>,
-        cell: ({ row }) => <div className="flex w-[7rem] justify-center text-center capitalize">{row.getValue('code')}</div>,
+        cell: ({ row }) => (
+            <div className="flex w-full">
+        <span
+            className="truncate max-w-[6rem] md:max-w-full md:whitespace-normal"
+            title={row.getValue('code')}
+        >
+            {row.getValue('code')}
+        </span>
+            </div>
+        ),
     },
     {
         accessorKey: 'created_at',
