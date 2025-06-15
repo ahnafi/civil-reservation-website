@@ -50,9 +50,14 @@ class BookingUtils
 
     protected static function getScheduleForTestAndDate($test_id, $date)
     {
-        return DB::table('schedules')
+        // return DB::table('schedules')
+        //     ->where('test_id', $test_id)
+        //     ->where('date', $date)
+        //     ->first();
+
+        return Schedule::query()
             ->where('test_id', $test_id)
-            ->where('date', $date)
+            ->whereDate('date', $date)
             ->first();
     }
 
