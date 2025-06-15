@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Mail\TransactionFailed;
 use App\Mail\TransactionSuccess;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
@@ -24,14 +25,9 @@ class TransactionService
         }
 
         if ($user && $user->email) {
-            // $record->status = 'success';
-            // $record->payment_date = Carbon::now()->format('Y-m-d\TH:i:s');
-            // $record->save();
-
-            // Mail::raw("Pembayaran Anda telah disetujui dengan kode pembayaran {$record->code}.", function ($message) use ($user) {
-            //     $message->to($user->email)
-            //         ->subject('Pembayaran Disetujui');
-            // });
+            $record->status = 'success';
+            $record->payment_date = Carbon::now()->format('Y-m-d\TH:i:s');
+            $record->save();
 
             Mail::to($user->email)->send(new TransactionSuccess($record->id));
 
@@ -55,13 +51,10 @@ class TransactionService
 
         if ($user && $user->email) {
             $record->status = 'failed';
-            $record->note = $data['note']; // ambil dari input form
+            $record->note = $data['note'];
             $record->save();
 
-            Mail::raw("Pembayaran Anda telah ditolak dengan kode pembayaran {$record->code}.", function ($message) use ($user) {
-                $message->to($user->email)
-                    ->subject('Pembayaran Ditolak');
-            });
+            Mail::to($user->email)->send(new TransactionFailed($record->id));
 
             Notification::make()
                 ->title('Transaksi ditolak')
