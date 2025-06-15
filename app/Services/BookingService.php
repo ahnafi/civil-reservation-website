@@ -118,6 +118,7 @@ class BookingService
         $testIds = BookingUtils::getTestIdsFromTesting($testing_id);
         BookingUtils::handleScheduleForTesting($testing_id, $testIds);
     }
+
     public function recreateSubmission(Model $record)
     {
         // Step 1: Duplikasi data utama submission
