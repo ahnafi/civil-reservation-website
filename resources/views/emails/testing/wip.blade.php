@@ -11,7 +11,7 @@
                 <p>Halo Bapak/Ibu {{ $testing->submission->user->name }},</p>
                 <p>Kami ingin memberitahukan bahwa pengujian untuk permohonan Anda dengan nomor
                     <span
-                        style="padding: 2px 4px; background-color:#edf2f7; border-radius: 4px; font-weight: bold; display: inline-block; color: #222;">{{ $testing->submission->code }}</span>
+                        style="padding: 2px 4px; background-color:#edf2f7; border-radius: 4px; font-weight: bold; display: inline-block; color: #222;">{{ $testing->code }}</span>
                     saat ini sedang berlangsung di Laboratorium Teknik Sipil Universitas Jenderal Soedirman.
                 </p>
                 <p>Tim kami sedang melakukan pengujian sesuai dengan layanan yang Anda ajukan, dan kami akan segera
@@ -100,14 +100,10 @@
     </tr>
 
     <tr>
-        <td align="left" style="font-size:0px;padding:10px 25px;word-break:break-word">
+        <td align="left" style="font-size:0px;padding:10px 16px;word-break:break-word">
             <div
                 style="font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;line-height:18px;text-align:left;color:#64748b;">
-                <p>Jika Anda memiliki pertanyaan atau memerlukan informasi tambahan, silakan hubungi kami melalui halaman
-                    bantuan di aplikasi.</p>
-                <p style="margin-top: 15px; font-size: 11px; color: #9ca3af;">
-                    Email ini dikirim secara otomatis. Mohon tidak membalas email ini.
-                </p>
+                <p>Jika Anda memiliki pertanyaan atau memerlukan informasi tambahan, silakan hubungi kami melalui halaman bantuan di aplikasi.</p>
             </div>
         </td>
     </tr>
