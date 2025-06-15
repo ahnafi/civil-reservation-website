@@ -94,21 +94,22 @@ class BookingService
 
             throw $e;
         }
-
     }
-
-
 
     public function storePaymentReceipt($transaction_id, $file, $payment_method)
     {
         $transaction = Transaction::findOrFail($transaction_id);
         $transaction->payment_method = $payment_method;
 
-        $extension= $file->getClientOriginalExtension();
+        $extension = $file->getClientOriginalExtension();
         $filename = FileNaming::generatePaymentReceiptName($transaction_id, $extension);
-        $file->storeAs('public/payment_receipts', $filename);
 
-        $transaction->payment_receipt_image = $filename;
+        // Simpan ke storage/app/public/payment_receipt_images/
+        $path = $file->storeAs('payment_receipt_images', $filename, 'public');
+
+        // Simpan path relatif ke database
+        $transaction->payment_receipt_images = $path;
+
         $transaction->save();
     }
 
@@ -137,7 +138,7 @@ class BookingService
         if ($record->relationLoaded('tests') || method_exists($record, 'tests')) {
             $testData = [];
             foreach ($record->tests as $test) {
-            $testData[$test->id] = ['quantity' => $test->pivot->quantity];
+                $testData[$test->id] = ['quantity' => $test->pivot->quantity];
             }
             $submission->tests()->attach($testData);
         }
@@ -145,7 +146,7 @@ class BookingService
         // Step 3: Duplikasi relasi packages (tanpa pivot tambahan)
         if ($record->relationLoaded('packages') || method_exists($record, 'packages')) {
             $submission->packages()->attach(
-            $record->packages->pluck('id')->toArray()
+                $record->packages->pluck('id')->toArray()
             );
         }
 
@@ -158,6 +159,4 @@ class BookingService
 
         return redirect()->route('filament.admin.resources.submissions.edit', $submission->id);
     }
-
-
 }

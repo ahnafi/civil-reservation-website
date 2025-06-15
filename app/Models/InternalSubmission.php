@@ -3,39 +3,33 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
-class Submission extends Model
+class InternalSubmission extends Model
 {
-    use SoftDeletes;
-
     protected $fillable = [
-        "code",
-        "user_id",
-        "company_name",
-        "project_name",
-        "project_address",
-        "total_cost",
-        "documents",
-        "test_submission_date",
-        "user_note",
-        "admin_note",
-        "status",
-        "note",
-        "approval_date"
+        'code',
+        'user_id',
+        'name',
+        'study_program',
+        'research_title',
+        'total_personnel',
+        'supervisor',
+        'documents',
+        'test_submission_date',
+        'status',
+        'user_note',
+        'admin_note',
+        'approval_date'
     ];
 
     protected $casts = [
-        'document' => 'array',
+        'documents' => 'array',
     ];
 
     protected static function boot(): void
@@ -46,12 +40,11 @@ class Submission extends Model
             try {
                 $paddedUserId = str_pad($submission->user_id, 3, '0', STR_PAD_LEFT);
                 $paddedId = str_pad($submission->id, 3, '0', STR_PAD_LEFT);
-                $date = Carbon::parse($submission->test_submission_date)->format('Ymd');
 
-                $submission->code = 'SBM-' . $paddedUserId . $paddedId;
+                $submission->code = 'INT-' . $paddedUserId . $paddedId;
                 $submission->saveQuietly();
             } catch (\Throwable $e) {
-                Log::error('Submission code generation failed', ['error' => $e->getMessage()]);
+                Log::error('InternalSubmission code generation failed', ['error' => $e->getMessage()]);
             }
         });
 
@@ -59,7 +52,6 @@ class Submission extends Model
             if ($model->isDirty('documents')) {
                 $originalDocuments = $model->getOriginal('documents') ?? [];
                 $newDocuments = $model->documents ?? [];
-
                 $removedDocuments = array_diff($originalDocuments, $newDocuments);
 
                 foreach ($removedDocuments as $removedDocument) {
@@ -81,22 +73,16 @@ class Submission extends Model
         });
     }
 
-
     protected function casts(): array
     {
         return [
-            "approval_date" => "datetime"
+            'approval_date' => 'datetime',
         ];
     }
 
-    public function user(): BelongsTo
+    public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function transactions(): HasMany
-    {
-        return $this->hasMany(Transaction::class);
     }
 
     public function testing(): HasOne
@@ -108,7 +94,6 @@ class Submission extends Model
     {
         return $this->belongsToMany(Test::class, 'submission_test')->withTimestamps()->withPivot('quantity');
     }
-
 
     public function packages(): BelongsToMany
     {
@@ -177,4 +162,3 @@ class Submission extends Model
             ->orderBy('submissions.created_at', 'desc');
     }
 }
-  

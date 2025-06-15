@@ -123,6 +123,8 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
         },
     ];
 
+    console.log('Transaction Detail:', transaction);
+
     // Inertia form
     const { data, setData, post, processing, errors, reset } = useInertiaForm<PaymentFormData>({
         transaction_id: transaction.id,
@@ -240,7 +242,7 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
         });
     };
 
-    if (isSuccess || TransactionStatus.PAID === "paid") {
+    if (isSuccess && TransactionStatus.PAID === 'paid') {
         return (
             <AppLayout breadcrumbs={breadcrumbs}>
                 <Head title="Pembayaran Berhasil" />
@@ -260,7 +262,7 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
         );
     }
 
-    if (TransactionStatus.FAILED !== "failed") {
+    if (TransactionStatus.FAILED !== 'failed') {
         return (
             <AppLayout breadcrumbs={breadcrumbs}>
                 <Head title="Pembayaran Gagal" />
@@ -371,7 +373,7 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
                                         </div>
 
                                         {/* Download Invoice */}
-                                        {transaction.payment_invoice_file && (
+                                        {transaction.payment_invoice_files && (
                                             <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-700">
                                                 <div className="flex items-center justify-between">
                                                     <div className="flex items-center space-x-3">
@@ -387,7 +389,7 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
                                                     </div>
                                                     <Button variant="outline" size="sm" asChild>
                                                         <a
-                                                            href={`/storage/${transaction.payment_invoice_file}`}
+                                                            href={`/storage/${transaction.payment_invoice_files}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                         >

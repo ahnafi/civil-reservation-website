@@ -67,6 +67,7 @@ const InfoItem = ({ icon, label, value }: { icon: React.ReactNode; label: string
 export default function TransactionDetail({ transactionHistoryDetail }: { transactionHistoryDetail: Transaction[] }) {
     // Get the first transaction record
     const transaction: Transaction = transactionHistoryDetail[0];
+    console.log('Transaction Detail:', transaction);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -154,7 +155,7 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                         <InfoItem
                                             icon={<CreditCard className="h-5 w-5 text-blue-600" />}
                                             label="Metode Pembayaran"
-                                            value={transaction.payment_method}
+                                            value={!transaction.payment_method ? "Tidak tersedia" : transaction.payment_method}
                                         />
                                         <InfoItem
                                             icon={<Link2 className="h-5 w-5 text-blue-600" />}
@@ -180,27 +181,35 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                                     <h4 className="font-medium">Invoice Pembayaran</h4>
                                                 </div>
                                                 <Button size="sm" variant="ghost" asChild>
-                                                    <a href={`/storage/${transaction.payment_invoice_file}`} target="_blank">
+                                                    <a href={`/storage/${transaction.payment_invoice_files}`} target="_blank">
                                                         <Download className="h-4 w-4" />
                                                     </a>
                                                 </Button>
                                             </div>
                                             <small className="text-gray-500">Invoice pembayaran untuk transaksi ini</small>
                                         </div>
-
                                         <div className="rounded-lg border p-4">
                                             <div className="mb-2 flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
                                                     <Receipt className="h-5 w-5 text-blue-600" />
                                                     <h4 className="font-medium">Bukti Pembayaran</h4>
                                                 </div>
-                                                <Button size="sm" variant="ghost" asChild>
-                                                    <a href={`/storage/${transaction.payment_receipt_image}`} target="_blank">
-                                                        <Download className="h-4 w-4" />
-                                                    </a>
-                                                </Button>
+                                                {transaction.payment_receipt_images ? (
+                                                    <Button size="sm" variant="ghost" asChild>
+                                                        <a href={`/storage/${transaction.payment_receipt_images}`} target="_blank" rel="noopener noreferrer">
+                                                            <Download className="h-4 w-4" />
+                                                        </a>
+                                                    </Button>
+                                                ) : (
+                                                    <span className="text-sm text-gray-400 italic">Belum tersedia</span>
+                                                )}
                                             </div>
-                                            <small className="text-gray-500">Bukti pembayaran yang telah diunggah</small>
+                                            <small className="text-gray-500">
+                                                {transaction.payment_receipt_images 
+                                                    ? "Bukti pembayaran yang telah diunggah" 
+                                                    : "Bukti pembayaran belum diunggah"
+                                                }
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
@@ -235,18 +244,32 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
 
                                 {transaction.status === 'pending' && (
                                     <>
-                                        <div className="rounded-lg bg-yellow-50 p-4 dark:bg-yellow-900/20">
-                                            <div className="mb-2 flex items-center gap-2">
-                                                <Clock className="h-5 w-5 text-yellow-600" />
-                                                <h4 className="font-medium text-yellow-700 dark:text-yellow-400">Menunggu Pembayaran</h4>
+                                        {transaction.payment_receipt_images ? (
+                                            <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
+                                                <div className="mb-2 flex items-center gap-2">
+                                                    <Clock className="h-5 w-5 text-blue-600" />
+                                                    <h4 className="font-medium text-blue-700 dark:text-blue-400">Menunggu Konfirmasi</h4>
+                                                </div>
+                                                <p className="text-sm text-blue-700 dark:text-blue-400">
+                                                    Anda telah mengirim bukti pembayaran. Menunggu konfirmasi dari pihak admin.
+                                                </p>
                                             </div>
-                                            <p className="text-sm text-yellow-700 dark:text-yellow-400">
-                                                Silakan selesaikan pembayaran Anda sebelum {formatDate(transaction.payment_deadline)}.
-                                            </p>
-                                        </div>
-                                        <Link href={`/payment/${transaction.code}`} className="mt-4">
-                                            <Button className="w-full">Upload Bukti Pembayaran</Button>
-                                        </Link>
+                                        ) : (
+                                            <>
+                                                <div className="rounded-lg bg-yellow-50 p-4 dark:bg-yellow-900/20">
+                                                    <div className="mb-2 flex items-center gap-2">
+                                                        <Clock className="h-5 w-5 text-yellow-600" />
+                                                        <h4 className="font-medium text-yellow-700 dark:text-yellow-400">Menunggu Pembayaran</h4>
+                                                    </div>
+                                                    <p className="text-sm text-yellow-700 dark:text-yellow-400">
+                                                        Silakan selesaikan pembayaran Anda sebelum {formatDate(transaction.payment_deadline)}.
+                                                    </p>
+                                                </div>
+                                                <Link href={`/payment/${transaction.code}`} className="mt-4">
+                                                    <Button className="w-full">Upload Bukti Pembayaran</Button>
+                                                </Link>
+                                            </>
+                                        )}
                                     </>
                                 )}
 

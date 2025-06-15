@@ -81,7 +81,7 @@ class BookingController extends Controller
                 $validated['payment_method']
             );
 
-            return redirect()->route('history-submissions')
+            return redirect()->route('history-transactions')
                 ->with('success', 'Bukti Pembayaran Berhasil Diupload!');
         } catch (Exception $e) {
             Log::error('Payment submission failed:', [

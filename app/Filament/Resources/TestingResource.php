@@ -44,7 +44,7 @@ class TestingResource extends Resource
 
                 Forms\Components\Select::make('submission_id')
                     ->label('Kode Pengajuan')
-                    ->relationship('submission', 'code')
+                    ->relationship("submission", "code", fn($query) => $query->orderBy('created_at', 'desc'))
                     ->searchable()
                     ->preload()
                     ->required(),
@@ -126,7 +126,7 @@ class TestingResource extends Resource
                         ->exporter(TestingExporter::class)
                 ]
             )
-            ->modifyQueryUsing(fn(Builder $query)=> $query->latest())
+            ->modifyQueryUsing(fn(Builder $query) => $query->latest())
             ->columns([
                 Tables\Columns\TextColumn::make('code')
                     ->label('Kode pengujian')
@@ -207,12 +207,12 @@ class TestingResource extends Resource
                 ])
             ]);
         //            ->bulkActions([
-//                Tables\Actions\BulkActionGroup::make([
-//                    Tables\Actions\DeleteBulkAction::make(),
-//                    Tables\Actions\ForceDeleteBulkAction::make(),
-//                    Tables\Actions\RestoreBulkAction::make(),
-//                ]),
-//            ]);
+        //                Tables\Actions\BulkActionGroup::make([
+        //                    Tables\Actions\DeleteBulkAction::make(),
+        //                    Tables\Actions\ForceDeleteBulkAction::make(),
+        //                    Tables\Actions\RestoreBulkAction::make(),
+        //                ]),
+        //            ]);
     }
 
     public static function getRelations(): array

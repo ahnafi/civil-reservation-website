@@ -1,8 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { SimpleOption, type SubmissionSchedule, Testing, Transaction } from '@/types';
-import { ColumnDef } from '@tanstack/react-table';
 import { formatDate, parseISODate } from '@/utils/date-utils';
 import { Link } from '@inertiajs/react';
+import { ColumnDef } from '@tanstack/react-table';
 import { ArrowUpDown, Download } from 'lucide-react';
 
 // Submission Column Labels
@@ -51,7 +51,7 @@ export const transactionColumnLabels: Record<string, string> = {
     code: 'Kode Transaksi',
     created_at: 'Tanggal Dibuat',
     amount: 'Jumlah',
-    payment_invoice_file: 'Invoice',
+    payment_invoice_files: 'Invoice',
     status: 'Status Pembayaran',
     detail: 'Detail',
 };
@@ -182,12 +182,9 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
         header: () => <div className="flex w-[7rem] justify-center text-center">Kode Transaksi</div>,
         cell: ({ row }) => (
             <div className="flex w-full">
-        <span
-            className="truncate max-w-[6rem] md:max-w-full md:whitespace-normal"
-            title={row.getValue('code')}
-        >
-            {row.getValue('code')}
-        </span>
+                <span className="max-w-[6rem] truncate md:max-w-full md:whitespace-normal" title={row.getValue('code')}>
+                    {row.getValue('code')}
+                </span>
             </div>
         ),
     },
@@ -232,10 +229,10 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
         },
     },
     {
-        accessorKey: 'payment_invoice_file',
+        accessorKey: 'payment_invoice_files',
         header: () => <div className="text-center">Invoice</div>,
         cell: ({ row }) => {
-            const invoice = row.getValue('payment_invoice_file') as string | null;
+            const invoice = row.getValue('payment_invoice_files') as string | null;
 
             const handleDownload = () => {
                 if (invoice) {

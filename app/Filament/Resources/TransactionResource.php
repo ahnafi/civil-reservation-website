@@ -43,6 +43,7 @@ class TransactionResource extends Resource
 
                 Forms\Components\Select::make('submission_id')
                     ->relationship("submission", "code")
+                    ->relationship("submission", "code", fn($query) => $query->orderBy('created_at', 'desc'))
                     ->searchable()
                     ->columnSpanFull()
                     ->live()
@@ -131,7 +132,7 @@ class TransactionResource extends Resource
                         }
                     }),
 
-                Forms\Components\FileUpload::make('payment_invoice_file')
+                Forms\Components\FileUpload::make('payment_invoice_files')
                     ->label('Invoice Pembayaran')
                     ->columnSpanFull()
                     ->acceptedFileTypes([
@@ -150,7 +151,7 @@ class TransactionResource extends Resource
                     }),
 
 
-                Forms\Components\FileUpload::make('payment_receipt_image')
+                Forms\Components\FileUpload::make('payment_receipt_images')
                     ->hiddenOn("create")
                     ->columnSpanFull()
                     ->label('Bukti Pembayaran')
@@ -186,11 +187,11 @@ class TransactionResource extends Resource
             ->headerActions(
                 [
                     Tables\Actions\ExportAction::make()
-                    ->color("success")
+                        ->color("success")
                         ->exporter(TransactionExporter::class)
                 ]
             )
-            ->modifyQueryUsing(fn(Builder $query)=> $query->latest())
+            ->modifyQueryUsing(fn(Builder $query) => $query->latest())
             ->recordUrl(null)
             ->columns([
                 Tables\Columns\TextColumn::make('code')
@@ -284,20 +285,20 @@ class TransactionResource extends Resource
                 Tables\Actions\RestoreAction::make()
             ]);
         //            ->bulkActions([
-//                Tables\Actions\BulkActionGroup::make([
-//                    Tables\Actions\DeleteBulkAction::make(),
-//                    Tables\Actions\ForceDeleteBulkAction::make(),
-//                    Tables\Actions\RestoreBulkAction::make(),
-//                ]),
-//            ]);
+        //                Tables\Actions\BulkActionGroup::make([
+        //                    Tables\Actions\DeleteBulkAction::make(),
+        //                    Tables\Actions\ForceDeleteBulkAction::make(),
+        //                    Tables\Actions\RestoreBulkAction::make(),
+        //                ]),
+        //            ]);
     }
 
     //    public static function getRelations(): array
-//    {
-//        return [
-//            //
-//        ];
-//    }
+    //    {
+    //        return [
+    //            //
+    //        ];
+    //    }
 
     public static function getPages(): array
     {

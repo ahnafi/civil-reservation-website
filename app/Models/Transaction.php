@@ -105,7 +105,6 @@ class Transaction extends Model
                 }
             }
         });
-
     }
 
     public function submission(): BelongsTo

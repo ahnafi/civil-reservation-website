@@ -111,7 +111,7 @@ class TransactionsRelationManager extends RelationManager
                         }
                     }),
 
-                Forms\Components\FileUpload::make('payment_invoice_file')
+                Forms\Components\FileUpload::make('payment_invoice_files')
                     ->label('Invoice Pembayaran')
                     ->acceptedFileTypes([
                         'application/pdf',
@@ -120,7 +120,7 @@ class TransactionsRelationManager extends RelationManager
                     ])
                     ->directory('payment_invoice'),
 
-                Forms\Components\FileUpload::make('payment_receipt_image')
+                Forms\Components\FileUpload::make('payment_receipt_images')
                     ->hiddenOn("create")
                     ->label('Bukti Pembayaran')
                     ->image()
@@ -201,9 +201,11 @@ class TransactionsRelationManager extends RelationManager
                 Tables\Actions\ForceDeleteAction::make(),
                 Tables\Actions\RestoreAction::make()
             ])
-            ->bulkActions([Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make(),
+            ->bulkActions([Tables\Actions\BulkActionGroup::make([
+                Tables\Actions\DeleteBulkAction::make(),
                 Tables\Actions\ForceDeleteBulkAction::make(),
-                Tables\Actions\RestoreBulkAction::make(),]),])
+                Tables\Actions\RestoreBulkAction::make(),
+            ]),])
             ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([SoftDeletingScope::class,]));
     }
 }

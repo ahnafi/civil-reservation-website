@@ -190,15 +190,15 @@ export interface Transaction {
     note?: string;
     status: TransactionStatus;
     submission_code: string;
-    payment_invoice_file?: string;
-    payment_receipt_image?: string;
+    payment_invoice_files?: string;
+    payment_receipt_images?: string;
     payment_deadline: string;
     payment_date?: string;
     submission_id: number;
     created_at: string;
     updated_at: string;
     deleted_at?: string;
-};
+}
 
 export interface Testing {
     id: number;
@@ -228,7 +228,7 @@ export interface testForSchedule {
     category_name: string;
     laboratory_id: number;
     laboratory_code: string;
-    laboratory_name:  string;
+    laboratory_name: string;
 }
 
 export interface scheduleForSchedule {
