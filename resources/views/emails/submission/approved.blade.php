@@ -14,7 +14,7 @@
                         style="padding: 2px 4px; background-color:#edf2f7; border-radius: 4px; font-weight: bold; display: inline-block;">{{ $submission->code }}</span>
                     telah disetujui.
                 </p>
-                <p>Berikut detail pengajuannya :</p>
+                <p>Berikut detail pengujianya :</p>
             </div>
         </td>
     </tr>

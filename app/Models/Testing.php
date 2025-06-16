@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Mail\TestingWip;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -9,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Services\BookingService;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -43,6 +45,9 @@ class Testing extends Model
 
             $testing->code = 'UJI-' . $submissionCode . '-' . $date;
             $testing->saveQuietly();
+//             send mail
+            $userEmail = $testing->submission->user->email;
+            Mail::to($userEmail)->send(new TestingWip($testing->id));
         });
 
         static::updating(function ($model) {

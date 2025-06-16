@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Mail\TransactionPending;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -52,6 +54,12 @@ class Transaction extends Model
             }
         });
 
+
+        static::created(function ($transaction) {
+            $userEmail = $transaction->submission->user->email;
+            Mail::to($userEmail)->send(new TransactionPending($transaction->id));
+        });
+          
         static::updating(function ($transaction) {
             if ($transaction->isDirty('payment_invoice_files')) {
                 $original = $transaction->getOriginal('payment_invoice_files') ?? [];

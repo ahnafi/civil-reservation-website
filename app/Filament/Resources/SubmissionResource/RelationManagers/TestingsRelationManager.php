@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
+use App\Services\TestingService;
 
 class TestingsRelationManager extends RelationManager
 {
@@ -114,10 +115,8 @@ class TestingsRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-
-                Tables\Actions\Action::make("Selesaikan")
+               Tables\Actions\Action::make("Selesaikan")
                     ->form([
-
                         Forms\Components\FileUpload::make('documents')
                             ->label('Lampiran')
                             ->multiple()
@@ -127,7 +126,6 @@ class TestingsRelationManager extends RelationManager
                                 'application/msword',
                                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                             ])
-                            ->required()
                             ->openable()
                             ->helperText('Format file yang diterima: PDF, DOC, DOCX.')
                             ->columnSpanFull(),
@@ -136,36 +134,10 @@ class TestingsRelationManager extends RelationManager
                             ->columnSpanFull()
                             ->label('Catatan')
                             ->nullable(),
-
                     ])
                     ->action(function (array $data, Model $record) {
-
-                        $user = $record->submission->user;
-                        if ($user && $user->email) {
-
-                            $record->status = "completed";
-                            $record->completed_at = Carbon::now()->format('Y-m-d\TH:i:s');
-                            $record->documents = $data['documents'];
-                            $record->note = $data['note'] ?? null;
-                            $record->save();
-
-                            Mail::raw("Pengujian selesai.", function ($message) use ($user) {
-                                $message->to($user->email)
-                                    ->subject('Pengujian selesai');
-                            });
-
-                            Notification::make()
-                                ->title('Pengujian selesai')
-                                ->body("Pengajuan oleh {$user->name} dengan kode pengajuan {$record->submission->code} telah selesai.")
-                                ->success()
-                                ->send();
-                        } else {
-                            Notification::make()
-                                ->title('Gagal mengubah pengujian ')
-                                ->body("Pengujian dengan kode {$record->code} gagal diubah.")
-                                ->danger()
-                                ->send();
-                        }
+                        $testingService = app(TestingService::class);
+                        $testingService->solved($data, $record);
                     })
                     ->requiresConfirmation()
                     ->color("success")
