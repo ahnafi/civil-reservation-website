@@ -69,7 +69,9 @@ class BookingUtils
             $schedule->available_slots -= 1;
             $schedule->save();
         } else {
-            throw new \Exception('No available slots for this schedule.');
+            return response()->json([
+                'message' => 'Slot tidak tersedia untuk jadwal ini',
+            ], 400);
         }
     }
 

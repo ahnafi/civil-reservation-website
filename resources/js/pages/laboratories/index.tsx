@@ -21,7 +21,7 @@ export default function Laboratories({ laboratories }: { laboratories: Laborator
                             <CardHeader className="px-0">
                                 <Link href={'/laboratory/' + laboratory.slug}>
                                     <img
-                                        src={'/storage/' + laboratory.image}
+                                        src={'/storage/' + laboratory.images[0]}
                                         alt={laboratory.name}
                                         className="h-48 w-full rounded-md object-cover md:h-54 lg:h-60"
                                     />

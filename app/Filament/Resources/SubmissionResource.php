@@ -9,6 +9,7 @@ use App\Models\Package;
 use App\Models\Submission;
 use App\Models\Test;
 use App\Models\User;
+use App\Services\FileNaming;
 use Filament\Tables\Actions\ExportAction;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
@@ -29,6 +30,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use \App\Services\BookingService;
 use \App\Services\SubmissionService;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class SubmissionResource extends Resource
 {
@@ -104,8 +106,9 @@ class SubmissionResource extends Resource
                             Forms\Components\DateTimePicker::make('test_submission_date')
                                 ->label('Tanggal pengujian')
                                 ->required(),
-                            Forms\Components\FileUpload::make('document')
+                            Forms\Components\FileUpload::make('documents')
                                 ->label('Lampiran')
+                                ->multiple()
                                 ->preserveFilenames()
                                 ->acceptedFileTypes([
                                     'application/pdf',
@@ -116,7 +119,14 @@ class SubmissionResource extends Resource
                                 ->directory("submission")
                                 ->helperText('Format file yang diterima: PDF, DOC, DOCX. Maksimal ukuran file: 2MB.')
                                 ->openable()
-                                ->columnSpanFull(),
+                                ->columnSpanFull()
+                                ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                                    $extension = $file->getClientOriginalExtension();
+
+                                    $id   = $get('id') ?? -1;
+
+                                    return FileNaming::generateSubmissionName($id, $extension);
+                                }),
                             Forms\Components\Textarea::make('note')
                                 ->label('Catatan')
                                 ->columnSpanFull(),

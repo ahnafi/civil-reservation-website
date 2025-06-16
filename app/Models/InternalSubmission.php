@@ -1,0 +1,164 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+
+class InternalSubmission extends Model
+{
+    protected $fillable = [
+        'code',
+        'user_id',
+        'name',
+        'study_program',
+        'research_title',
+        'total_personnel',
+        'supervisor',
+        'documents',
+        'test_submission_date',
+        'status',
+        'user_note',
+        'admin_note',
+        'approval_date'
+    ];
+
+    protected $casts = [
+        'documents' => 'array',
+    ];
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::created(function ($submission) {
+            try {
+                $paddedUserId = str_pad($submission->user_id, 3, '0', STR_PAD_LEFT);
+                $paddedId = str_pad($submission->id, 3, '0', STR_PAD_LEFT);
+
+                $submission->code = 'INT-' . $paddedUserId . $paddedId;
+                $submission->saveQuietly();
+            } catch (\Throwable $e) {
+                Log::error('InternalSubmission code generation failed', ['error' => $e->getMessage()]);
+            }
+        });
+
+        static::updating(function ($model) {
+            if ($model->isDirty('documents')) {
+                $originalDocuments = $model->getOriginal('documents') ?? [];
+                $newDocuments = $model->documents ?? [];
+                $removedDocuments = array_diff($originalDocuments, $newDocuments);
+
+                foreach ($removedDocuments as $removedDocument) {
+                    if (Storage::disk('public')->exists($removedDocument)) {
+                        Storage::disk('public')->delete($removedDocument);
+                    }
+                }
+            }
+        });
+
+        static::deleting(function ($model) {
+            if (!empty($model->documents)) {
+                foreach ($model->documents as $filename) {
+                    if (Storage::disk('public')->exists($filename)) {
+                        Storage::disk('public')->delete($filename);
+                    }
+                }
+            }
+        });
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'approval_date' => 'datetime',
+        ];
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function testing(): HasOne
+    {
+        return $this->hasOne(Testing::class);
+    }
+
+    public function tests(): BelongsToMany
+    {
+        return $this->belongsToMany(Test::class, 'submission_test')->withTimestamps()->withPivot('quantity');
+    }
+
+    public function packages(): BelongsToMany
+    {
+        return $this->belongsToMany(Package::class, 'submission_package')->withTimestamps();
+    }
+
+    public function submissionPackages(): HasMany
+    {
+        return $this->hasMany(SubmissionPackage::class);
+    }
+    public function submissionTests(): HasMany
+    {
+        return $this->hasMany(SubmissionTest::class);
+    }
+
+    public function scopeWithScheduleJoin($query)
+    {
+        return $query
+            ->leftJoin('submission_test', 'submissions.id', '=', 'submission_test.submission_id')
+            ->leftJoin('submission_package', 'submissions.id', '=', 'submission_package.submission_id')
+            ->leftJoin('tests', 'submission_test.test_id', '=', 'tests.id')
+            ->leftJoin('packages', 'submission_package.package_id', '=', 'packages.id')
+            ->leftJoin('laboratories as test_labs', 'tests.laboratory_id', '=', 'test_labs.id')
+            ->leftJoin('laboratories as package_labs', 'packages.laboratory_id', '=', 'package_labs.id')
+            ->select(
+                'submissions.id',
+                'submissions.code',
+                'submissions.company_name',
+                'submissions.test_submission_date',
+                'submissions.status',
+                'submission_test.test_id',
+                'submission_package.package_id',
+                'tests.name as test_name',
+                'packages.name as package_name',
+                DB::raw('COALESCE(test_labs.id, package_labs.id) as lab_id'),
+                DB::raw('COALESCE(test_labs.code, package_labs.code) as lab_code'),
+                DB::raw('COALESCE(test_labs.name, package_labs.name) as lab_name'),
+            )
+            ->orderBy('submissions.test_submission_date', 'desc');
+    }
+
+    public function scopeWithUserScheduleJoin($query)
+    {
+        return $query
+            ->leftJoin('submission_test', 'submissions.id', '=', 'submission_test.submission_id')
+            ->leftJoin('submission_package', 'submissions.id', '=', 'submission_package.submission_id')
+            ->leftJoin('tests', 'submission_test.test_id', '=', 'tests.id')
+            ->leftJoin('packages', 'submission_package.package_id', '=', 'packages.id')
+            ->leftJoin('laboratories as test_labs', 'tests.laboratory_id', '=', 'test_labs.id')
+            ->leftJoin('laboratories as package_labs', 'packages.laboratory_id', '=', 'package_labs.id')
+            ->select(
+                'submissions.id',
+                'submissions.code',
+                'submissions.company_name',
+                'submissions.test_submission_date',
+                'submissions.status',
+                'submission_test.test_id',
+                'submission_package.package_id',
+                'tests.name as test_name',
+                'packages.name as package_name',
+                DB::raw('COALESCE(test_labs.id, package_labs.id) as lab_id'),
+                DB::raw('COALESCE(test_labs.code, package_labs.code) as lab_code'),
+                DB::raw('COALESCE(test_labs.name, package_labs.name) as lab_name'),
+            )
+            ->where('submissions.user_id', auth()->user()->id)
+            ->orderBy('submissions.created_at', 'desc');
+    }
+}

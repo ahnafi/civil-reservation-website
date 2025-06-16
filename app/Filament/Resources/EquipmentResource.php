@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Editor\Resources\EquipmentResource\Pages;
 use App\Models\Equipment;
+use App\Services\FileNaming;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -11,6 +12,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use function Symfony\Component\Translation\t;
 
 class EquipmentResource extends Resource
 {
@@ -29,12 +32,22 @@ class EquipmentResource extends Resource
                 Forms\Components\FileUpload::make('image')
                     ->label('Gambar Peralatan')
                     ->image()
+                    ->imageEditor()
+                    ->previewable(true)
                     ->preserveFilenames()
                     ->enableOpen()
                     ->enableDownload()
                     ->directory('equipment')
                     ->maxSize(2048)
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                        $extension = $file->getClientOriginalExtension();
+
+                        $id   = $get('id') ?? -1;
+                        $name = $get('name') ?? 'equipment';
+
+                        return FileNaming::generateEquipmentName($id, $name, $extension);
+                    }),
                 Forms\Components\TextInput::make('name')
                     ->label('Nama Peralatan')
                     ->required()

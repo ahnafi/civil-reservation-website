@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements FilamentUser, MustVerifyEmail
@@ -52,6 +53,12 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     {
         parent::boot();
 
+        static::creating(function ($model) {
+            if (empty($model->photo)) {
+                $model->photo = 'user_photos\/default-user_profile.jpg';
+            }
+        });
+
         static::created(function ($user) {
             if ($user->role !== null) {
                 return;
@@ -66,6 +73,32 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
                     $user->role = 'external';
                 }
                 $user->save();
+            }
+        });
+
+        static::updating(function ($model) {
+            if ($model->isDirty('photo')) {
+                $oldImage = $model->getOriginal('photo');
+                $newImage = $model->photo;
+
+                if (
+                    $oldImage &&
+                    $oldImage !== $newImage &&
+                    $oldImage !== 'user_photos\/default-user_profile.jpg' &&
+                    Storage::disk('public')->exists($oldImage)
+                ) {
+                    Storage::disk('public')->delete($oldImage);
+                }
+            }
+        });
+
+        static::deleting(function ($model) {
+            if (
+                $model->photo &&
+                $model->photo !== 'user_photos\/default-user_profile.jpg' &&
+                Storage::disk('public')->exists($model->photo)
+            ) {
+                Storage::disk('public')->delete($model->photo);
             }
         });
     }

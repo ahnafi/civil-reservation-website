@@ -4,10 +4,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Test } from '@/types';
+import { type BreadcrumbItem, Test, TestCart } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Clock, Layers, MapPin, Ruler, Tag } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Detail({ test }: { test: Test }) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -22,6 +22,36 @@ export default function Detail({ test }: { test: Test }) {
     ];
 
     const [mainImage, setMainImage] = useState(test.images[0]);
+    const [testCart, setTestCart] = useState<TestCart[]>([]);
+    const [isAdding, setIsAdding] = useState(false);
+
+    useEffect(() => {
+        const savedTest = localStorage.getItem('tests');
+        if (savedTest) {
+            const parsedTest = JSON.parse(savedTest);
+            setTestCart(parsedTest);
+        }
+    }, []);
+
+    const handleAddTestToCart = (test: Test) => {
+        setIsAdding(true);
+        const existingTest: TestCart | undefined = testCart.find((item) => item.test_id === test.id);
+        if (existingTest) {
+            alert('Test already exists in the cart');
+            setIsAdding(false);
+        } else {
+            const newTestCart: TestCart = {
+                test_id: test.id,
+                slug: test.slug,
+                unit: test.minimum_unit,
+                test: test,
+            };
+            setTestCart([...testCart, newTestCart]);
+            alert('Test added to cart');
+            localStorage.setItem('tests', JSON.stringify([...testCart, newTestCart]));
+            setIsAdding(false);
+        }
+    };
 
     const formatRupiah = (value: number) => {
         return new Intl.NumberFormat('id-ID', {
@@ -44,7 +74,7 @@ export default function Detail({ test }: { test: Test }) {
                             <CardContent className="p-0">
                                 <div className="relative aspect-square w-full overflow-hidden">
                                     <img
-                                        src={'/storage/test_image/' + mainImage}
+                                        src={'/storage/' + mainImage}
                                         alt={test.name}
                                         className="h-full w-full object-cover transition-all duration-300 hover:scale-105"
                                     />
@@ -63,7 +93,7 @@ export default function Detail({ test }: { test: Test }) {
                                                         onClick={() => setMainImage(image)}
                                                     >
                                                         <img
-                                                            src={'/storage/test_image/' + image}
+                                                            src={'/storage/' + image}
                                                             alt={`${test.name} ${index + 1}`}
                                                             className="aspect-square h-full w-full object-cover"
                                                         />
@@ -163,7 +193,7 @@ export default function Detail({ test }: { test: Test }) {
                                                             <div className="flex items-center gap-4">
                                                                 <div className="h-16 w-16 overflow-hidden rounded-md">
                                                                     <img
-                                                                        src={`/storage/test_image/${pkg.images[0]}`}
+                                                                        src={`/storage/${pkg.images[0]}`}
                                                                         alt={pkg.name}
                                                                         className="h-full w-full object-cover"
                                                                     />
@@ -190,12 +220,14 @@ export default function Detail({ test }: { test: Test }) {
                             </CardContent>
 
                             <CardFooter className="flex flex-col gap-4 p-0 sm:flex-row">
-                                <Link
-                                    href={`/tests/${test.slug}/order`}
-                                    className="bg-blue-base text-light-base normal-font-size w-full rounded-md px-4 py-2 text-center font-semibold hover:bg-blue-600/90 md:py-4"
+                                <Button
+                                    variant="outline"
+                                    disabled={isAdding}
+                                    onClick={() => handleAddTestToCart(test)}
+                                    className="bg-blue-base text-light-base normal-font-size h-full w-full rounded-md px-4 py-2 text-center font-semibold hover:bg-blue-600/90 md:py-4"
                                 >
                                     Pesan Sekarang
-                                </Link>
+                                </Button>
                             </CardFooter>
                         </Card>
                     </div>
@@ -214,7 +246,7 @@ export default function Detail({ test }: { test: Test }) {
                                 <div className="w-full md:w-1/4">
                                     <div className="overflow-hidden rounded-lg">
                                         <img
-                                            src={`/storage/${test.laboratory.image}`}
+                                            src={`/storage/${test.laboratory.images}`}
                                             alt={test.laboratory.name}
                                             className="h-full w-full object-cover"
                                         />

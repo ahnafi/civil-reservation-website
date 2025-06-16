@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\Api\ContactController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\LaboratoryController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ResearchController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TestController;
+use App\Mail\ContactFormMail;
 use Illuminate\Support\Facades\Route;
 
 // API Routes
@@ -30,5 +32,8 @@ Route::get("tests", [TestController::class, "apiIndex"])->name("tests.api.index"
 Route::get("tests/{test:slug}", [TestController::class, "apiDetail"])->name("tests.api.detail");
 Route::get("tests/search", [TestController::class, "apiSearch"])->name("tests.api.search");
 
-Route::get("labs", [LaboratoryController::class, "apiLabs"])->name("labs.api.index");
+Route::get("labs", [LaboratoryController::class, "apiIndex"])->name("labs.api.index");
 Route::get("labs/{laboratory:slug}", [LaboratoryController::class, "apiDetail"])->name("labs.api.detail");
+
+// Contact Form Route
+Route::post("contact", [ContactController::class, "send"])->name("contact.send");

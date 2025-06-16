@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Services\BookingService;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class Testing extends Model
 {
@@ -35,18 +37,42 @@ class Testing extends Model
             $bookingService = new BookingService();
             $bookingService->storeScheduleTesting($testing->id);
 
-            // Generate code based on the test date and submission ID
+            $submission = $testing->submission;
+
+            // Generate code based on the test date and submission Code
             $date = Carbon::parse($testing->test_date)->format('Ymd');
-            $submissionId = str_pad($testing->submission_id ?? 0, 3, '0', STR_PAD_LEFT);
-            $testingId = str_pad($testing->id ?? 0, 3, '0', STR_PAD_LEFT);
+            $submissionCode = $submission->code;
 
-            $testing->code = 'UJI-' . $date . '-' . $submissionId . $testingId;
+            $testing->code = 'UJI-' . $submissionCode . '-' . $date;
             $testing->saveQuietly();
-        });
-
-        static::created(function ($testing) {
+//             send mail
             $userEmail = $testing->submission->user->email;
             Mail::to($userEmail)->send(new TestingWip($testing->id));
+        });
+
+        static::updating(function ($model) {
+              if ($model->isDirty('documents')) {
+                $originalDocuments = $model->getOriginal('documents') ?? [];
+                $newDocuments = $model->documents ?? [];
+
+                $removedDocuments = array_diff($originalDocuments, $newDocuments);
+
+                foreach ($removedDocuments as $removedDocument) {
+                    if (Storage::disk('public')->exists($removedDocument)) {
+                        Storage::disk('public')->delete($removedDocument);
+                    }
+                }
+             }
+        });
+
+        static::deleting(function ($model) {
+            if (!empty($model->documents)) {
+                foreach ($model->documents as $filename) {
+                    if (Storage::disk('public')->exists($filename)) {
+                        Storage::disk('public')->delete($filename);
+                    }
+                }
+            }
         });
 
     }

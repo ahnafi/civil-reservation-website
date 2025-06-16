@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\LaboratoryController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\DashboardController;
@@ -27,18 +28,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('package/{package:slug}', [PackageController::class, "detail"])->name('packages-detail');
 
     // Get Booking Page
-    Route::get('orders/cart', function () {
-        return Inertia::render('orders/cart');
-    })->name('orders-cart');
-    Route::get('orders/cart/form', function () {
+    Route::get('orders/cart', [CartController::class, 'cart'])->name('orders-cart');
+    Route::get('orders/form', function () {
         return Inertia::render('orders/form');
     })->name('orders-cart-form');
+    Route::get('orders/checkout', function () {
+        return Inertia::render('orders/checkout');
+    })->name('orders-cart-checkout');
     Route::get('orders/status', function () {
         return Inertia::render('orders/status');
     })->name('orders-status');
     Route::get('orders/history', function () {
         return Inertia::render('orders/history');
     })->name('orders-history');
+
+    // Get Payment Page
+    Route::get('payment/{transaction:code}', [BookingController::class, "payment"])->name('orders-payment');
 
     // Get Submission History
     Route::get('history/submissions', [HistoryController::class, "submissionsHistory"])->name('history-submissions');
@@ -54,9 +59,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('cart/add', [BookingController::class, 'addToCart'])->name('cart.add');
 
     // Post Page
-    Route::post('cart/submit', [BookingController::class, 'submitSubmission'])->name('createSubmission');
-    Route::post('submission/payment', [BookingController::class, 'submitPayment'])->name('submitPayment');
+    Route::post('payment', [BookingController::class, 'submitPayment'])->name('submit-payment');
     Route::post('schedule/submit', [ScheduleController::class, 'getSchedule'])->name('schedule.submit');
+    Route::post('cart/submit', [BookingController::class, 'submitSubmission'])->name('createSubmission');
 });
 
 require __DIR__ . '/settings.php';

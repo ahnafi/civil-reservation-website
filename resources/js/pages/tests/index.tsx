@@ -1,9 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, PaginatedTests, Test } from '@/types';
+import { type BreadcrumbItem, PaginatedTests, Test, TestCart } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -13,6 +14,37 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Tests({ tests }: { tests: PaginatedTests }) {
+    const [testCart, setTestCart] = useState<TestCart[]>([]);
+    const [isAdding, setIsAdding] = useState(false);
+
+    useEffect(() => {
+        const savedTest = localStorage.getItem('tests');
+        if (savedTest) {
+            const parsedTest = JSON.parse(savedTest);
+            setTestCart(parsedTest);
+        }
+    }, []);
+
+    const handleAddTestToCart = (test: Test) => {
+        setIsAdding(true);
+        const existingTest: TestCart | undefined = testCart.find((item) => item.test_id === test.id);
+        if (existingTest) {
+            alert('Test already exists in the cart');
+            setIsAdding(false);
+        } else {
+            const newTestCart: TestCart = {
+                test_id: test.id,
+                slug: test.slug,
+                unit: test.minimum_unit,
+                test: test,
+            };
+            setTestCart([...testCart, newTestCart]);
+            alert('Test added to cart');
+            localStorage.setItem('tests', JSON.stringify([...testCart, newTestCart]));
+            setIsAdding(false);
+        }
+    };
+
     const formatRupiah = (value: number, currency = 'IDR') => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
@@ -25,10 +57,10 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
     const renderPaginationLinks = () => {
         const { links, current_page, last_page } = tests;
 
-        const numberedLinks = links.filter((link) => !link.label.includes('Previous') && !link.label.includes('Next'));
+        const numberedLinks = links.filter((link) => !link.label.includes('Sebelumnya') && !link.label.includes('Berikutnya'));
 
         return (
-            <div className="mt-6 flex items-center justify-center gap-1">
+            <div className="small-font-size mt-6 flex items-center justify-center gap-1">
                 <Button variant="outline" size="icon" disabled={current_page === 1} asChild={current_page !== 1}>
                     {current_page !== 1 ? (
                         <Link href={tests.prev_page_url || '#'}>
@@ -48,7 +80,11 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                         className={link.active ? 'bg-blue-600 hover:bg-blue-700' : ''}
                         asChild={!link.active}
                     >
-                        {!link.active ? <Link href={link.url || '#'}>{link.label}</Link> : <span>{link.label}</span>}
+                        {!link.active ? (
+                            <Link href={link.url || '#'} dangerouslySetInnerHTML={{ __html: link.label }} />
+                        ) : (
+                            <span dangerouslySetInnerHTML={{ __html: link.label }} />
+                        )}
                     </Button>
                 ))}
                 <Button variant="outline" size="icon" disabled={current_page === last_page} asChild={current_page !== last_page}>
@@ -67,16 +103,16 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
     };
 
     return (
-    <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Pengujian" />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div className="flex h-full flex-col gap-4 rounded-xl p-4">
                 <div className="grid auto-rows-min grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {tests.data.map((data: Test) => (
                         <Card className="gap-0 p-2" key={data.id}>
                             <CardHeader className="px-0">
                                 <Link href={'/test/' + data.slug}>
                                     <img
-                                        src={'/storage/test_image/' + data.images}
+                                        src={'/storage/' + data.images}
                                         alt={data.name}
                                         className="h-48 w-full rounded-md object-cover md:h-54 lg:h-60"
                                     />
@@ -134,9 +170,11 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                                 </CardDescription>
                                 <div className="flex flex-wrap items-center justify-between">
                                     <h4 className="font-semibold">{formatRupiah(data.price)}</h4>
-                                    <Link
-                                        href={'/test/' + data.slug}
-                                        className="bg-blue-base text-light-base flex items-center justify-between gap-1 rounded-md px-3 py-2"
+                                    <Button
+                                        onClick={() => handleAddTestToCart(data)}
+                                        variant="outline"
+                                        disabled={isAdding}
+                                        className="flex cursor-pointer items-center justify-between gap-1 rounded-md px-3 py-2"
                                     >
                                         <svg
                                             className="h-4 w-4 md:h-5 md:w-5"
@@ -154,16 +192,16 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                                             ></path>
                                         </svg>
                                         <span className="small-font-size">Tambah ke Keranjang</span>
-                                    </Link>
+                                    </Button>
                                 </div>
                             </CardContent>
                         </Card>
                     ))}
                 </div>
                 {renderPaginationLinks()}
-                <div className="mt-4 text-center text-sm text-gray-500">
+                <span className="small-font-size col mt-4 text-center text-gray-500">
                     Menampilkan {tests.from} hingga {tests.to} dari {tests.total} pengujian
-                </div>
+                </span>
             </div>
         </AppLayout>
     );

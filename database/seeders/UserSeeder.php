@@ -16,9 +16,10 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Admin User',
                 'email' => 'admin@example.com',
+                'email_verified_at' => now(),
                 'password' => Hash::make('qwerty123'),
                 'phone' => '1234567890',
-                'photo' => 'profile1.png',
+                'photo' => 'user_photos\/default-user_profile.jpg',
                 'identity' => 'admin_identity',
                 'role' => 'admin',
                 'created_at' => now(),
@@ -26,9 +27,10 @@ class UserSeeder extends Seeder
             [
                 'name' => 'External User',
                 'email' => 'external@example.com',
+                'email_verified_at' => now(),
                 'password' => Hash::make('qwerty123'),
                 'phone' => '1234567891',
-                'photo' => 'profile2.png',
+                'photo' => 'user_photos\/default-user_profile.jpg',
                 'identity' => 'external_identity',
                 'role' => 'external',
                 'created_at' => now(),
@@ -36,13 +38,36 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Internal User',
                 'email' => 'internal@example.com',
+                'email_verified_at' => now(),
                 'password' => Hash::make('qwerty123'),
                 'phone' => '1234567892',
-                'photo' => 'profile3.png',
+                'photo' => 'user_photos\/default-user_profile.jpg',
                 'identity' => 'internal_identity',
                 'role' => 'internal',
                 'created_at' => now(),
             ],
+            [
+                'name' => 'Bintang Putra Akbar',
+                'email' => 'internal@demo.com',
+                'email_verified_at' => now()->subDay(178),
+                'password' => Hash::make('qwerty123'),
+                'phone' => '081326804033',
+                'photo' => 'user_photos\/default-user_profile.jpg',
+                'identity' => 'internal_identity',
+                'role' => 'internal',
+                'created_at' => now()->subDays(180),
+            ],
+            [
+                'name' => 'Athallah Tsany Satriyaji',
+                'email' => 'external@demo.com',
+                'email_verified_at' => now()->subDays(179),
+                'password' => Hash::make('qwerty123'),
+                'phone' => '085375502733',
+                'photo' => 'user_photos\/default-user_profile.jpg',
+                'identity' => 'external_identity',
+                'role' => 'external',
+                'created_at' => now()->subDays(180),
+            ]
         ];
 
         foreach ($users as $user) {

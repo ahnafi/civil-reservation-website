@@ -1,10 +1,16 @@
+'use client';
+
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import type { BreadcrumbItem, PackageCart, TestCart } from '@/types';
 import { Head, Link } from '@inertiajs/react';
+import { AlertCircle, Beaker, Building2, CheckCircle2, ClipboardList, CreditCard, Minus, PackageIcon, Plus, ShoppingCart, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,258 +23,478 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const dummyData: {
-    title: string;
-    price: number;
-    order: number;
-    link: string;
-    testPackages: {
-        title: string;
-        price: number;
-    }[];
-    notes?: string;
-}[] = [
-    {
-        title: 'Uji Material Kerikil Lengkap',
-        price: 850000,
-        order: 1,
-        link: 'packages/example',
-        testPackages: [
-            {
-                title: 'Uji Kadar Air',
-                price: 100000,
-            },
-            {
-                title: 'Uji Berat Jenis',
-                price: 150000,
-            },
-            {
-                title: 'Uji Kadar Lumpur',
-                price: 200000,
-            },
-            {
-                title: 'Uji Kadar Tanah Liat',
-                price: 200000,
-            },
-            {
-                title: 'Uji Kadar Tanah Liat',
-                price: 200000,
-            },
-        ],
-        notes: 'Untuk kebutuhan dasar sebelum produksi atau riset awal.',
-    },
-    {
-        title: 'Uji Material Kerikil Lengkap',
-        price: 850000,
-        order: 1,
-        link: 'packages/example',
-        testPackages: [
-            {
-                title: 'Uji Kadar Air',
-                price: 100000,
-            },
-            {
-                title: 'Uji Berat Jenis',
-                price: 150000,
-            },
-            {
-                title: 'Uji Kadar Lumpur',
-                price: 200000,
-            },
-            {
-                title: 'Uji Kadar Tanah Liat',
-                price: 200000,
-            },
-            {
-                title: 'Uji Kadar Tanah Liat',
-                price: 200000,
-            },
-        ],
-        notes: 'Untuk kebutuhan dasar sebelum produksi atau riset awal.',
-    },
-    {
-        title: 'Uji Material Kerikil Lengkap',
-        price: 850000,
-        order: 1,
-        link: 'packages/example',
-        testPackages: [
-            {
-                title: 'Uji Kadar Air',
-                price: 100000,
-            },
-            {
-                title: 'Uji Berat Jenis',
-                price: 150000,
-            },
-            {
-                title: 'Uji Kadar Lumpur',
-                price: 200000,
-            },
-            {
-                title: 'Uji Kadar Tanah Liat',
-                price: 200000,
-            },
-            {
-                title: 'Uji Kadar Tanah Liat',
-                price: 200000,
-            },
-        ],
-        notes: 'Untuk kebutuhan dasar sebelum produksi atau riset awal.',
-    },
-];
-
 export default function Cart() {
-    const formatRupiah = (value: number, currency = 'IDR') => {
+    const [testsCart, setTestsCart] = useState<TestCart[]>([]);
+    const [packagesCart, setPackagesCart] = useState<PackageCart[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        try {
+            const savedTests = localStorage.getItem('tests') || '[]';
+            const savedPackages = localStorage.getItem('packages') || '[]';
+
+            setTestsCart(JSON.parse(savedTests));
+            setPackagesCart(JSON.parse(savedPackages));
+        } catch (err) {
+            setError('Error loading cart data');
+            console.error(err);
+            console.error('Error loading cart data:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    const updateTestQuantity = (testId: number, newQuantity: number) => {
+        const updatedTests = testsCart.map((item: TestCart) => {
+            if (item.test_id === testId) {
+                const minUnit = item.test.minimum_unit || 1;
+                const quantity = Math.max(minUnit, newQuantity);
+                return { ...item, unit: quantity };
+            }
+            return item;
+        });
+
+        setTestsCart(updatedTests);
+        localStorage.setItem('tests', JSON.stringify(updatedTests));
+    };
+
+    const updatePackageQuantity = (packageId: number, newQuantity: number) => {
+        const updatedPackages = packagesCart.map((item) => {
+            if (item.package_id === packageId) {
+                return { ...item, quantity: Math.max(1, newQuantity) };
+            }
+            return item;
+        });
+
+        setPackagesCart(updatedPackages);
+        localStorage.setItem('packages', JSON.stringify(updatedPackages));
+    };
+
+    const removeTest = (testId: number) => {
+        const updatedTests = testsCart.filter((item: TestCart) => item.test_id !== testId);
+        setTestsCart(updatedTests);
+        localStorage.setItem('tests', JSON.stringify(updatedTests));
+    };
+
+    const removePackage = (packageId: number) => {
+        const updatedPackages = packagesCart.filter((item: PackageCart) => item.package_id !== packageId);
+        setPackagesCart(updatedPackages);
+        localStorage.setItem('packages', JSON.stringify(updatedPackages));
+    };
+
+    const calculateSubtotal = () => {
+        let subtotal = 0;
+
+        testsCart.forEach((item: TestCart) => {
+            subtotal += item.test.price * item.unit;
+        });
+
+        packagesCart.forEach((item: PackageCart) => {
+            subtotal += item.package.price * (item.quantity || 1);
+        });
+
+        return subtotal;
+    };
+
+    const subtotal = calculateSubtotal();
+    const tax = Math.round(subtotal * 0.1);
+    const shipping = subtotal > 0 ? 50000 : 0;
+    const total = subtotal + tax + shipping;
+
+    const formatRupiah = (value: number) => {
         return new Intl.NumberFormat('id-ID', {
             style: 'currency',
-            currency: currency,
+            currency: 'IDR',
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
         }).format(value);
     };
 
+    if (isLoading) {
+        return (
+            <AppLayout breadcrumbs={breadcrumbs}>
+                <Head title="Keranjang" />
+                <div className="flex h-64 items-center justify-center">
+                    <div className="border-primary h-12 w-12 animate-spin rounded-full border-t-2 border-b-2"></div>
+                </div>
+            </AppLayout>
+        );
+    }
+
+    const isEmpty = testsCart.length === 0 && packagesCart.length === 0;
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Keranjang" />
 
-            <div className="grid grid-cols-1 gap-6 p-4 lg:grid-cols-1 xl:grid-cols-3">
-                <div className="space-y-4 xl:col-span-2">
-                    <ol className="small-font-size flex w-full items-center space-x-2 rounded-lg border border-gray-200 bg-white p-3 text-center font-medium text-gray-500 shadow-xs sm:space-x-4 sm:p-4 rtl:space-x-reverse dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
-                        <li className="flex items-center text-blue-600 dark:text-blue-500">
-                            <span className="me-2 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-blue-600 dark:border-blue-500">
-                                1
-                            </span>
-                            Keranjang
-                            <svg
-                                className="ms-2 h-3 w-3 sm:ms-4 rtl:rotate-180"
-                                aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 12 10"
-                            >
-                                <path
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="m7 9 4-4-4-4M1 9l4-4-4-4"
-                                />
-                            </svg>
-                        </li>
-                        <li className="flex items-center">
-                            <span className="me-2 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gray-500 dark:border-gray-400">
-                                2
-                            </span>
-                            Formulir Pesanan
-                            <svg
-                                className="ms-2 h-3 w-3 sm:ms-4 rtl:rotate-180"
-                                aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 12 10"
-                            >
-                                <path
-                                    stroke="currentColor"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="m7 9 4-4-4-4M1 9l4-4-4-4"
-                                />
-                            </svg>
-                        </li>
-                        <li className="flex items-center">
-                            <span className="me-2 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-gray-500 dark:border-gray-400">
-                                3
-                            </span>
-                            Checkout
-                        </li>
-                    </ol>
-                    <Separator />
-                    <div className="flex flex-col gap-4">
-                        {dummyData.map((data, index) => (
-                            <>
-                                <div className="flex gap-4" key={index}>
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 640 512"
-                                        className="h-8 w-8 md:h-12 md:w-12"
-                                        fill="currentColor"
-                                    >
-                                        <path d="M175 389.4c-9.8 16-15 34.3-15 53.1c-10 3.5-20.8 5.5-32 5.5c-53 0-96-43-96-96L32 64C14.3 64 0 49.7 0 32S14.3 0 32 0L96 0l64 0 64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l0 245.9-49 79.6zM96 64l0 96 64 0 0-96L96 64zM352 0L480 0l32 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l0 150.9L629.7 406.2c6.7 10.9 10.3 23.5 10.3 36.4c0 38.3-31.1 69.4-69.4 69.4l-309.2 0c-38.3 0-69.4-31.1-69.4-69.4c0-12.8 3.6-25.4 10.3-36.4L320 214.9 320 64c-17.7 0-32-14.3-32-32s14.3-32 32-32l32 0zm32 64l0 160c0 5.9-1.6 11.7-4.7 16.8L330.5 320l171 0-48.8-79.2c-3.1-5-4.7-10.8-4.7-16.8l0-160-64 0z" />
-                                    </svg>
-                                    <div className="flex-1 space-y-1">
-                                        <p className="big-font-size font-medium">{data.title}</p>
-                                        <div className="flex items-center gap-2">
-                                            <Input type="number" placeholder="1" className="max-w-[64px]" min={0} value={data.order} />
-                                            <Button variant="destructive" className="cursor-pointer transition duration-300">
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    width="24"
-                                                    height="24"
-                                                    viewBox="0 0 24 24"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    stroke-width="2"
-                                                    stroke-linecap="round"
-                                                    stroke-linejoin="round"
-                                                    className="lucide lucide-x"
-                                                >
-                                                    <path d="M18 6 6 18" />
-                                                    <path d="m6 6 12 12" />
-                                                </svg>
-                                                Hapus
-                                            </Button>
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+                <div className="container mx-auto px-4 py-8">
+                    {isEmpty ? (
+                        <EmptyCart />
+                    ) : (
+                        <div className="mx-auto max-w-7xl">
+                            {/* Progress Steps */}
+                            {/* <div className="mb-8">
+                                <div className="flex items-center justify-center space-x-8 md:space-x-16">
+                                    <div className="flex flex-col items-center">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg">
+                                            <ShoppingCart className="h-5 w-5" />
                                         </div>
-                                        <div className="">
-                                            <p className="small-font-size text-neutral-500">Isi Paket</p>
-                                            <ol className="small-font-size list-inside list-decimal">
-                                                {data.testPackages.map((test, index) => (
-                                                    <li key={index}>
-                                                        <Link href="/tests/example" className="hover:underline">
-                                                            {test.title} - {formatRupiah(test.price)}
-                                                        </Link>
-                                                    </li>
-                                                ))}
-                                            </ol>
-                                        </div>
-                                        <small>
-                                            <span className="text-red-base">*</span> {data.notes}
-                                        </small>
+                                        <span className="mt-2 text-sm font-medium text-blue-600">Keranjang</span>
                                     </div>
-                                    <p className="font-semibold">{formatRupiah(data.price)}</p>
+                                    <div className="hidden h-px flex-1 bg-gray-300 md:block dark:bg-gray-700"></div>
+                                    <div className="flex flex-col items-center">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-gray-500 dark:bg-gray-800">
+                                            <ClipboardList className="h-5 w-5" />
+                                        </div>
+                                        <span className="mt-2 text-sm text-gray-500">Formulir</span>
+                                    </div>
+                                    <div className="hidden h-px flex-1 bg-gray-300 md:block dark:bg-gray-700"></div>
+                                    <div className="flex flex-col items-center">
+                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-200 text-gray-500 dark:bg-gray-800">
+                                            <CreditCard className="h-5 w-5" />
+                                        </div>
+                                        <span className="mt-2 text-sm text-gray-500">Pembayaran</span>
+                                    </div>
                                 </div>
-                                <Separator />
-                            </>
-                        ))}
-                    </div>
-                </div>
+                            </div> */}
+                            <div className="mb-12">
+                                <div className="relative">
+                                    <div className="absolute top-6 left-0 h-0.5 w-full bg-gray-200 dark:bg-gray-700"></div>
+                                    <div className="relative mx-auto flex max-w-2xl justify-between">
+                                        <div className="group flex flex-col items-center">
+                                            <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg">
+                                                <CheckCircle2 className="h-6 w-6" />
+                                            </div>
+                                            <span className="mt-3 text-sm font-semibold text-blue-600 dark:text-blue-400">Keranjang</span>
+                                            <Badge className="mt-1 text-xs">
+                                                Sedang Aktif
+                                            </Badge>
+                                        </div>
+                                        <div className="group flex flex-col items-center">
+                                            <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-gray-400 dark:bg-gray-700 dark:text-gray-500">
+                                                <ClipboardList className="h-6 w-6" />
+                                            </div>
+                                            <span className="mt-3 text-sm font-medium text-gray-500">Formulir Pesanan</span>
+                                            <Badge variant="outline" className="mt-1 text-xs">Menunggu</Badge>
+                                        </div>
+                                        <div className="group flex flex-col items-center">
+                                            <div className="relative z-10 flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-gray-400 dark:bg-gray-700 dark:text-gray-500">
+                                                <CreditCard className="h-6 w-6" />
+                                            </div>
+                                            <span className="mt-3 text-sm font-medium text-gray-500">Checkout</span>
+                                            <Badge variant="outline" className="mt-1 text-xs">
+                                                Menunggu
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                <Card className="flex h-fit flex-col gap-4 p-4 xl:col-span-1">
-                    <div className="flex justify-between">
-                        <small className="font-medium">Subtotal</small>
-                        <small className="font-semibold">{formatRupiah(500000)}</small>
-                    </div>
-                    <div className="flex justify-between">
-                        <small className="font-medium">Pajak</small>
-                        <small className="font-semibold">{formatRupiah(50000)}</small>
-                    </div>
-                    <div className="flex justify-between">
-                        <small className="font-medium">Biaya Pengiriman</small>
-                        <small className="font-semibold">{formatRupiah(50000)}</small>
-                    </div>
-                    <Separator />
-                    <div className="flex justify-between">
-                        <p className="font-medium">Total</p>
-                        <p className="font-semibold">{formatRupiah(600000)}</p>
-                    </div>
-                    <Button className="bg-blue-base text-light-base dark:text-light-base flex cursor-pointer items-center justify-center px-24 py-6 transition-colors duration-300 ease-out hover:bg-blue-700 hover:decoration-current! dark:bg-blue-500 dark:hover:bg-blue-600 dark:hover:decoration-current!">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" className="h-8 w-8 md:h-12 md:w-12" fill="currentColor">
-                            <path d="M0 24C0 10.7 10.7 0 24 0L69.5 0c22 0 41.5 12.8 50.6 32l411 0c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3l-288.5 0 5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5L488 336c13.3 0 24 10.7 24 24s-10.7 24-24 24l-288.3 0c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5L24 48C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z" />{' '}
-                        </svg>
-                        <span className="big-font-size font-semibold">Pesan Sekarang</span>
-                    </Button>
-                </Card>
+                            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+                                {/* Cart Items */}
+                                <div className="space-y-6 lg:col-span-2">
+                                    <div className="rounded-xl bg-white p-2 shadow-sm dark:bg-gray-800">
+                                        <h2 className="mb-6 text-xl font-semibold text-gray-900 dark:text-white">Item Keranjang</h2>
+
+                                        {/* Tests Section */}
+                                        {testsCart.length > 0 && (
+                                            <div className="mb-8">
+                                                <div className="mb-4 flex items-center gap-2">
+                                                    <Beaker className="h-5 w-5 text-blue-600" />
+                                                    <h3 className="font-semibold text-gray-900 dark:text-white">Pengujian Individual</h3>
+                                                    <Badge variant="secondary">{testsCart.length}</Badge>
+                                                </div>
+                                                <div className="space-y-4">
+                                                    {testsCart.map((testItem: TestCart, index) => (
+                                                        <div
+                                                            key={`test-${index}`}
+                                                            className="rounded-lg border border-gray-200 p-4 transition-shadow hover:shadow-md dark:border-gray-700"
+                                                        >
+                                                            <div className="flex gap-4">
+                                                                <div className="h-20 w-20 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700">
+                                                                    <img
+                                                                        src={`/storage/${testItem.test.images[0]}`}
+                                                                        alt={testItem.test.name}
+                                                                        className="h-full w-full object-cover"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <div className="flex items-start justify-between">
+                                                                        <div>
+                                                                            <h4 className="font-semibold text-gray-900 dark:text-white">
+                                                                                {testItem.test.name}
+                                                                            </h4>
+                                                                            <div className="mt-1 flex flex-wrap gap-1">
+                                                                                {testItem.test.laboratory && (
+                                                                                    <Badge variant="outline" className="text-xs">
+                                                                                        <Building2 className="mr-1 h-3 w-3" />
+                                                                                        {testItem.test.laboratory.name}
+                                                                                    </Badge>
+                                                                                )}
+                                                                                {testItem.test.category && (
+                                                                                    <Badge variant="outline" className="text-xs">
+                                                                                        {testItem.test.category.name}
+                                                                                    </Badge>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="text-right">
+                                                                            <div className="font-semibold text-gray-900 dark:text-white">
+                                                                                {formatRupiah(testItem.test.price * testItem.unit)}
+                                                                            </div>
+                                                                            <div className="text-xs text-gray-500">
+                                                                                {formatRupiah(testItem.test.price)} / unit
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div className="mt-3 flex items-center justify-between">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                size="sm"
+                                                                                className="h-8 w-8 p-0"
+                                                                                onClick={() =>
+                                                                                    updateTestQuantity(testItem.test_id, testItem.unit - 1)
+                                                                                }
+                                                                                disabled={testItem.unit <= testItem.test.minimum_unit}
+                                                                            >
+                                                                                <Minus className="h-3 w-3" />
+                                                                            </Button>
+                                                                            <span className="w-8 text-center text-sm font-medium">
+                                                                                {testItem.unit}
+                                                                            </span>
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                size="sm"
+                                                                                className="h-8 w-8 p-0"
+                                                                                onClick={() =>
+                                                                                    updateTestQuantity(testItem.test_id, testItem.unit + 1)
+                                                                                }
+                                                                            >
+                                                                                <Plus className="h-3 w-3" />
+                                                                            </Button>
+                                                                            <span className="ml-2 text-xs text-gray-500">
+                                                                                Min: {testItem.test.minimum_unit}
+                                                                            </span>
+                                                                        </div>
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="sm"
+                                                                            className="text-red-500 hover:bg-red-50 hover:text-red-700"
+                                                                            onClick={() => removeTest(testItem.test_id)}
+                                                                        >
+                                                                            <Trash2 className="h-4 w-4" />
+                                                                        </Button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Packages Section */}
+                                        {packagesCart.length > 0 && (
+                                            <div>
+                                                <div className="mb-4 flex items-center gap-2">
+                                                    <PackageIcon className="h-5 w-5 text-green-600" />
+                                                    <h3 className="font-semibold text-gray-900 dark:text-white">Paket Pengujian</h3>
+                                                    <Badge variant="secondary">{packagesCart.length}</Badge>
+                                                </div>
+                                                <div className="space-y-4">
+                                                    {packagesCart.map((packageItem: PackageCart, index) => (
+                                                        <div
+                                                            key={`package-${index}`}
+                                                            className="rounded-lg border border-gray-200 p-4 transition-shadow hover:shadow-md dark:border-gray-700"
+                                                        >
+                                                            <div className="flex gap-4">
+                                                                <div className="h-20 w-20 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-700">
+                                                                    <img
+                                                                        src={`/storage/${packageItem.package.images ? packageItem.package.images[0] : 'default.jpg'}`}
+                                                                        alt={packageItem.package.name}
+                                                                        className="h-full w-full object-cover"
+                                                                    />
+                                                                </div>
+                                                                <div className="flex-1">
+                                                                    <div className="flex items-start justify-between">
+                                                                        <div>
+                                                                            <h4 className="font-semibold text-gray-900 dark:text-white">
+                                                                                {packageItem.package.name}
+                                                                            </h4>
+                                                                            {packageItem.package.laboratory && (
+                                                                                <Badge variant="outline" className="mt-1 text-xs">
+                                                                                    <Building2 className="mr-1 h-3 w-3" />
+                                                                                    {packageItem.package.laboratory.name}
+                                                                                </Badge>
+                                                                            )}
+                                                                        </div>
+                                                                        <div className="text-right">
+                                                                            <div className="font-semibold text-gray-900 dark:text-white">
+                                                                                {formatRupiah(
+                                                                                    packageItem.package.price * (packageItem.quantity || 1),
+                                                                                )}
+                                                                            </div>
+                                                                            {packageItem.quantity > 1 && (
+                                                                                <div className="text-xs text-gray-500">
+                                                                                    {formatRupiah(packageItem.package.price)} / paket
+                                                                                </div>
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+
+                                                                    {packageItem.package.tests && packageItem.package.tests.length > 0 && (
+                                                                        <div className="mt-2 rounded-md bg-gray-50 p-2 dark:bg-gray-700">
+                                                                            <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                                                                Termasuk:
+                                                                            </div>
+                                                                            <ScrollArea className="mt-1 h-16">
+                                                                                <div className="space-y-1">
+                                                                                    {packageItem.package.tests.map((test, testIndex) => (
+                                                                                        <div
+                                                                                            key={testIndex}
+                                                                                            className="text-xs text-gray-600 dark:text-gray-400"
+                                                                                        >
+                                                                                            • {test.name}
+                                                                                        </div>
+                                                                                    ))}
+                                                                                </div>
+                                                                            </ScrollArea>
+                                                                        </div>
+                                                                    )}
+
+                                                                    <div className="mt-3 flex items-center justify-between">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                size="sm"
+                                                                                className="h-8 w-8 p-0"
+                                                                                onClick={() =>
+                                                                                    updatePackageQuantity(
+                                                                                        packageItem.package_id,
+                                                                                        (packageItem.quantity || 1) - 1,
+                                                                                    )
+                                                                                }
+                                                                                disabled={(packageItem.quantity || 1) <= 1}
+                                                                            >
+                                                                                <Minus className="h-3 w-3" />
+                                                                            </Button>
+                                                                            <span className="w-8 text-center text-sm font-medium">
+                                                                                {packageItem.quantity || 1}
+                                                                            </span>
+                                                                            <Button
+                                                                                variant="outline"
+                                                                                size="sm"
+                                                                                className="h-8 w-8 p-0"
+                                                                                onClick={() =>
+                                                                                    updatePackageQuantity(
+                                                                                        packageItem.package_id,
+                                                                                        (packageItem.quantity || 1) + 1,
+                                                                                    )
+                                                                                }
+                                                                            >
+                                                                                <Plus className="h-3 w-3" />
+                                                                            </Button>
+                                                                        </div>
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="sm"
+                                                                            className="text-red-500 hover:bg-red-50 hover:text-red-700"
+                                                                            onClick={() => removePackage(packageItem.package_id)}
+                                                                        >
+                                                                            <Trash2 className="h-4 w-4" />
+                                                                        </Button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Order Summary Sidebar */}
+                                <div className="lg:col-span-1">
+                                    <div className="sticky top-6">
+                                        <Card className="overflow-hidden shadow-sm">
+                                            <CardHeader className="bg-gray-50 dark:bg-gray-800">
+                                                <CardTitle className="text-lg text-gray-900 dark:text-white">Ringkasan Pesanan</CardTitle>
+                                            </CardHeader>
+                                            <CardContent className="p-6">
+                                                <div className="space-y-4">
+                                                    <div className="flex justify-between text-sm">
+                                                        <span className="text-gray-600 dark:text-gray-400">
+                                                            Subtotal ({testsCart.length + packagesCart.length} item)
+                                                        </span>
+                                                        <span className="font-medium">{formatRupiah(subtotal)}</span>
+                                                    </div>
+                                                    <div className="flex justify-between text-sm">
+                                                        <span className="text-gray-600 dark:text-gray-400">Pajak (10%)</span>
+                                                        <span className="font-medium">{formatRupiah(tax)}</span>
+                                                    </div>
+                                                    <div className="flex justify-between text-sm">
+                                                        <span className="text-gray-600 dark:text-gray-400">Biaya Penanganan</span>
+                                                        <span className="font-medium">{formatRupiah(shipping)}</span>
+                                                    </div>
+
+                                                    <Separator />
+
+                                                    <div className="flex justify-between">
+                                                        <span className="text-lg font-semibold text-gray-900 dark:text-white">Total</span>
+                                                        <span className="text-lg font-bold text-blue-600">{formatRupiah(total)}</span>
+                                                    </div>
+
+                                                    <Alert className="border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950">
+                                                        <AlertCircle className="h-4 w-4" />
+                                                        <AlertDescription className="text-sm">
+                                                            Harga sudah termasuk pajak dan biaya penanganan. Pastikan data yang dimasukkan sudah benar
+                                                            sebelum melanjutkan.
+                                                        </AlertDescription>
+                                                    </Alert>
+                                                </div>
+                                            </CardContent>
+                                            <CardFooter className="p-6 pt-0">
+                                                <Link href="/orders/form" className="w-full">
+                                                    <Button className="w-full bg-blue-600 py-3 text-base font-semibold hover:bg-blue-700">
+                                                        Lanjutkan ke Formulir Pesanan
+                                                    </Button>
+                                                </Link>
+                                            </CardFooter>
+                                        </Card>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </div>
         </AppLayout>
+    );
+}
+
+function EmptyCart() {
+    return (
+        <div className="container mx-auto">
+            <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="mb-8 flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20">
+                    <ShoppingCart className="h-16 w-16 text-blue-500" />
+                </div>
+                <h2 className="mb-4 text-3xl font-bold text-gray-900 dark:text-white">Keranjang Kosong</h2>
+                <p className="mb-8 max-w-lg text-lg text-gray-600 dark:text-gray-300">
+                    Anda belum menambahkan item apapun ke keranjang. Mulai jelajahi layanan pengujian yang tersedia.
+                </p>
+                <Link href="/tests">
+                    <Button size="lg" className="px-8 py-3">
+                        <ShoppingCart className="mr-2 h-5 w-5" />
+                        Jelajahi Pengujian
+                    </Button>
+                </Link>
+            </div>
+        </div>
     );
 }

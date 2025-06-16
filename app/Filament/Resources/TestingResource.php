@@ -6,6 +6,7 @@ use App\Filament\Exports\TestingExporter;
 use App\Filament\Resources\TestingResource\Pages;
 use App\Filament\Resources\TestingResource\RelationManagers;
 use App\Models\Testing;
+use App\Services\FileNaming;
 use App\Services\TestingService;
 use Filament\Forms;
 use Filament\Forms\Components\ToggleButtons;
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class TestingResource extends Resource
 {
@@ -42,7 +44,7 @@ class TestingResource extends Resource
 
                 Forms\Components\Select::make('submission_id')
                     ->label('Kode Pengajuan')
-                    ->relationship('submission', 'code')
+                    ->relationship("submission", "code", fn($query) => $query->orderBy('created_at', 'desc'))
                     ->searchable()
                     ->preload()
                     ->required(),
@@ -104,6 +106,13 @@ class TestingResource extends Resource
                     ->openable()
                     ->helperText('Format file yang diterima: PDF, DOC, DOCX.')
                     ->columnSpanFull()
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                        $extension = $file->getClientOriginalExtension();
+
+                        $id   = $get('id') ?? -1;
+
+                        return FileNaming::generateTestingResult($id, $extension);
+                    })
             ]);
     }
 
@@ -117,7 +126,7 @@ class TestingResource extends Resource
                         ->exporter(TestingExporter::class)
                 ]
             )
-            ->modifyQueryUsing(fn(Builder $query)=> $query->latest())
+            ->modifyQueryUsing(fn(Builder $query) => $query->latest())
             ->columns([
                 Tables\Columns\TextColumn::make('code')
                     ->label('Kode pengujian')
@@ -198,12 +207,12 @@ class TestingResource extends Resource
                 ])
             ]);
         //            ->bulkActions([
-//                Tables\Actions\BulkActionGroup::make([
-//                    Tables\Actions\DeleteBulkAction::make(),
-//                    Tables\Actions\ForceDeleteBulkAction::make(),
-//                    Tables\Actions\RestoreBulkAction::make(),
-//                ]),
-//            ]);
+        //                Tables\Actions\BulkActionGroup::make([
+        //                    Tables\Actions\DeleteBulkAction::make(),
+        //                    Tables\Actions\ForceDeleteBulkAction::make(),
+        //                    Tables\Actions\RestoreBulkAction::make(),
+        //                ]),
+        //            ]);
     }
 
     public static function getRelations(): array

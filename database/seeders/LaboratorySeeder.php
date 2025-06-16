@@ -19,35 +19,35 @@ class LaboratorySeeder extends Seeder
                 "name" => "Lab Tanah",
                 "room" => "D 101",
                 "description" => "Laboratorium yang digunakan untuk melakukan pengujian dan analisis terhadap tanah, termasuk sifat fisik, kimia, dan mekanik tanah.",
-                "image" => "laboratories/lt.jpg",
+                "images" => ["laboratory_images/lt.jpg"],
             ],
             [
                 "code" => "LH",
                 "name" => "Lab Hidrologi",
                 "room" => "D 102",
                 "description" => "Laboratorium yang digunakan untuk melakukan pengujian dan analisis terhadap air, termasuk kualitas air, aliran sungai, dan siklus hidrologi.",
-                "image" => "laboratories/lh.jpg",
+                "images" => ["laboratory_images/lh.jpg"],
             ],
             [
                 "code" => "LSBB",
                 "name" => "Lab Struktur dan Bahan Bangunan",
                 "room" => "D 103",
                 "description" => "Laboratorium Struktur dan Laboratorium yang digunakan untuk melakukan pengujian dan analisis terhadap bahan bangunan, termasuk beton, baja, dan material lainnya.",
-                "image" => "laboratories/lsbb.jpg",
+                "images" => ["laboratory_images/lsbb.jpg"],
             ],
             [
                 "code" => "LP",
                 "name" => "Lab Pemetaan",
                 "room" => "D 104",
                 "description" => "Laboratorium yang digunakan untuk melakukan pengujian dan analisis terhadap data pemetaan, termasuk survei tanah, pemetaan topografi, dan pemetaan geospasial.",
-                "image" => "laboratories/lp.jpg",
+                "images" => ["laboratory_images/lp.jpg"],
             ],
             [
                 "code" => "LMT",
                 "name" => "Lab Mekanika Tanah",
                 "room" => "D 105",
                 "description" => "Laboratorium Laboratorium yang digunakan untuk melakukan pengujian dan analisis terhadap sifat mekanik tanah, termasuk kekuatan, kepadatan, dan permeabilitas tanah.",
-                "image" => "laboratories/lmt.jpg",
+                "images" => ["laboratory_images/lmt.jpg"],
             ]
         ];
 

@@ -17,8 +17,8 @@ return new class extends Migration {
             $table->enum("payment_method", ["BANK JATENG", "BANK MANDIRI", "BANK BNI", "BANK BRI", "BANK BSI", "BANK BTN"])->nullable();
             $table->text("note")->nullable();
             $table->enum("status", ["pending", "success", "failed"])->default("pending");
-            $table->string("payment_invoice_file")->nullable();
-            $table->string("payment_receipt_image")->nullable();
+            $table->text("payment_invoice_files")->nullable();
+            $table->text("payment_receipt_images")->nullable();
             $table->dateTime("payment_deadline")->nullable();
             $table->dateTime("payment_date")->nullable();
             $table->foreignId("submission_id")->constrained()->cascadeOnDelete();

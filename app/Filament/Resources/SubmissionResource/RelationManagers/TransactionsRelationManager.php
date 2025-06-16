@@ -98,7 +98,7 @@ class TransactionsRelationManager extends RelationManager
                         }
                     }),
 
-                Forms\Components\FileUpload::make('payment_invoice_file')
+                Forms\Components\FileUpload::make('payment_invoice_files')
                     ->label('Invoice Pembayaran')
                     ->acceptedFileTypes([
                         'application/pdf',
@@ -107,7 +107,7 @@ class TransactionsRelationManager extends RelationManager
                     ])
                     ->directory('payment_invoice'),
 
-                Forms\Components\FileUpload::make('payment_receipt_image')
+                Forms\Components\FileUpload::make('payment_receipt_images')
                     ->hiddenOn("create")
                     ->label('Bukti Pembayaran')
                     ->image()

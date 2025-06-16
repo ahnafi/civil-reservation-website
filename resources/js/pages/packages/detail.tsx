@@ -5,10 +5,10 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Package as TestPackage } from '@/types';
+import { type BreadcrumbItem, PackageCart, Package as TestPackage } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { BarChart3, Building2, CheckCircle2, Clock, MapPin, Package } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const howItWorks: {
     id: number;
@@ -55,6 +55,36 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
     ];
 
     const [mainImage, setMainImage] = useState(data.images[0]);
+    const [packageCart, setPackageCart] = useState<PackageCart[]>([]);
+    const [isAdding, setIsAdding] = useState(false);
+
+    useEffect(() => {
+        const savedPackage = localStorage.getItem('packages');
+        if (savedPackage) {
+            const parsedPackage = JSON.parse(savedPackage);
+            setPackageCart(parsedPackage);
+        }
+    }, []);
+
+    const handleAddTestToCart = (selectedPackage: TestPackage) => {
+        setIsAdding(true);
+        const existingTest: PackageCart | undefined = packageCart.find((item) => item.package_id === selectedPackage.id);
+        if (existingTest) {
+            alert('Package already exists in the cart');
+            setIsAdding(false);
+        } else {
+            const newTestCart: PackageCart = {
+                package_id: selectedPackage.id,
+                slug: selectedPackage.slug,
+                package: selectedPackage,
+                quantity: 1,
+            };
+            setPackageCart([...packageCart, newTestCart]);
+            alert('Package added to cart');
+            localStorage.setItem('packages', JSON.stringify([...packageCart, newTestCart]));
+            setIsAdding(false);
+        }
+    };
 
     const formatRupiah = (value: number) => {
         return new Intl.NumberFormat('id-ID', {
@@ -116,7 +146,7 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                                 <CardContent className="p-0">
                                     <div className="relative aspect-video w-full overflow-hidden">
                                         <img
-                                            src={'/storage/package_image/' + mainImage}
+                                            src={'/storage/' + mainImage}
                                             alt={data.name}
                                             className="h-full w-full object-cover transition-all duration-300 hover:scale-105"
                                         />
@@ -134,7 +164,7 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                                                             onClick={() => setMainImage(image)}
                                                         >
                                                             <img
-                                                                src={'/storage/package_image/' + image}
+                                                                src={'/storage/' + image}
                                                                 alt={`${data.name} ${index + 1}`}
                                                                 className="aspect-square h-full w-full object-cover"
                                                             />
@@ -180,7 +210,7 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                                     </div>
                                 </CardContent>
                                 <CardFooter className="p-0">
-                                    <Button className="w-full" size="lg">
+                                    <Button onClick={() => handleAddTestToCart(data)} className="w-full" size="lg">
                                         Pesan Paket Ini
                                     </Button>
                                 </CardFooter>

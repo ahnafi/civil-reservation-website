@@ -5,7 +5,9 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
+use App\Services\FileNaming;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -14,6 +16,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use function PHPUnit\Framework\isNull;
 
 class UserResource extends Resource
@@ -102,12 +105,24 @@ class UserResource extends Resource
                         "admin" => "warning",
                     ])->visible(fn($record) => is_null($record) || ($record && $record->role != "superadmin"))
                     ->hidden(fn($record) => ($record && $record->id == Auth::user()->id)),
-                Forms\Components\FileUpload::make('photo')
+                FileUpload::make('photo')
+                    ->label('Foto Profil')
                     ->image()
-                    ->directory('photo_profiles')
-                    ->avatar()
                     ->imageEditor()
-                    ->openable(),
+                    ->previewable(true)
+                    ->avatar()
+                    ->directory('user_photos')
+                    ->imagePreviewHeight('150')
+                    ->visibility('public')
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                        $extension = $file->getClientOriginalExtension();
+
+                        $id   = $get('id') ?? -1;
+                        $name = $get('name') ?? 'user';
+
+                        return FileNaming::generateUserProfileName($id, $name, $extension);
+                    })
+                    ->default('default-user_profile.jpg')
             ]);
     }
 

@@ -5,6 +5,7 @@ namespace App\Filament\Editor\Resources;
 use App\Filament\Editor\Resources\NewsResource\Pages;
 use App\Filament\Editor\Resources\NewsResource\RelationManagers;
 use App\Models\News;
+use App\Services\FileNaming;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,6 +13,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Illuminate\Support\Facades\Log;
 
 class NewsResource extends Resource
 {
@@ -31,10 +34,18 @@ class NewsResource extends Resource
             ->schema([
                 Forms\Components\FileUpload::make('thumbnail')
                     ->label('Thumbnail')
-                    ->directory(directory: 'news-thumbnails')
+                    ->directory('news_thumbnails')
                     ->imageEditor()
                     ->required()
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                        $extension = $file->getClientOriginalExtension();
+
+                        $id   = $get('id') ?? -1;
+                        $name = $get('title') ?? 'news';
+
+                        return FileNaming::generateNewsName($id, $name, $extension);
+                    }),
 
                 Forms\Components\TextInput::make('title')
                     ->label('Judul')
@@ -56,10 +67,18 @@ class NewsResource extends Resource
                             ->columnSpanFull(),
                         Forms\Components\FileUpload::make('avatar')
                             ->avatar()
-                            ->directory('authors-avatars')
+                            ->directory('author_avatars')
                             ->imageEditor()
                             ->image()
-                            ->label('Avatar'),
+                            ->label('Avatar')
+                            ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                                $extension = $file->getClientOriginalExtension();
+
+                                $id   = $get('id') ?? -1;
+                                $name = $get('name') ?? 'author';
+
+                                return FileNaming::generateAuthorAvatarName($id, $name, $extension);
+                            })
                     ])
                     ->label('Penulis')
                     ->relationship('author', 'name')
@@ -86,9 +105,11 @@ class NewsResource extends Resource
 
                 Forms\Components\RichEditor::make('content')
                     ->label('Konten')
-                    ->fileAttachmentsDirectory('news-attachments')
+                    ->fileAttachmentsDisk('public')
+                    ->fileAttachmentsDirectory('news_content_attachments')
+                    ->fileAttachmentsVisibility('public')
                     ->required()
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
             ]);
     }
 

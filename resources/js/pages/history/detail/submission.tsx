@@ -2,9 +2,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, SubmissionSchedule } from '@/types';
+import { parseAndFormatDate } from '@/utils/date-utils';
 import { Head } from '@inertiajs/react';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
 import { ArrowLeft, Beaker, Building2, ClipboardCheck, Clock, FileText, Package } from 'lucide-react';
 import React from 'react';
 
@@ -12,7 +11,7 @@ import React from 'react';
 const formatDate = (dateString: string) => {
     if (!dateString) return 'Tanggal tidak valid';
     try {
-        return format(new Date(dateString), 'd MMMM yyyy', { locale: id });
+        return parseAndFormatDate(new Date(dateString));
     } catch {
         return 'Tanggal tidak valid';
     }

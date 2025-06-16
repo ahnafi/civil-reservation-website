@@ -1,10 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { SimpleOption, type SubmissionSchedule, Testing, Transaction } from '@/types';
-import { ColumnDef } from '@tanstack/react-table';
-import { format, parseISO } from 'date-fns';
-import { id } from 'date-fns/locale';
-import { ArrowUpDown, Download } from 'lucide-react';
+import { formatDate, parseISODate } from '@/utils/date-utils';
 import { Link } from '@inertiajs/react';
+import { ColumnDef } from '@tanstack/react-table';
+import { ArrowUpDown, Download } from 'lucide-react';
 
 // Submission Column Labels
 export const submissionColumnLabels: Record<string, string> = {
@@ -52,7 +51,7 @@ export const transactionColumnLabels: Record<string, string> = {
     code: 'Kode Transaksi',
     created_at: 'Tanggal Dibuat',
     amount: 'Jumlah',
-    payment_invoice_file: 'Invoice',
+    payment_invoice_files: 'Invoice',
     status: 'Status Pembayaran',
     detail: 'Detail',
 };
@@ -112,8 +111,8 @@ export const submissionColumns: ColumnDef<SubmissionSchedule>[] = [
         ),
         cell: ({ row }) => {
             const testDateRaw = row.getValue('test_submission_date') as string;
-            const testDate = parseISO(testDateRaw);
-            const formatted = format(testDate, 'dd-MM-yyyy');
+            const testDate = parseISODate(testDateRaw);
+            const formatted = formatDate(testDate);
 
             return <div className="flex w-[5rem] justify-center text-center capitalize">{formatted}</div>;
         },
@@ -161,7 +160,10 @@ export const submissionColumns: ColumnDef<SubmissionSchedule>[] = [
         header: () => <div className="flex justify-center text-center">Detail</div>,
         cell: ({ row }) => (
             <div className="flex justify-center">
-                <Link href={`/history/submission/${row.original.code}`} className="small-font-size cursor-pointer rounded-full bg-blue-base px-2 py-1 text-center font-medium text-light-base hover:bg-blue-600">
+                <Link
+                    href={`/history/submission/${row.original.code}`}
+                    className="small-font-size bg-blue-base text-light-base cursor-pointer rounded-full px-2 py-1 text-center font-medium hover:bg-blue-600"
+                >
                     Lihat Detail
                 </Link>
             </div>
@@ -178,11 +180,17 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
     {
         accessorKey: 'code',
         header: () => <div className="flex w-[7rem] justify-center text-center">Kode Transaksi</div>,
-        cell: ({ row }) => <div className="flex w-[7rem] justify-center text-center capitalize">{row.getValue('code')}</div>,
+        cell: ({ row }) => (
+            <div className="flex w-full">
+                <span className="max-w-[6rem] truncate md:max-w-full md:whitespace-normal" title={row.getValue('code')}>
+                    {row.getValue('code')}
+                </span>
+            </div>
+        ),
     },
     {
         accessorKey: 'created_at',
-        header: ({column}) => (
+        header: ({ column }) => (
             <Button
                 variant="ghost"
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
@@ -206,8 +214,8 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
         },
         cell: ({ row }) => {
             const createdAtRaw = row.getValue('created_at') as string;
-            const createdAt = parseISO(createdAtRaw);
-            const formatted = format(createdAt, 'dd-MM-yyyy, HH:mm', { locale: id });
+            const createdAt = parseISODate(createdAtRaw);
+            const formatted = formatDate(createdAt);
 
             return <div className="flex w-[5rem] justify-center text-center capitalize">{formatted}</div>;
         },
@@ -221,10 +229,10 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
         },
     },
     {
-        accessorKey: 'payment_invoice_file',
+        accessorKey: 'payment_invoice_files',
         header: () => <div className="text-center">Invoice</div>,
         cell: ({ row }) => {
-            const invoice = row.getValue('payment_invoice_file') as string | null;
+            const invoice = row.getValue('payment_invoice_files') as string | null;
 
             const handleDownload = () => {
                 if (invoice) {
@@ -263,7 +271,9 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
 
             return (
                 <div className="flex w-full justify-center">
-                    <div className={`text-light-base items-center rounded-2xl px-2 py-1 text-center font-medium capitalize md:px-3 ${statusColor}`}>{status}</div>
+                    <div className={`text-light-base items-center rounded-2xl px-2 py-1 text-center font-medium capitalize md:px-3 ${statusColor}`}>
+                        {status}
+                    </div>
                 </div>
             );
         },
@@ -273,7 +283,10 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
         header: () => <div className="flex justify-center text-center">Detail</div>,
         cell: ({ row }) => (
             <div className="flex justify-center">
-                <Link href={`/history/transaction/${row.original.code}`} className="small-font-size cursor-pointer rounded-full bg-blue-base px-2 py-1 text-center font-medium text-light-base hover:bg-blue-600">
+                <Link
+                    href={`/history/transaction/${row.original.code}`}
+                    className="small-font-size bg-blue-base text-light-base cursor-pointer rounded-full px-2 py-1 text-center font-medium hover:bg-blue-600"
+                >
                     Lihat Detail
                 </Link>
             </div>
@@ -318,8 +331,8 @@ export const testingColumns: ColumnDef<Testing>[] = [
         },
         cell: ({ row }) => {
             const testDateRaw = row.getValue('test_date') as string;
-            const testDate = parseISO(testDateRaw);
-            const formatted = format(testDate, 'dd-MM-yyyy');
+            const testDate = parseISODate(testDateRaw);
+            const formatted = formatDate(testDate);
 
             return <div className="flex w-[5rem] justify-center text-center capitalize">{formatted}</div>;
         },
@@ -345,7 +358,10 @@ export const testingColumns: ColumnDef<Testing>[] = [
         header: () => <div className="flex justify-center text-center">Detail</div>,
         cell: ({ row }) => (
             <div className="flex justify-center">
-                <Link href={`/history/test/${row.original.code}`} className="small-font-size cursor-pointer rounded-full bg-blue-base px-2 py-1 text-center font-medium text-light-base hover:bg-blue-600">
+                <Link
+                    href={`/history/test/${row.original.code}`}
+                    className="small-font-size bg-blue-base text-light-base cursor-pointer rounded-full px-2 py-1 text-center font-medium hover:bg-blue-600"
+                >
                     Lihat Detail
                 </Link>
             </div>

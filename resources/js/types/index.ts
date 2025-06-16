@@ -25,7 +25,6 @@ export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
-
     [key: string]: unknown;
 }
 
@@ -33,7 +32,10 @@ export interface User {
     id: number;
     name: string;
     email: string;
-    avatar?: string;
+    phone: string | null;
+    identity: string;
+    role: string;
+    photo: string;
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;
@@ -54,7 +56,7 @@ export interface Laboratory {
     code: string;
     room: string;
     slug: string;
-    image: string;
+    images: string[];
     daily_slot?: number;
     description: string;
     created_at: Date;
@@ -173,7 +175,7 @@ export interface LaboratorySimple {
     slug: string;
     name: string;
     description: string;
-    image: string;
+    images: string[];
 }
 
 // Transaction Types
@@ -188,8 +190,8 @@ export interface Transaction {
     note?: string;
     status: TransactionStatus;
     submission_code: string;
-    payment_invoice_file?: string;
-    payment_receipt_image?: string;
+    payment_invoice_files?: string;
+    payment_receipt_images?: string;
     payment_deadline: string;
     payment_date?: string;
     submission_id: number;
@@ -198,13 +200,10 @@ export interface Transaction {
     deleted_at?: string;
 }
 
-// Testing Types
-export type TestingStatus = 'testing' | 'completed';
-
 export interface Testing {
     id: number;
     code?: string | null;
-    status: TestingStatus;
+    status: string;
     note?: string | null;
     documents?: string | null;
     test_date: string;
@@ -229,7 +228,7 @@ export interface testForSchedule {
     category_name: string;
     laboratory_id: number;
     laboratory_code: string;
-    laboratory_name:  string;
+    laboratory_name: string;
 }
 
 export interface scheduleForSchedule {
@@ -238,6 +237,38 @@ export interface scheduleForSchedule {
     available_slots: number;
     approved_count: number;
     pending_count: number;
+}
+
+export interface Booking {
+    company_name: string;
+    project_name: string;
+    project_address: string;
+    test_submission_date: string;
+    submission_tests: Test[];
+    submission_packages: Package[];
+}
+
+export interface TestCart {
+    test_id: number;
+    slug: string;
+    unit: number;
+    test: Test;
+}
+
+export interface PackageCart {
+    package_id: number;
+    slug: string;
+    package: Package;
+    quantity: number;
+}
+
+export interface BookingForm {
+    company_name: string;
+    project_name: string;
+    project_address: string;
+    test_submission_date: string;
+    note: string;
+    total_cost: number;
 }
 
 export type PaginatedTests = Pagination<Test>;

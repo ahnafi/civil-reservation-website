@@ -5,6 +5,7 @@ namespace App\Filament\Editor\Resources;
 use App\Filament\Editor\Resources\AuthorResource\Pages;
 use App\Filament\Editor\Resources\AuthorResource\RelationManagers;
 use App\Models\Author;
+use App\Services\FileNaming;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class AuthorResource extends Resource
 {
@@ -40,11 +42,20 @@ class AuthorResource extends Resource
                     ->label('Biografi')
                     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('avatar')
+                    ->label('Avatar')
                     ->avatar()
-                    ->directory('authors-avatars')
+                    ->directory('author_avatars')
                     ->imageEditor()
                     ->image()
-                    ->label('Avatar'),
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                        $extension = $file->getClientOriginalExtension();
+
+                        $id   = $get('id') ?? -1;
+                        $name = $get('name') ?? 'author';
+
+                        return FileNaming::generateAuthorName($id, $name, $extension);
+                    })
+
             ]);
     }
 
@@ -52,14 +63,14 @@ class AuthorResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('avatar')
+                    ->label('Foto')
+                    ->circular(),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nama')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->label('Email')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('avatar')
-                    ->label('Avatar')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->label('Dihapus Pada')

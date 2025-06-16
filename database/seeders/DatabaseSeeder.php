@@ -21,6 +21,10 @@ class DatabaseSeeder extends Seeder
             SubmissionSeeder::class,
             TransactionSeeder::class,
             TestingSeeder::class,
+            DownloadSeeder::class,
+            NewsCategorySeeder::class,
+            AuthorSeeder::class,
+            NewsSeeder::class,
         ]);
     }
 }

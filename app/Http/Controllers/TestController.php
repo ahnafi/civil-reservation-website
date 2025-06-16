@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Test;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Inertia\Inertia;
@@ -28,10 +29,10 @@ class TestController extends Controller
 
     public function apiIndex(Request $request): LengthAwarePaginator
     {
-        return Test::active()->with(["category", "laboratory"])->paginate(16);
+        return Test::active()->with(["category", "laboratory"])->paginate(8);
     }
 
-    public function apiDetail(Test $test): Response
+    public function apiDetail(Test $test): JsonResponse
     {
         return response()->json([
             'data' => $test->load("category", "laboratory", "packages"),

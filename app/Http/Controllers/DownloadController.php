@@ -10,7 +10,7 @@ class DownloadController extends Controller
 {
     public function index(): LengthAwarePaginator
     {
-        return Download::paginate(16);
+        return Download::paginate(8);
     }
 
     public function search(Request $request): LengthAwarePaginator
