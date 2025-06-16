@@ -24,21 +24,42 @@ class BookingController extends Controller
         $validated = $request->validated();
 
         try {
+            $userId = auth()->id();
+            $submissionType = $validated['submission_type'] ?? 'external';
+
+            // Prepare detail data based on submission type
+            $detailData = [];
+
+            if ($submissionType === 'external') {
+                $detailData = [
+                    'company_name' => $validated['company_name'],
+                    'project_name' => $validated['project_name'],
+                    'project_address' => $validated['project_address'],
+                ];
+            } elseif ($submissionType === 'internal') {
+                $detailData = [
+                    'name' => $validated['name'],
+                    'program_study' => $validated['program_study'],
+                    'research_title' => $validated['research_title'],
+                    'personnel_count' => $validated['personnel_count'],
+                    'supervisor' => $validated['supervisor'],
+                ];
+            }
+
+            // Call the service with correct parameters
             $bookingService->createSubmission(
-                auth()->id(),
-                $validated['company_name'],
-                $validated['project_name'],
-                $validated['project_address'],
+                $userId,
+                $submissionType,
+                $detailData,
                 $validated['test_submission_date'],
-                $validated['user_note'],
-                $validated['submission_tests'],
-                $validated['submission_packages']
+                $validated['user_note'] ?? null,
+                $validated['submission_tests'] ?? [],
+                $validated['submission_packages'] ?? []
             );
 
             return redirect()->route('orders-cart-checkout')
                 ->with('Success', 'Pengajuan Berhasil Dibuat!');
         } catch (\Exception $e) {
-            // 🪵 Log error message and data
             Log::error('Submission failed:', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),

@@ -21,16 +21,14 @@ class Submission extends Model
     protected $fillable = [
         "code",
         "user_id",
-        "company_name",
-        "project_name",
-        "project_address",
-        "total_cost",
+        "submission_type",
+        "internal_detail_id",
+        "external_detail_id",
         "documents",
         "test_submission_date",
         "user_note",
         "admin_note",
         "status",
-        "note",
         "approval_date"
     ];
 
@@ -109,7 +107,6 @@ class Submission extends Model
         return $this->belongsToMany(Test::class, 'submission_test')->withTimestamps()->withPivot('quantity');
     }
 
-
     public function packages(): BelongsToMany
     {
         return $this->belongsToMany(Package::class, 'submission_package')->withTimestamps();
@@ -122,6 +119,16 @@ class Submission extends Model
     public function submissionTests(): HasMany
     {
         return $this->hasMany(SubmissionTest::class);
+    }
+
+    public function internalDetail(): BelongsTo
+    {
+        return $this->belongsTo(InternalDetail::class, 'internal_detail_id');
+    }
+
+    public function externalDetail(): BelongsTo
+    {
+        return $this->belongsTo(ExternalDetail::class, 'external_detail_id');
     }
 
     public function scopeWithScheduleJoin($query)
@@ -177,4 +184,3 @@ class Submission extends Model
             ->orderBy('submissions.created_at', 'desc');
     }
 }
-  

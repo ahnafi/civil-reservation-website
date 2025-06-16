@@ -14,13 +14,16 @@ return new class extends Migration {
             $table->id();
             $table->string("code")->unique()->nullable();
             $table->foreignId("user_id")->constrained()->cascadeOnDelete();
-            $table->string("company_name")->nullable();
-            $table->string("project_name");
-            $table->string("project_address");
-            $table->unsignedInteger("total_cost")->default(0)->nullable();
-            $table->text("documents")->nullable();
+            $table->enum("submission_type", ["internal", "external"]);
+
+            $table->unsignedBigInteger('internal_detail_id')->nullable();
+            $table->unsignedBigInteger('external_detail_id')->nullable();
+            $table->foreign('internal_detail_id')->references('id')->on('submission_internal_details')->nullOnDelete();
+            $table->foreign('external_detail_id')->references('id')->on('submission_external_details')->nullOnDelete();
+
             $table->date("test_submission_date");
             $table->enum("status", ["submitted", "approved", "rejected"])->default("submitted");
+            $table->text("documents")->nullable();
             $table->text("user_note")->nullable();
             $table->text("admin_note")->nullable();
             $table->dateTime("approval_date")->nullable();

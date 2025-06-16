@@ -13,6 +13,8 @@ use App\Models\Transaction;
 use App\Models\Testing;
 use App\Models\Schedule;
 use App\Models\ScheduleTesting;
+use App\Models\SubmissionExternalDetail;
+use App\Models\SubmissionInternalDetail;
 use Laravel\Pennant\Feature;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -23,9 +25,8 @@ class BookingService
 {
     public function createSubmission(
         $user_id,
-        $company_name,
-        $project_name,
-        $project_address,
+        $submission_type,
+        $detailData, // array khusus untuk internal atau external
         $test_submission_date,
         $user_note,
         array $submission_tests,
@@ -33,12 +34,20 @@ class BookingService
     ) {
         DB::beginTransaction();
 
+        logger()->info('BookingService@createSubmission called', [
+            'user_id' => $user_id,
+            'submission_type' => $submission_type,
+            'detailData' => $detailData,
+            'test_submission_date' => $test_submission_date,
+            'user_note' => $user_note,
+            'submission_tests' => $submission_tests,
+            'submission_packages' => $submission_packages
+        ]);
         try {
-            // Extract IDs
+            // 1. Hitung total harga
             $testIds = collect($submission_tests)->pluck('test_id')->filter()->toArray();
             $packageIds = collect($submission_packages)->pluck('package_id')->filter()->toArray();
 
-            // Load data
             $tests = Test::whereIn('id', $testIds)->get()->keyBy('id');
             $packages = Package::whereIn('id', $packageIds)->get()->keyBy('id');
 
@@ -57,21 +66,40 @@ class BookingService
                 }
             }
 
-            // Create submission
-            $submission = new Submission();
-            $submission->user_id = $user_id;
-            $submission->company_name = $company_name;
-            $submission->project_name = $project_name;
-            $submission->project_address = $project_address;
-            $submission->total_cost = $total_cost;
-            $submission->test_submission_date = $test_submission_date;
-            $submission->user_note = $user_note;
-            $submission->save();
+            // 2. Simpan detail tergantung tipe
+            $internalDetailId = null;
+            $externalDetailId = null;
 
-            if (!$submission->id) {
-                throw new \Exception('Submission was not saved to DB.');
+            if ($submission_type === 'internal') {
+                $internalDetail = SubmissionInternalDetail::create([
+                    'name' => $detailData['name'],
+                    'program_study' => $detailData['program_study'],
+                    'research_title' => $detailData['research_title'],
+                    'personnel_count' => $detailData['personnel_count'],
+                    'supervisor' => $detailData['supervisor'],
+                ]);
+                $internalDetailId = $internalDetail->id;
+            } elseif ($submission_type === 'external') {
+                $externalDetail = SubmissionExternalDetail::create([
+                    'company_name' => $detailData['company_name'],
+                    'project_name' => $detailData['project_name'],
+                    'project_address' => $detailData['project_address'],
+                    'total_cost' => $total_cost,
+                ]);
+                $externalDetailId = $externalDetail->id;
             }
 
+            // 3. Buat Submission
+            $submission = Submission::create([
+                'user_id' => $user_id,
+                'submission_type' => $submission_type,
+                'internal_detail_id' => $internalDetailId,
+                'external_detail_id' => $externalDetailId,
+                'test_submission_date' => $test_submission_date,
+                'user_note' => $user_note,
+            ]);
+
+            // 4. Tambah relasi pengujian & paket
             foreach ($submission_tests as $test) {
                 $submission->tests()->attach($test['test_id'], [
                     'quantity' => $test['unit']
@@ -89,7 +117,8 @@ class BookingService
                 'trace' => $e->getTraceAsString(),
                 'user_id' => $user_id,
                 'submission_tests' => $submission_tests,
-                'submission_packages' => $submission_packages
+                'submission_packages' => $submission_packages,
+                'type' => $submission_type
             ]);
 
             throw $e;
