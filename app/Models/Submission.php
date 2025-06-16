@@ -131,32 +131,6 @@ class Submission extends Model
         return $this->belongsTo(ExternalDetail::class, 'external_detail_id');
     }
 
-    public function scopeWithScheduleJoin($query)
-    {
-        return $query
-            ->leftJoin('submission_test', 'submissions.id', '=', 'submission_test.submission_id')
-            ->leftJoin('submission_package', 'submissions.id', '=', 'submission_package.submission_id')
-            ->leftJoin('tests', 'submission_test.test_id', '=', 'tests.id')
-            ->leftJoin('packages', 'submission_package.package_id', '=', 'packages.id')
-            ->leftJoin('laboratories as test_labs', 'tests.laboratory_id', '=', 'test_labs.id')
-            ->leftJoin('laboratories as package_labs', 'packages.laboratory_id', '=', 'package_labs.id')
-            ->select(
-                'submissions.id',
-                'submissions.code',
-                'submissions.company_name',
-                'submissions.test_submission_date',
-                'submissions.status',
-                'submission_test.test_id',
-                'submission_package.package_id',
-                'tests.name as test_name',
-                'packages.name as package_name',
-                DB::raw('COALESCE(test_labs.id, package_labs.id) as lab_id'),
-                DB::raw('COALESCE(test_labs.code, package_labs.code) as lab_code'),
-                DB::raw('COALESCE(test_labs.name, package_labs.name) as lab_name'),
-            )
-            ->orderBy('submissions.test_submission_date', 'desc');
-    }
-
     public function scopeWithUserScheduleJoin($query)
     {
         return $query
@@ -166,12 +140,16 @@ class Submission extends Model
             ->leftJoin('packages', 'submission_package.package_id', '=', 'packages.id')
             ->leftJoin('laboratories as test_labs', 'tests.laboratory_id', '=', 'test_labs.id')
             ->leftJoin('laboratories as package_labs', 'packages.laboratory_id', '=', 'package_labs.id')
+            // Tambahkan join untuk detail tables
+            ->leftJoin('submission_external_details', 'submissions.external_detail_id', '=', 'submission_external_details.id')
+            ->leftJoin('submission_internal_details', 'submissions.internal_detail_id', '=', 'submission_internal_details.id')
             ->select(
                 'submissions.id',
                 'submissions.code',
-                'submissions.company_name',
+                'submissions.submission_type',
                 'submissions.test_submission_date',
                 'submissions.status',
+                'submissions.user_note',
                 'submission_test.test_id',
                 'submission_package.package_id',
                 'tests.name as test_name',
@@ -179,8 +157,18 @@ class Submission extends Model
                 DB::raw('COALESCE(test_labs.id, package_labs.id) as lab_id'),
                 DB::raw('COALESCE(test_labs.code, package_labs.code) as lab_code'),
                 DB::raw('COALESCE(test_labs.name, package_labs.name) as lab_name'),
+                // External detail fields
+                'submission_external_details.company_name',
+                'submission_external_details.project_name',
+                'submission_external_details.project_address',
+                'submission_external_details.total_cost',
+                // Internal detail fields  
+                'submission_internal_details.name',
+                'submission_internal_details.program_study',
+                'submission_internal_details.research_title',
+                'submission_internal_details.personnel_count',
+                'submission_internal_details.supervisor'
             )
-            ->where('submissions.user_id', auth()->user()->id)
             ->orderBy('submissions.created_at', 'desc');
     }
 }
