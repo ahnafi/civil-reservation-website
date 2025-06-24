@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Mail\Resubmission;
 use App\Models\Submission;
 use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +14,7 @@ use App\Models\Transaction;
 use App\Models\Testing;
 use App\Models\Schedule;
 use App\Models\ScheduleTesting;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Pennant\Feature;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -154,9 +156,11 @@ class BookingService
         // Step 4: Opsional - notifikasi atau email
         Notification::make()
             ->title('Pengajuan ulang')
-            ->body('Data submission berhasil diajukan ulang.')
+            ->body("Pengujian dengan kode {$record->code} berhasil diajukan ulang.")
             ->success()
             ->send();
+
+        Mail::to($record->user->email)->send(new Resubmission($record->id));
 
         return redirect()->route('filament.admin.resources.submissions.edit', $submission->id);
     }
