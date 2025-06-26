@@ -24,11 +24,27 @@ class SubmitSubmissionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company_name' => 'required|string|max:255',
-            'project_name' => 'required|string|max:255',
-            'project_address' => 'required|string|max:255',
-            'test_submission_date' => 'required|date_format:Y-m-d',
-            'user_note' => 'nullable|string|max:512',
+
+            'submission_type' => ['required', 'in:internal,external'],
+            
+            // Field khusus external
+            'company_name' => ['required_if:submission_type,external'],
+            'project_name' => ['required_if:submission_type,external'],
+            'project_address' => ['required_if:submission_type,external'],
+
+            // Field khusus internal
+            'name' => ['required_if:submission_type,internal'],
+            'program_study' => ['required_if:submission_type,internal'],
+            'research_title' => ['required_if:submission_type,internal'],
+            'personnel_count' => ['nullable', 'integer'],
+            'supervisor' => ['nullable', 'string'],
+
+            // Umum
+            'test_submission_date' => ['required', 'date'],
+            'submission_tests' => ['required', 'array'],
+            'submission_packages' => ['nullable', 'array'],
+            'user_note' => ['nullable', 'string'],
+            'admin_note' => ['nullable', 'string'],
 
             // submission_tests is required if submission_packages is not present
             'submission_tests' => 'required_without:submission_packages|array',
@@ -74,5 +90,4 @@ class SubmitSubmissionRequest extends FormRequest
             'submission_packages.*.package_id' => 'Paket pengujian',
         ];
     }
-
 }

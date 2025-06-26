@@ -17,6 +17,7 @@ class DashboardController extends Controller
     public function index(): Response
     {
         $userSubmissions = Submission::WithUserScheduleJoin()
+            ->where('user_id', auth()->id())
             ->limit(5)
             ->get();
 
