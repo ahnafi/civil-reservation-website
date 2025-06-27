@@ -32,7 +32,7 @@ use \App\Services\BookingService;
 use \App\Services\SubmissionService;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
-class SubmissionResource extends Resource
+class dump extends Resource
 {
     protected static ?string $model = Submission::class;
 
@@ -52,6 +52,11 @@ class SubmissionResource extends Resource
                 Forms\Components\Split::make([
                     Forms\Components\Section::make()
                         ->schema([
+                            Forms\Components\TextInput::make('user_role')
+                                ->hidden()
+                                ->disabled()
+                                ->dehydrated(false)
+                                ->formatStateUsing(fn($state, Get $get) => $state ?: (User::find($get("user_id"))?->role ?? "external")),
                             Select::make('user_id')
                                 ->relationship('user', 'name')
                                 ->searchable()
@@ -62,7 +67,7 @@ class SubmissionResource extends Resource
                                 ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                     $user = User::find($state);
                                     if ($user) {
-                                        $set("submission_type", $user->role);
+                                        $set("user_role", $user->role);
 
                                         if ($user->role !== "external") {
                                             $set("total_cost", 0);
@@ -80,18 +85,13 @@ class SubmissionResource extends Resource
                                     }
                                 }),
 
-                            TextInput::make("submission_type")
-                                ->hidden()
-                                ->disabled()
-                                ->dehydrated(false),
-
-                            // if external
+                                // if role is external
 
                             TextInput::make('company_name')
                                 ->label('Nama perusahaan')
                                 ->helperText("Penguji internal tidak wajib mengisi")
                                 ->maxLength(255)
-                                ->required(fn(Get $get) => $get("submission_type") === "external"),
+                                ->required(fn(Get $get) => $get("user_role") === "external"),
                             TextInput::make('project_name')
                                 ->label('Nama proyek')
                                 ->required()
@@ -107,10 +107,7 @@ class SubmissionResource extends Resource
                                 ->default(0)
                                 ->reactive(),
 
-                            // if internal
-
-
-                            // table submission
+                                //  if role is internal
 
                             Forms\Components\DateTimePicker::make('test_submission_date')
                                 ->label('Tanggal pengujian')
@@ -132,7 +129,7 @@ class SubmissionResource extends Resource
                                 ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                                     $extension = $file->getClientOriginalExtension();
 
-                                    $id = $get('id') ?? -1;
+                                    $id   = $get('id') ?? -1;
 
                                     return FileNaming::generateSubmissionName($id, $extension);
                                 }),
@@ -160,7 +157,7 @@ class SubmissionResource extends Resource
                                             if ($package) {
                                                 $set("package_price", $package->price);
 
-                                                if ($get("../../submission_type") === "external") {
+                                                if ($get("../../user_role") === "external") {
                                                     $totalCost = $get("../../total_cost") ?? 0;
                                                     $totalCost += $package->price;
                                                     $set("../../total_cost", $totalCost);
@@ -443,7 +440,7 @@ class SubmissionResource extends Resource
     {
         $totalCost = 0;
 
-        $userRole = $get("submission_type");
+        $userRole = $get("user_role");
 
         if ($userRole === "external") {
             foreach ($get("submissionPackages") ?? [] as $package) {

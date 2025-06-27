@@ -95,7 +95,7 @@ class BookingService
                 'user_id' => $user_id,
                 'submission_type' => $submission_type,
                 'internal_detail_id' => $internalDetailId,
-                'external_detail_id' => $externalDetailId,
+                'submission_external_detail_id' => $externalDetailId,
                 'test_submission_date' => $test_submission_date,
                 'user_note' => $user_note,
             ]);

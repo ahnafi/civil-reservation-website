@@ -28,7 +28,7 @@ class TransactionResource extends Resource
     protected static ?string $model = Transaction::class;
     protected static ?string $navigationIcon = 'heroicon-s-banknotes';
     protected static ?string $modelLabel = 'Transaksi';
-    protected static ?string $navigationGroup = 'Manajemen Peminjaman';
+    protected static ?string $navigationGroup = 'Manajemen Pengujian';
     protected static ?string $navigationBadgeTooltip = 'Banyak transaksi yang diajukan';
 
     public static function getNavigationBadge(): ?string

@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SubmissionExternalDetail extends Model
 {
+    use SoftDeletes;
     protected $fillable = [
         'company_name',
         'project_name',
@@ -16,6 +18,6 @@ class SubmissionExternalDetail extends Model
 
     public function submission(): HasOne
     {
-        return $this->hasOne(Submission::class, 'submission_id');
+        return $this->hasOne(Submission::class);
     }
 }

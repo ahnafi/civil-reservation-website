@@ -22,8 +22,8 @@ class Submission extends Model
         "code",
         "user_id",
         "submission_type",
-        "internal_detail_id",
-        "external_detail_id",
+        "submission_internal_detail_id",
+        "submission_external_detail_id",
         "documents",
         "test_submission_date",
         "user_note",
@@ -33,7 +33,7 @@ class Submission extends Model
     ];
 
     protected $casts = [
-        'document' => 'array',
+        'documents' => 'array',
     ];
 
     protected static function boot(): void
@@ -123,12 +123,12 @@ class Submission extends Model
 
     public function internalDetail(): BelongsTo
     {
-        return $this->belongsTo(InternalDetail::class, 'internal_detail_id');
+        return $this->belongsTo(SubmissionInternalDetail::class, 'submission_internal_detail_id');
     }
 
     public function externalDetail(): BelongsTo
     {
-        return $this->belongsTo(ExternalDetail::class, 'external_detail_id');
+        return $this->belongsTo(SubmissionExternalDetail::class, 'submission_external_detail_id');
     }
 
     public function scopeWithUserScheduleJoin($query)
@@ -141,8 +141,8 @@ class Submission extends Model
             ->leftJoin('laboratories as test_labs', 'tests.laboratory_id', '=', 'test_labs.id')
             ->leftJoin('laboratories as package_labs', 'packages.laboratory_id', '=', 'package_labs.id')
             // Tambahkan join untuk detail tables
-            ->leftJoin('submission_external_details', 'submissions.external_detail_id', '=', 'submission_external_details.id')
-            ->leftJoin('submission_internal_details', 'submissions.internal_detail_id', '=', 'submission_internal_details.id')
+            ->leftJoin('submission_external_details', 'submissions.submission_external_detail_id', '=', 'submission_external_details.id')
+            ->leftJoin('submission_internal_details', 'submissions.submission_internal_detail_id', '=', 'submission_internal_details.id')
             ->select(
                 'submissions.id',
                 'submissions.code',
