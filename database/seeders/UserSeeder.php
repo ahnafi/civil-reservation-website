@@ -47,17 +47,6 @@ class UserSeeder extends Seeder
                 'created_at' => now(),
             ],
             [
-                'name' => 'Bintang Putra Akbar',
-                'email' => 'internal@demo.com',
-                'email_verified_at' => now()->subDay(178),
-                'password' => Hash::make('qwerty123'),
-                'phone' => '081326804033',
-                'photo' => 'user_photos\/default-user_profile.jpg',
-                'identity' => 'internal_identity',
-                'role' => 'internal',
-                'created_at' => now()->subDays(180),
-            ],
-            [
                 'name' => 'Athallah Tsany Satriyaji',
                 'email' => 'external@demo.com',
                 'email_verified_at' => now()->subDays(179),
@@ -66,6 +55,17 @@ class UserSeeder extends Seeder
                 'photo' => 'user_photos\/default-user_profile.jpg',
                 'identity' => 'external_identity',
                 'role' => 'external',
+                'created_at' => now()->subDays(180),
+            ],
+            [
+                'name' => 'Bintang Putra Akbar',
+                'email' => 'internal@demo.com',
+                'email_verified_at' => now()->subDay(178),
+                'password' => Hash::make('qwerty123'),
+                'phone' => '081326804033',
+                'photo' => 'user_photos\/default-user_profile.jpg',
+                'identity' => 'internal_identity',
+                'role' => 'internal',
                 'created_at' => now()->subDays(180),
             ]
         ];
