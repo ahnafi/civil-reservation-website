@@ -321,7 +321,8 @@ class SubmissionExternalDetailResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\TransactionsRelationManager::class,
+            RelationManagers\TestingsRelationManager::class,
         ];
     }
 
