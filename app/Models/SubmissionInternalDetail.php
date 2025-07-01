@@ -19,6 +19,6 @@ class SubmissionInternalDetail extends Model
 
     public function submission(): HasOne
     {
-        return $this->hasOne(Submission::class, 'submission_id');
+        return $this->hasOne(Submission::class, 'submission_internal_detail_id');
     }
 }
