@@ -8,6 +8,8 @@ use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Package;
 use App\Models\Test;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 
 use App\Models\Transaction;
@@ -25,14 +27,14 @@ use Illuminate\Support\Facades\Mail;
 class BookingService
 {
     public function createSubmission(
-        $user_id,
-        $submission_type,
-        $detailData, // array khusus untuk internal atau external
-        $test_submission_date,
-        $user_note,
+        int $user_id,
+        string $submission_type,
+        array $detailData, // array khusus untuk internal atau external
+        string $test_submission_date,
+        string $user_note,
         array $submission_tests,
         array $submission_packages
-    ) {
+    ): void {
         DB::beginTransaction();
 
         logger()->info('BookingService@createSubmission called', [
@@ -126,7 +128,7 @@ class BookingService
         }
     }
 
-    public function storePaymentReceipt($transaction_id, $file, $payment_method)
+    public function storePaymentReceipt(int $transaction_id, UploadedFile $file, string $payment_method): void
     {
         $transaction = Transaction::findOrFail($transaction_id);
         $transaction->payment_method = $payment_method;
@@ -143,21 +145,21 @@ class BookingService
         $transaction->save();
     }
 
-    public function storeScheduleTesting($testing_id)
+    public function storeScheduleTesting(int $testing_id): void
     {
         $testIds = BookingUtils::getTestIdsFromTesting($testing_id);
         BookingUtils::handleScheduleForTesting($testing_id, $testIds);
     }
 
-    public function recreateSubmission(Model $record)
+    public function recreateSubmission(Model $record): RedirectResponse
     {
         DB::beginTransaction();
-        
+
         try {
             // Eager load submission dengan relasi yang diperlukan
             $originalSubmission = $record->submission()->with([
-                'user', 
-                'tests', 
+                'user',
+                'tests',
                 'packages',
                 'externalDetail',
                 'internalDetail'
@@ -232,7 +234,7 @@ class BookingService
                 ->send();
 
             Mail::to($originalSubmission->user->email)->send(new Resubmission($submission->id));
-            
+
             if($originalSubmission->submission_type === 'external'){
                 return redirect()->route('filament.admin.resources.submission-external-details.edit', $externalDetailId);
             }else{
