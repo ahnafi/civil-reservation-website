@@ -12,7 +12,6 @@ import { Head, Link } from "@inertiajs/react"
 import { BarChart3, Building2, CheckCircle2, Clock, MapPin, Package, ShoppingCart } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast, ToastContainer } from "react-toastify"
-import "react-toastify/dist/ReactToastify.css"
 
 const howItWorks: {
     id: number
@@ -75,7 +74,7 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
         setIsAdding(true)
         const existingTest: PackageCart | undefined = packageCart.find((item) => item.package_id === selectedPackage.id)
         if (existingTest) {
-            toast.error("Package already exists in the cart", {
+            toast.error("Paket sudah ada dikeranjang!", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
@@ -92,7 +91,7 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                 quantity: 1,
             }
             setPackageCart([...packageCart, newTestCart])
-            toast.success("Package added to cart successfully!", {
+            toast.success("Paket berhasil ditambahkan ke keranjang!", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
