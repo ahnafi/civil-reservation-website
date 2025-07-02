@@ -29,9 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Get Booking Page
     Route::get('orders/cart', [CartController::class, 'cart'])->name('orders-cart');
-    Route::get('orders/form', function () {
-        return Inertia::render('orders/form');
-    })->name('orders-cart-form');
+    Route::get('orders/form', [CartController::class, 'form'])->name('orders-cart-form');
     Route::get('orders/checkout', function () {
         return Inertia::render('orders/checkout');
     })->name('orders-cart-checkout');
