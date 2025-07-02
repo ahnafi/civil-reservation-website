@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Exports\SubmissionExporter;
+use App\Filament\Exports\SubmissionExternalDetailExporter;
 use App\Filament\Resources\SubmissionExternalDetailResource\Pages;
 use App\Filament\Resources\SubmissionExternalDetailResource\RelationManagers;
 use App\Models\Package;
@@ -22,6 +22,7 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ExportAction as TablesExportAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -266,6 +267,13 @@ class SubmissionExternalDetailResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->headerActions([
+                TablesExportAction::make()
+                    ->exporter(SubmissionExternalDetailExporter::class)
+                    ->label('Ekspor Excel')
+                    ->color('success')
+                    ->icon('heroicon-o-document-arrow-down')
+            ])
             ->columns([
                 Tables\Columns\TextColumn::make('submission.code')
                     ->label('Kode Submission')
@@ -290,6 +298,11 @@ class SubmissionExternalDetailResource extends Resource
                         'success' => 'approved',
                         'danger' => 'rejected',
                     ])
+                    ->color(fn(string $state): string => match ($state) {
+                        "submitted" => "info",
+                        "approved" => "success",
+                        "rejected" => "danger",
+                    })
                     ->formatStateUsing(fn(string $state): string => match ($state) {
                         'submitted' => 'Diajukan',
                         'approved' => 'Diterima',
@@ -368,14 +381,7 @@ class SubmissionExternalDetailResource extends Resource
                     Tables\Actions\DeleteAction::make(),
                     Tables\Actions\RestoreAction::make(),
                 ])->tooltip("Aksi"),
-            ], position: Tables\Enums\ActionsPosition::AfterColumns)
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
-                ]),
-            ]);
+            ], position: Tables\Enums\ActionsPosition::AfterColumns);
     }
 
     public static function getRelations(): array
