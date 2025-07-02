@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\SlotUnavailableException;
 use App\Mail\Resubmission;
 use App\Models\Submission;
 use Filament\Notifications\Notification;
@@ -35,6 +36,22 @@ class BookingService
         array $submission_tests,
         array $submission_packages
     ): void {
+
+        $testIds = collect($submission_tests)->pluck('test_id')->toArray();
+        $packageTestIds = Package::whereIn('id', $submission_packages)
+            ->with('tests')
+            ->get()
+            ->flatMap(fn($p) => $p->tests->pluck('id'))
+            ->toArray();
+
+        $allTestIds = array_unique(array_merge($testIds, $packageTestIds));
+
+        $unavailableTestNames = BookingUtils::getUnavailableTestNames($allTestIds, $test_submission_date);
+
+        if (!empty($unavailableTestNames)) {
+            throw new SlotUnavailableException($unavailableTestNames);
+        }
+
         DB::beginTransaction();
 
         logger()->info('BookingService@createSubmission called', [
@@ -47,6 +64,7 @@ class BookingService
             'submission_packages' => $submission_packages
         ]);
         try {
+
             // 1. Hitung total harga
             $testIds = collect($submission_tests)->pluck('test_id')->filter()->toArray();
             $packageIds = collect($submission_packages)->pluck('package_id')->filter()->toArray();
