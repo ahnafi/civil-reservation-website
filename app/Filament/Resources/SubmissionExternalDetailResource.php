@@ -38,11 +38,11 @@ class SubmissionExternalDetailResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
 
-    protected static ?string $navigationLabel = 'Pengujian Eksternal';
+    protected static ?string $navigationLabel = 'Pengajuan Eksternal';
 
-    protected static ?string $modelLabel = 'Pengujian Eksternal';
+    protected static ?string $modelLabel = 'Pengajuan Eksternal';
 
-    protected static ?string $pluralModelLabel = 'Pengujian Eksternal';
+    protected static ?string $pluralModelLabel = 'Pengajuan Eksternal';
 
     protected static ?string $navigationGroup = 'Manajemen Pengujian';
     protected static ?string $navigationBadgeTooltip = 'Banyak pengujian yang diajukan';
@@ -276,7 +276,7 @@ class SubmissionExternalDetailResource extends Resource
             ])
             ->columns([
                 Tables\Columns\TextColumn::make('submission.code')
-                    ->label('Kode Submission')
+                    ->label('Kode Pengajuan')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('submission.user.name')
