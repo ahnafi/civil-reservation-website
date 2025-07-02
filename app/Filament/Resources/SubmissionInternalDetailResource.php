@@ -36,11 +36,11 @@ class SubmissionInternalDetailResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
-    protected static ?string $navigationLabel = 'Pengujian Internal';
+    protected static ?string $navigationLabel = 'Pengajuan Internal';
 
-    protected static ?string $modelLabel = 'Pengujian Internal';
+    protected static ?string $modelLabel = 'Pengajuan Internal';
 
-    protected static ?string $pluralModelLabel = 'Pengujian Internal';
+    protected static ?string $pluralModelLabel = 'Pengajuan Internal';
 
     protected static ?string $navigationGroup = 'Manajemen Pengujian';
     protected static ?string $navigationBadgeTooltip = 'Banyak pengujian yang diajukan';
@@ -245,7 +245,7 @@ class SubmissionInternalDetailResource extends Resource
             ])
             ->columns([
                 Tables\Columns\TextColumn::make('submission.code')
-                    ->label('Kode Submission')
+                    ->label('Kode Pengajuan')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('submission.user.name')
