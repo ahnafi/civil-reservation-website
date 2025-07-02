@@ -21,9 +21,12 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use App\Services\BookingService;
+use App\Services\SubmissionService;
 
 class SubmissionInternalDetailResource extends Resource
 {
@@ -31,19 +34,28 @@ class SubmissionInternalDetailResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
-    protected static ?string $navigationLabel = 'Submission Internal';
+    protected static ?string $navigationLabel = 'Pengujian Internal';
 
-    protected static ?string $modelLabel = 'Submission Internal';
+    protected static ?string $modelLabel = 'Pengujian Internal';
 
-    protected static ?string $pluralModelLabel = 'Submission Internal';
+    protected static ?string $pluralModelLabel = 'Pengujian Internal';
 
-    protected static ?string $navigationGroup = 'Submissions';
+    protected static ?string $navigationGroup = 'Manajemen Pengujian';
+    protected static ?string $navigationBadgeTooltip = 'Banyak pengujian yang diajukan';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::whereHas('submission', function ($query) {
+            $query->where('submission_type', 'internal')
+                ->where('status', 'submitted');
+        })->count();
+    }
 
     public static function form(Forms\Form $form): Forms\Form
     {
         return $form
             ->schema([
-                Section::make('Data Submission')
+                Section::make('Data Pengujian')
                     ->schema([
                         Select::make('user_id')
                             ->label("Pengguna")
@@ -57,6 +69,7 @@ class SubmissionInternalDetailResource extends Resource
                             ->hidden(),
 
                         ToggleButtons::make('status')
+                            ->inline()
                             ->label('Status pengajuan')
                             ->required()
                             ->options([
@@ -210,7 +223,7 @@ class SubmissionInternalDetailResource extends Resource
                                     ->dehydrated(false)
                                     ->default(0),
                             ])
-                            ->columns(4)
+                            ->columns(3)
                             ->columnSpanFull()
                             ->addActionLabel('Tambah Pengujian')
                             ->defaultItems(0)
@@ -239,14 +252,17 @@ class SubmissionInternalDetailResource extends Resource
                 Tables\Columns\TextColumn::make('research_title')
                     ->label('Judul Penelitian')
                     ->searchable()
-                    ->limit(40),
+                    ->limit(40)
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('personnel_count')
                     ->label('Jumlah Personel')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('supervisor')
                     ->label('Supervisor')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\BadgeColumn::make('submission.status')
                     ->label('Status')
                     ->colors([
@@ -254,7 +270,7 @@ class SubmissionInternalDetailResource extends Resource
                         'success' => 'approved',
                         'danger' => 'rejected',
                     ])
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
                         'submitted' => 'Diajukan',
                         'approved' => 'Diterima',
                         'rejected' => 'Ditolak',
@@ -281,8 +297,51 @@ class SubmissionInternalDetailResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
+                Tables\Actions\Action::make("Terima")
+                    ->action(function (Model $record) {
+                        $service = app(SubmissionService::class);
+                        $service->accept($record);
+                    })
+                    ->color("success")
+                    ->requiresConfirmation()
+                    ->icon("heroicon-o-check-circle")
+                    ->visible(fn($record) => $record->submission->status === 'submitted'),
+
+                Tables\Actions\Action::make("Tolak")
+                    ->form([
+                        Forms\Components\Textarea::make("reason")
+                            ->required()
+                            ->label("Perihal"),
+                    ])
+                    ->action(function (array $data, Model $record) {
+                        $service = app(SubmissionService::class);
+                        $service->reject($data, $record);
+                    })
+                    ->color("danger")
+                    ->requiresConfirmation()
+                    ->icon("heroicon-o-x-circle")
+                    ->visible(fn($record) => $record->submission->status === 'submitted'),
+
+                Tables\Actions\Action::make("Pengujian")
+                    ->icon("heroicon-o-beaker")
+                    ->color("info")
+                    ->url(fn(SubmissionInternalDetail $record): string => route("filament.admin.resources.submission-internal-details.edit", [$record, "activeRelationManager" => 0]))
+                    ->visible(fn($record) => $record->submission->status === 'approved'),
+
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make("Pengajuan ulang")
+                        ->action(function (Model $record) {
+                            $bookingService = app(BookingService::class);
+                            $bookingService->recreateSubmission($record);
+                        })
+                        ->icon("heroicon-s-arrow-path")
+                        ->visible(fn($record) => $record->submission->status === "approved"),
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\RestoreAction::make(),
+                ])->tooltip("Aksi"),
+            ], position: Tables\Enums\ActionsPosition::AfterColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

@@ -15,22 +15,25 @@ class SubmissionService
 
     public function accept(Model $record): void
     {
-        if ($record->user && $record->user->email) {
-            $record->status = 'approved';
-            $record->approval_date = Carbon::now()->format('Y-m-d\TH:i:s');
-            $record->save();
+        // Eager load the submission and user relationship
+        $record->load(['submission.user']);
 
-            Mail::to($record->user->email)->send(new SubmissionApproved($record->id));
+        if ($record->submission->user && $record->submission->user->email) {
+            $record->submission->status = 'approved';
+            $record->submission->approval_date = Carbon::now()->format('Y-m-d\TH:i:s');
+            $record->submission->save();
+
+            Mail::to($record->submission->user->email)->send(new SubmissionApproved($record->submission->id));
 
             Notification::make()
                 ->title('Pengajuan berhasil disetujui')
-                ->body("Pengajuan oleh {$record->user->name} telah disetujui.")
+                ->body("Pengajuan oleh {$record->submission->user->name} telah disetujui.")
                 ->success()
                 ->send();
         } else {
             Notification::make()
                 ->title('Gagal mengubah pengajuan ')
-                ->body("Pengajuan oleh {$record->user->name} gagal diubah.")
+                ->body("Pengajuan gagal diubah karena data pengguna tidak lengkap.")
                 ->danger()
                 ->send();
         }
@@ -38,21 +41,24 @@ class SubmissionService
 
     public function reject(array $data, Model $record)
     {
-        if ($record->user && $record->user->email) {
-            $record->status = 'rejected';
-            $record->save();
+        // Eager load the submission and user relationship
+        $record->load(['submission.user']);
 
-            Mail::to($record->user->email)->send(new SubmissionRejected($record->id, $data["reason"]));
+        if ($record->submission->user && $record->submission->user->email) {
+            $record->submission->status = 'rejected';
+            $record->submission->save();
+
+            Mail::to($record->submission->user->email)->send(new SubmissionRejected($record->submission->id, $data["reason"]));
 
             Notification::make()
                 ->title('Pengajuan Ditolak')
-                ->body("Pengajuan oleh {$record->user->name} telah ditolak.")
+                ->body("Pengajuan oleh {$record->submission->user->name} telah ditolak.")
                 ->success()
                 ->send();
         } else {
             Notification::make()
                 ->title('Gagal mengubah pengajuan ')
-                ->body("Pengajuan oleh {$record->user->name} gagal diubah.")
+                ->body("Pengajuan gagal diubah karena data pengguna tidak lengkap.")
                 ->danger()
                 ->send();
         }

@@ -2,12 +2,15 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Exports\SubmissionExporter;
 use App\Filament\Resources\SubmissionExternalDetailResource\Pages;
 use App\Filament\Resources\SubmissionExternalDetailResource\RelationManagers;
 use App\Models\Package;
+use App\Models\Submission;
 use App\Models\SubmissionExternalDetail;
 use App\Models\Test;
 use App\Services\FileNaming;
+use Filament\Actions\ExportAction;
 use Filament\Forms;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
@@ -21,9 +24,12 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use App\Services\SubmissionService;
+use App\Services\BookingService;
 
 class SubmissionExternalDetailResource extends Resource
 {
@@ -31,19 +37,28 @@ class SubmissionExternalDetailResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
 
-    protected static ?string $navigationLabel = 'Submission Eksternal';
+    protected static ?string $navigationLabel = 'Pengujian Eksternal';
 
-    protected static ?string $modelLabel = 'Submission Eksternal';
+    protected static ?string $modelLabel = 'Pengujian Eksternal';
 
-    protected static ?string $pluralModelLabel = 'Submission Eksternal';
+    protected static ?string $pluralModelLabel = 'Pengujian Eksternal';
 
-    protected static ?string $navigationGroup = 'Submissions';
+    protected static ?string $navigationGroup = 'Manajemen Pengujian';
+    protected static ?string $navigationBadgeTooltip = 'Banyak pengujian yang diajukan';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::whereHas('submission', function ($query) {
+            $query->where('submission_type', 'external')
+                ->where('status', 'submitted');
+        })->count();
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Section::make('Data Submission')
+                Section::make('Data Pengujian')
                     ->schema([
                         Select::make('user_id')
                             ->label("Pengguna")
@@ -57,6 +72,7 @@ class SubmissionExternalDetailResource extends Resource
                             ->hidden(),
 
                         ToggleButtons::make('status')
+                            ->inline()
                             ->label('Status pengajuan')
                             ->required()
                             ->options([
@@ -126,6 +142,7 @@ class SubmissionExternalDetailResource extends Resource
                     ->schema([
                         Forms\Components\TextInput::make('company_name')
                             ->label('Nama perusahaan')
+                            ->required()
                             ->maxLength(255)
                             ->default(null),
                         Forms\Components\TextInput::make('project_name')
@@ -147,7 +164,7 @@ class SubmissionExternalDetailResource extends Resource
                             ->helperText('Total akan dihitung otomatis dari paket dan pengujian yang dipilih'),
                     ]),
 
-                Section::make('Paket & Pengujian')
+                Section::make('Paket & Satuan Pengujian Yang Dipilih')
                     ->schema([
                         Repeater::make("submissionPackages")
                             ->label('Paket pengujian')
@@ -165,7 +182,7 @@ class SubmissionExternalDetailResource extends Resource
                                         if ($package) {
                                             $set("package_price", $package->price);
                                         }
-                                        
+
                                         // Update total cost setelah package dipilih
                                         self::updateTotalCost($get, $set);
                                     }),
@@ -261,13 +278,6 @@ class SubmissionExternalDetailResource extends Resource
                 Tables\Columns\TextColumn::make('company_name')
                     ->label('Nama Perusahaan')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('project_name')
-                    ->label('Nama Proyek')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('project_address')
-                    ->label('Alamat Proyek')
-                    ->searchable()
-                    ->limit(30),
                 Tables\Columns\TextColumn::make('total_cost')
                     ->label('Total Biaya')
                     ->numeric()
@@ -289,6 +299,7 @@ class SubmissionExternalDetailResource extends Resource
                 Tables\Columns\TextColumn::make('submission.test_submission_date')
                     ->label('Tanggal Pengujian')
                     ->date()
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -307,8 +318,57 @@ class SubmissionExternalDetailResource extends Resource
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
+                Tables\Actions\Action::make("Terima")
+                    ->action(function (Model $record) {
+                        $service = app(SubmissionService::class);
+                        $service->accept($record);
+                    })
+                    ->color("success")
+                    ->requiresConfirmation()
+                    ->icon("heroicon-o-check-circle")
+                    ->visible(fn($record) => $record->submission->status === 'submitted'),
+
+                Tables\Actions\Action::make("Tolak")
+                    ->form([
+                        Forms\Components\Textarea::make("reason")
+                            ->required()
+                            ->label("Perihal"),
+                    ])
+                    ->action(function (array $data, Model $record) {
+                        $service = app(SubmissionService::class);
+                        $service->reject($data, $record);
+                    })
+                    ->color("danger")
+                    ->requiresConfirmation()
+                    ->icon("heroicon-o-x-circle")
+                    ->visible(fn($record) => $record->submission->status === 'submitted'),
+
+                Tables\Actions\Action::make("Transaksi")
+                    ->icon("heroicon-o-credit-card")
+                    ->color("warning")
+                    ->url(fn(SubmissionExternalDetail $record): string => route("filament.admin.resources.submission-external-details.edit", [$record, "activeRelationManager" => 0]))
+                    ->visible(fn($record) => $record->submission->status === 'approved'),
+
+                Tables\Actions\Action::make("Pengujian")
+                    ->icon("heroicon-o-beaker")
+                    ->color("info")
+                    ->url(fn(SubmissionExternalDetail $record): string => route("filament.admin.resources.submission-external-details.edit", [$record, "activeRelationManager" => 1]))
+                    ->visible(fn($record) => $record->submission->status === 'approved'),
+
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\Action::make("Pengajuan ulang")
+                        ->action(function (Model $record) {
+                            $bookingService = app(BookingService::class);
+                            $bookingService->recreateSubmission($record);
+                        })
+                        ->icon("heroicon-s-arrow-path")
+                        ->visible(fn($record) => $record->submission->status === "approved"),
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                    Tables\Actions\RestoreAction::make(),
+                ])->tooltip("Aksi"),
+            ], position: Tables\Enums\ActionsPosition::AfterColumns)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
