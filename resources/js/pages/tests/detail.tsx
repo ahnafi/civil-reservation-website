@@ -40,7 +40,7 @@ export default function Detail({ test }: { test: Test }) {
         setIsAdding(true)
         const existingTest: TestCart | undefined = testCart.find((item) => item.test_id === test.id)
         if (existingTest) {
-            toast.error("Test already exists in the cart", {
+            toast.error("Pengujian sudah ada di keranjang!", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
@@ -57,7 +57,7 @@ export default function Detail({ test }: { test: Test }) {
                 test: test,
             }
             setTestCart([...testCart, newTestCart])
-            toast.success("Test added to cart successfully!", {
+            toast.success("Pengujian berhasil ditambahkan ke keranjang!", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
