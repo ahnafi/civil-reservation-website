@@ -121,8 +121,6 @@ export default function Cart() {
     }
 
     const subtotal = calculateSubtotal()
-    const tax = Math.round(subtotal * 0.1)
-    const shipping = subtotal > 0 ? 50000 : 0
 
     const formatRupiah = (value: number) => {
         return new Intl.NumberFormat("id-ID", {
@@ -440,30 +438,87 @@ export default function Cart() {
                                 <div className="lg:col-span-1">
                                     <div className="sticky top-6">
                                         <Card className="overflow-hidden shadow-lg border-0 bg-white dark:bg-zinc-900">
-                                            <CardHeader className="bg-zinc-50 dark:bg-zinc-800">
+                                            <CardHeader className="bg-zinc-50 dark:bg-zinc-900 p-4">
                                                 <CardTitle className="text-lg text-zinc-900 dark:text-white">Ringkasan Pesanan</CardTitle>
                                             </CardHeader>
                                             <CardContent className="p-6">
                                                 <div className="space-y-4">
-                                                    <div className="flex justify-between text-sm">
-                            <span className="text-zinc-600 dark:text-zinc-400">
-                              Subtotal ({testsCart.length + packagesCart.length} item)
-                            </span>
-                                                        <span className="font-medium text-zinc-900 dark:text-white">{formatRupiah(subtotal)}</span>
-                                                    </div>
-                                                    <Separator className="bg-zinc-200 dark:bg-zinc-700" />
+                                                    {/* Individual Tests Breakdown */}
+                                                    {testsCart.length > 0 && (
+                                                        <div className="space-y-3">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="bg-blue-100 dark:bg-blue-900/30 p-1 rounded-full">
+                                                                    <Beaker className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                                                                </div>
+                                                                <h4 className="text-sm font-semibold text-zinc-900 dark:text-white">
+                                                                    Pengujian Individual
+                                                                </h4>
+                                                            </div>
+                                                            <div className="space-y-2 pl-6">
+                                                                {testsCart.map((testItem: TestCart, index) => (
+                                                                    <div key={`summary-test-${index}`} className="flex justify-between text-sm">
+                                                                        <div className="flex-1 pr-2">
+                                                                            <div className="text-zinc-700 dark:text-zinc-300 truncate">
+                                                                                {testItem.test.name}
+                                                                            </div>
+                                                                            <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                                                                                {formatRupiah(testItem.test.price)} × {testItem.unit} unit
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="font-medium text-zinc-900 dark:text-white">
+                                                                            {formatRupiah(testItem.test.price * testItem.unit)}
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Packages Breakdown */}
+                                                    {packagesCart.length > 0 && (
+                                                        <div className="space-y-3">
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="bg-green-100 dark:bg-green-900/30 p-1 rounded-full">
+                                                                    <PackageIcon className="h-3 w-3 text-green-600 dark:text-green-400" />
+                                                                </div>
+                                                                <h4 className="text-sm font-semibold text-zinc-900 dark:text-white">Paket Pengujian</h4>
+                                                            </div>
+                                                            <div className="space-y-2 pl-6">
+                                                                {packagesCart.map((packageItem: PackageCart, index) => (
+                                                                    <div key={`summary-package-${index}`} className="flex justify-between text-sm">
+                                                                        <div className="flex-1 pr-2">
+                                                                            <div className="text-zinc-700 dark:text-zinc-300 truncate">
+                                                                                {packageItem.package.name}
+                                                                            </div>
+                                                                            <div className="text-xs text-zinc-500 dark:text-zinc-400">
+                                                                                {formatRupiah(packageItem.package.price)} × {packageItem.quantity || 1} paket
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="font-medium text-zinc-900 dark:text-white">
+                                                                            {formatRupiah(packageItem.package.price * (packageItem.quantity || 1))}
+                                                                        </div>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                        <Separator className="bg-zinc-200 dark:bg-zinc-700" />
+                                                    {/* Summary Totals */}
 
                                                     <div className="flex justify-between">
                                                         <span className="text-lg font-semibold text-zinc-900 dark:text-white">Total</span>
                                                         <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
-                              {formatRupiah(subtotal)}
-                            </span>
+                                                      {formatRupiah(subtotal)}
+                                                    </span>
                                                     </div>
 
                                                     <Alert className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/50">
                                                         <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                                                         <AlertDescription className="text-sm text-blue-800 dark:text-blue-200">
-                                                            Harga belum termasuk biaya akomodasi jika diperlukan transportasi ke tempat pengujian, untuk harga biaya akomodasi akan diinformasikan lebih lanjut oleh administrator setelah pengajuan diterima.
+                                                            Harga belum termasuk biaya akomodasi jika diperlukan transportasi ke tempat pengujian,
+                                                            untuk harga biaya akomodasi akan diinformasikan lebih lanjut oleh administrator setelah
+                                                            pengajuan diterima.
                                                         </AlertDescription>
                                                     </Alert>
                                                 </div>
