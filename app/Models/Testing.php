@@ -42,8 +42,11 @@ class Testing extends Model
             // Generate code based on the test date and submission Code
             $date = Carbon::parse($testing->test_date)->format('Ymd');
             $submissionCode = $submission->code;
+            
+            // Add 3 random characters to ensure uniqueness
+            $randomString = Str::random(3);
 
-            $testing->code = 'UJI-' . $submissionCode . '-' . $date;
+            $testing->code = 'UJI-' . $submissionCode . '-' . $date . '-' . strtoupper($randomString);
             $testing->saveQuietly();
 //             send mail
             $userEmail = $testing->submission->user->email;

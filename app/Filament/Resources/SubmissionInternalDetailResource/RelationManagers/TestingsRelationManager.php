@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\SubmissionResource\RelationManagers;
+namespace App\Filament\Resources\SubmissionInternalDetailResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Forms\Components\ToggleButtons;
@@ -20,7 +20,7 @@ use App\Services\TestingService;
 
 class TestingsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'testing';
+    protected static string $relationship = 'testings';
     protected static ?string $modelLabel = 'Pengujian';
     protected static ?string $title = "Pengujian";
 
@@ -59,7 +59,7 @@ class TestingsRelationManager extends RelationManager
 
                 Forms\Components\DateTimePicker::make('test_date')
                     ->label('Tanggal Pengujian')
-                    ->default(fn() => $this->getOwnerRecord()->test_submission_date ?? now())
+                    ->default(fn() => $this->getOwnerRecord()->submission->test_submission_date ?? now())
                     ->nullable(),
 
                 Forms\Components\DateTimePicker::make('completed_at')
@@ -82,9 +82,13 @@ class TestingsRelationManager extends RelationManager
                         'application/pdf',
                         'application/msword',
                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'application/zip',
+                        'application/x-zip-compressed',
+                        'application/x-rar-compressed',
+                        'application/x-7z-compressed',
                     ])
                     ->openable()
-                    ->helperText('Format file yang diterima: PDF, DOC, DOCX. Maksimal ukuran file: 2MB.')
+                    ->helperText('Format file yang diterima: PDF, DOC, DOCX, ZIP, RAR, 7Z.')
                     ->columnSpanFull()
             ]);
     }
@@ -93,26 +97,57 @@ class TestingsRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                TextColumn::make('code')->label('Kode'),
+                TextColumn::make('code')
+                    ->label('Kode')
+                    ->searchable()
+                    ->sortable(),
 
-                Tables\Columns\TextColumn::make('status')->label('Status')->sortable()
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->sortable()
                     ->formatStateUsing(fn($state): string => match ($state) {
                         "testing" => "Sedang berjalan",
                         "completed" => "Selesai",
+                        default => $state,
                     })
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         "testing" => "warning",
                         "completed" => "success",
+                        default => "secondary",
                     }),
-                Tables\Columns\TextColumn::make('test_date')->label('Tanggal Pengujian')->dateTime(),
-                Tables\Columns\TextColumn::make('completed_at')->label('Selesai')->dateTime(),
+                Tables\Columns\TextColumn::make('test_date')
+                    ->label('Tanggal Pengujian')
+                    ->dateTime()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('completed_at')
+                    ->label('Selesai')
+                    ->dateTime()
+                    ->sortable(),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\SelectFilter::make('status')
+                    ->label('Status')
+                    ->options([
+                        'testing' => 'Sedang Berjalan',
+                        'completed' => 'Selesai',
+                    ]),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->mutateFormDataUsing(function (array $data) {
+                        // Set submission_id - the Testing model will auto-generate the code
+                        $internalDetail = $this->getOwnerRecord();
+                        $submission = $internalDetail->submission;
+                        $data['submission_id'] = $submission?->id;
+                        
+                        // Remove any manually set code as the model will generate it
+                        unset($data['code']);
+
+                        return $data;
+                    })
+                    ->successNotificationTitle('Pengujian berhasil dibuat'),
             ])
             ->actions([
                Tables\Actions\Action::make("Selesaikan")
@@ -125,9 +160,13 @@ class TestingsRelationManager extends RelationManager
                                 'application/pdf',
                                 'application/msword',
                                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                'application/zip',
+                                'application/x-zip-compressed',
+                                'application/x-rar-compressed',
+                                'application/x-7z-compressed',
                             ])
                             ->openable()
-                            ->helperText('Format file yang diterima: PDF, DOC, DOCX.')
+                            ->helperText('Format file yang diterima: PDF, DOC, DOCX, ZIP, RAR, 7Z.')
                             ->columnSpanFull(),
 
                         Forms\Components\Textarea::make('note')
@@ -160,4 +199,5 @@ class TestingsRelationManager extends RelationManager
                 SoftDeletingScope::class,
             ]));
     }
+
 }

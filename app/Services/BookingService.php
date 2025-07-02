@@ -94,8 +94,8 @@ class BookingService
             $submission = Submission::create([
                 'user_id' => $user_id,
                 'submission_type' => $submission_type,
-                'internal_detail_id' => $internalDetailId,
-                'external_detail_id' => $externalDetailId,
+                'submission_internal_detail_id' => $internalDetailId,
+                'submission_external_detail_id' => $externalDetailId,
                 'test_submission_date' => $test_submission_date,
                 'user_note' => $user_note,
             ]);
@@ -151,45 +151,110 @@ class BookingService
 
     public function recreateSubmission(Model $record)
     {
-        // Step 1: Duplikasi data utama submission
-        $submission = Submission::create([
-            "user_id" => $record->user_id,
-            "company_name" => $record->company_name,
-            "project_name" => $record->project_name,
-            "project_address" => $record->project_address,
-            "total_cost" => $record->total_cost,
-            "document" => $record->document,
-            "test_submission_date" => $record->test_submission_date,
-            "status" => "approved",
-            "note" => $record->note,
-            "approval_date" => now()
-        ]);
+        DB::beginTransaction();
+        
+        try {
+            // Eager load submission dengan relasi yang diperlukan
+            $originalSubmission = $record->submission()->with([
+                'user', 
+                'tests', 
+                'packages',
+                'externalDetail',
+                'internalDetail'
+            ])->first();
 
-        // // Step 2: Duplikasi relasi tests (dengan pivot "quantity")
-        if ($record->relationLoaded('tests') || method_exists($record, 'tests')) {
-            $testData = [];
-            foreach ($record->tests as $test) {
-                $testData[$test->id] = ['quantity' => $test->pivot->quantity];
+            if (!$originalSubmission) {
+                throw new \Exception('Submission tidak ditemukan');
             }
-            $submission->tests()->attach($testData);
+
+            // Step 1: Duplikasi detail tables berdasarkan tipe submission
+            $internalDetailId = null;
+            $externalDetailId = null;
+
+            if ($originalSubmission->submission_type === 'external' && $originalSubmission->externalDetail) {
+                $externalDetail = $originalSubmission->externalDetail;
+                $newExternalDetail = SubmissionExternalDetail::create([
+                    'company_name' => $externalDetail->company_name,
+                    'project_name' => $externalDetail->project_name,
+                    'project_address' => $externalDetail->project_address,
+                    'total_cost' => $externalDetail->total_cost,
+                ]);
+                $externalDetailId = $newExternalDetail->id;
+            }
+
+            if ($originalSubmission->submission_type === 'internal' && $originalSubmission->internalDetail) {
+                $internalDetail = $originalSubmission->internalDetail;
+                $newInternalDetail = SubmissionInternalDetail::create([
+                    'name' => $internalDetail->name,
+                    'program_study' => $internalDetail->program_study,
+                    'research_title' => $internalDetail->research_title,
+                    'personnel_count' => $internalDetail->personnel_count,
+                    'supervisor' => $internalDetail->supervisor,
+                ]);
+                $internalDetailId = $newInternalDetail->id;
+            }
+
+            // Step 2: Duplikasi data utama submission
+            $submission = Submission::create([
+                "user_id" => $originalSubmission->user_id,
+                "submission_type" => $originalSubmission->submission_type,
+                "submission_internal_detail_id" => $internalDetailId,
+                "submission_external_detail_id" => $externalDetailId,
+                "documents" => $originalSubmission->documents,
+                "test_submission_date" => $originalSubmission->test_submission_date,
+                "user_note" => $originalSubmission->user_note,
+                "status" => "submitted", // Reset status ke submitted untuk persetujuan ulang
+            ]);
+
+            // Step 3: Duplikasi relasi tests (dengan pivot "quantity")
+            if ($originalSubmission->tests->isNotEmpty()) {
+                $testData = [];
+                foreach ($originalSubmission->tests as $test) {
+                    $testData[$test->id] = ['quantity' => $test->pivot->quantity];
+                }
+                $submission->tests()->attach($testData);
+            }
+
+            // Step 4: Duplikasi relasi packages
+            if ($originalSubmission->packages->isNotEmpty()) {
+                $submission->packages()->attach(
+                    $originalSubmission->packages->pluck('id')->toArray()
+                );
+            }
+
+            DB::commit();
+
+            // Step 5: Notifikasi dan email
+            Notification::make()
+                ->title('Pengajuan ulang berhasil')
+                ->body("Pengujian dengan kode {$record->code} berhasil diajukan ulang dengan kode {$submission->code}.")
+                ->success()
+                ->send();
+
+            Mail::to($originalSubmission->user->email)->send(new Resubmission($submission->id));
+            
+            if($originalSubmission->submission_type === 'external'){
+                return redirect()->route('filament.admin.resources.submission-external-details.edit', $externalDetailId);
+            }else{
+                return redirect()->route('filament.admin.resources.submission-internal-details.edit', $internalDetailId);
+            }
+
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            Log::error('Error in BookingService@recreateSubmission', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'testing_id' => $record->id,
+            ]);
+
+            Notification::make()
+                ->title('Pengajuan ulang gagal')
+                ->body('Terjadi kesalahan saat membuat pengajuan ulang: ' . $e->getMessage())
+                ->danger()
+                ->send();
+
+            throw $e;
         }
-
-        // Step 3: Duplikasi relasi packages (tanpa pivot tambahan)
-        if ($record->relationLoaded('packages') || method_exists($record, 'packages')) {
-            $submission->packages()->attach(
-                $record->packages->pluck('id')->toArray()
-            );
-        }
-
-        // Step 4: Opsional - notifikasi atau email
-        Notification::make()
-            ->title('Pengajuan ulang')
-            ->body("Pengujian dengan kode {$record->code} berhasil diajukan ulang.")
-            ->success()
-            ->send();
-
-        Mail::to($record->user->email)->send(new Resubmission($record->id));
-
-        return redirect()->route('filament.admin.resources.submissions.edit', $submission->id);
     }
 }

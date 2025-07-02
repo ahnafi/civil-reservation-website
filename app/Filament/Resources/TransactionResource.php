@@ -28,7 +28,7 @@ class TransactionResource extends Resource
     protected static ?string $model = Transaction::class;
     protected static ?string $navigationIcon = 'heroicon-s-banknotes';
     protected static ?string $modelLabel = 'Transaksi';
-    protected static ?string $navigationGroup = 'Manajemen Peminjaman';
+    protected static ?string $navigationGroup = 'Manajemen Pengujian';
     protected static ?string $navigationBadgeTooltip = 'Banyak transaksi yang diajukan';
 
     public static function getNavigationBadge(): ?string
@@ -145,7 +145,7 @@ class TransactionResource extends Resource
                     ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                         $extension = $file->getClientOriginalExtension();
 
-                        $id   = $get('id') ?? -1;
+                        $id = $get('id') ?? -1;
 
                         return FileNaming::generateInvoiceName($id, $extension);
                     }),
@@ -164,7 +164,7 @@ class TransactionResource extends Resource
                     ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                         $extension = $file->getClientOriginalExtension();
 
-                        $id   = $get('id') ?? -1;
+                        $id = $get('id') ?? -1;
 
                         return FileNaming::generatePaymentReceiptName($id, $extension);
                     }),
@@ -212,7 +212,8 @@ class TransactionResource extends Resource
                 Tables\Columns\TextColumn::make('payment_date')
                     ->label('Tanggal Pembayaran')
                     ->dateTime()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('status')
                     ->label("Status")
                     ->badge()

@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class SubmissionPackage extends Pivot
 {
+    protected $table = 'submission_package';
+    protected $fillable = [
+        'submission_id',
+        'package_id',
+    ];
+
     public function package(): BelongsTo
     {
         return $this->belongsTo(Package::class);

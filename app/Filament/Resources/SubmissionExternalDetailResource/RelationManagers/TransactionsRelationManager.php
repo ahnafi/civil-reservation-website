@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\SubmissionResource\RelationManagers;
+namespace App\Filament\Resources\SubmissionExternalDetailResource\RelationManagers;
 
 use App\Services\TransactionService;
 use Filament\Forms;
@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 class TransactionsRelationManager extends RelationManager
 {
@@ -28,17 +29,9 @@ class TransactionsRelationManager extends RelationManager
             ->schema([
                 Forms\Components\TextInput::make('code')
                     ->label('Kode Unik Transaksi')
-                    ->required()
-                    ->unique(ignoreRecord: true)
-                    ->default(function () {
-                        $submission = $this->getOwnerRecord();
-                        $submissionId = $submission?->id ?? '000';
-                        $userId = $submission?->user_id ?? '000';
-                        $transactionCount = $submission ? $submission->transactions()->withTrashed()->count() + 1 : 1;
-
-                        return 'CVL-' . now()->format('Ymd') . $submissionId . $userId . $transactionCount;
-                    })
-                    ->disabled(),
+                    ->hiddenOn('create')
+                    ->disabled()
+                    ->helperText('Kode akan dibuat otomatis oleh sistem'),
 
                 Forms\Components\TextInput::make('amount')
                     ->numeric()
@@ -98,25 +91,22 @@ class TransactionsRelationManager extends RelationManager
                         }
                     }),
 
+                Forms\Components\DateTimePicker::make('payment_date')
+                    ->hiddenOn("create")
+                    ->label('Tanggal Pembayaran')
+                    ->nullable(),
+
                 Forms\Components\FileUpload::make('payment_invoice_files')
                     ->label('Invoice Pembayaran')
-                    ->acceptedFileTypes([
-                        'application/pdf',
-                        'application/msword',
-                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                    ])
+                    ->openable()
                     ->directory('payment_invoice'),
 
                 Forms\Components\FileUpload::make('payment_receipt_images')
                     ->hiddenOn("create")
                     ->label('Bukti Pembayaran')
-                    ->image()
+                    ->openable()
                     ->directory('payment_receipts'),
 
-                Forms\Components\DateTimePicker::make('payment_date')
-                    ->hiddenOn("create")
-                    ->label('Tanggal Pembayaran')
-                    ->nullable(),
                 Forms\Components\Textarea::make('note')
                     ->label('Catatan')
                     ->nullable()
@@ -128,36 +118,69 @@ class TransactionsRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('code')->label('Kode')->sortable(),
-                Tables\Columns\TextColumn::make('amount')->label('Total')->sortable(),
-                Tables\Columns\TextColumn::make('payment_method')->label('Metode Pembayaran')->sortable(),
-                Tables\Columns\TextColumn::make('status')->label('Status')->sortable()->badge()
+                Tables\Columns\TextColumn::make('code')
+                    ->label('Kode Transaksi')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('amount')
+                    ->label('Total Pembayaran')
+                    ->numeric()
+                    ->money('IDR')
+                    ->sortable(),
+                Tables\Columns\BadgeColumn::make('status')
+                    ->label('Status')
+                    ->colors([
+                        'info' => 'pending',
+                        'success' => 'success',
+                        'danger' => 'failed',
+                    ])
                     ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'pending' => 'Pending',
-                        "success" => "Diterima",
-                        "failed" => "Ditolak",
-                    })
-                    ->color(fn(string $state): string => match ($state) {
-                        "pending" => "info",
-                        "success" => "success",
-                        "failed" => "danger"
+                        'pending' => 'Diajukan',
+                        'success' => 'Diterima',
+                        'failed' => 'Ditolak',
+                        default => $state,
                     }),
-                Tables\Columns\TextColumn::make('payment_date')->label('Tanggal Pembayaran')->dateTime(),
+                Tables\Columns\TextColumn::make('payment_method')
+                    ->label('Metode Pembayaran'),
+                Tables\Columns\TextColumn::make('payment_date')
+                    ->label('Tanggal Pembayaran')
+                    ->dateTime()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Dibuat')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('status')
+                    ->label('Status')
                     ->options([
-                        "pending" => "Pending",
-                        "success" => "Berhasil",
-                        "failed" => "Gagal"
+                        'pending' => 'Diajukan',
+                        'success' => 'Diterima',
+                        'failed' => 'Ditolak',
                     ]),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()
+                    ->mutateFormDataUsing(function (array $data) {
+                        // Set submission_id - the Transaction model will auto-generate the code
+                        $externalDetail = $this->getOwnerRecord();
+                        $submission = $externalDetail->submission;
+                        $data['submission_id'] = $submission?->id;
+                        
+                        // Remove any manually set code as the model will generate it
+                        unset($data['code']);
+
+                        return $data;
+                    })
+                    ->using(function (array $data, string $model): Model {
+                        return $model::create($data);
+                    })
+                    ->successNotificationTitle('Transaksi berhasil dibuat'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\Action::make("Setujui")
                     ->icon("heroicon-o-check-circle")
                     ->requiresConfirmation()
@@ -184,7 +207,13 @@ class TransactionsRelationManager extends RelationManager
                     }),
 
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\EditAction::make()
+                        ->using(function (Model $record, array $data): Model {
+                            $record->update($data);
+                            return $record;
+                        })
+                        ->successNotificationTitle('Transaksi berhasil diperbarui'),
                     Tables\Actions\DeleteAction::make(),
                 ]),
                 Tables\Actions\ForceDeleteAction::make(),
@@ -197,6 +226,16 @@ class TransactionsRelationManager extends RelationManager
                     Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ])
-            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([SoftDeletingScope::class,]));
+            ->modifyQueryUsing(fn(Builder $query) => $query->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]));
     }
+
+    // protected function getTableQuery(): Builder
+    // {
+    //     $externalDetail = $this->getOwnerRecord();
+
+    //     // Use the transactions relationship directly from the external detail
+    //     return $externalDetail->transactions()->getQuery();
+    // }
 }

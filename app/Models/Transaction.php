@@ -42,7 +42,6 @@ class Transaction extends Model
             $submission = $transaction->submission;
             $submissionCode = $submission?->code ?? '000';
             $userId = $submission?->user_id ?? '000';
-            $transactionCount = $submission ? $submission->transactions()->withTrashed()->count() + 1 : 1;
 
             $uuid = Str::uuid()->toString();
             $shortUuid = substr(str_replace('-', '', $uuid), 0, 6);

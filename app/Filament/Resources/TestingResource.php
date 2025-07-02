@@ -28,7 +28,7 @@ class TestingResource extends Resource
     protected static ?string $model = Testing::class;
     protected static ?string $navigationIcon = 'heroicon-s-clipboard-document-list';
     protected static ?string $modelLabel = 'Pengujian';
-    protected static ?string $navigationGroup = 'Manajemen Peminjaman';
+    protected static ?string $navigationGroup = 'Manajemen Pengujian';
     protected static ?int $navigationSort = 3;
     protected static ?string $navigationBadgeTooltip = 'Banyak pengujian sedang diuji';
 

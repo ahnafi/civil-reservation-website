@@ -16,10 +16,10 @@ return new class extends Migration {
             $table->foreignId("user_id")->constrained()->cascadeOnDelete();
             $table->enum("submission_type", ["internal", "external"]);
 
-            $table->unsignedBigInteger('internal_detail_id')->nullable();
-            $table->unsignedBigInteger('external_detail_id')->nullable();
-            $table->foreign('internal_detail_id')->references('id')->on('submission_internal_details')->nullOnDelete();
-            $table->foreign('external_detail_id')->references('id')->on('submission_external_details')->nullOnDelete();
+            $table->unsignedBigInteger('submission_internal_detail_id')->nullable();
+            $table->unsignedBigInteger('submission_external_detail_id')->nullable();
+            $table->foreign('submission_internal_detail_id')->references('id')->on('submission_internal_details')->nullOnDelete();
+            $table->foreign('submission_external_detail_id')->references('id')->on('submission_external_details')->nullOnDelete();
 
             $table->date("test_submission_date");
             $table->enum("status", ["submitted", "approved", "rejected"])->default("submitted");
