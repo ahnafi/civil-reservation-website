@@ -97,7 +97,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function ReservationForm() {
+export default function ReservationForm({fullSlotDate} : {fullSlotDate: number[]}) {
     const { auth } = usePage<{ auth: { user: User } }>().props;
     const user = auth.user;
     const [cartEmpty, setCartEmpty] = useState(false);
