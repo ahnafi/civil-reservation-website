@@ -32,10 +32,16 @@ class BookingUtils
 
     public static function handleScheduleForTesting(int $testing_id, array $testIds): void
     {
-        DB::transaction(function () use ($testing_id, $testIds) {
-            $testing = Testing::findOrFail($testing_id);
-            $date = $testing->test_date;
+        $testing = Testing::findOrFail($testing_id);
+        $date = $testing->test_date;
 
+        $unavailableTestNames = self::getUnavailableTestNames($testIds, $date);
+
+        if (!empty($unavailableTestNames)) {
+            throw new SlotUnavailableException($unavailableTestNames);
+        }
+
+        DB::transaction(function () use ($testing_id, $testIds, $date) {
             foreach ($testIds as $test_id) {
                 $schedule = self::getScheduleForTestAndDate($test_id, $date);
 
@@ -57,13 +63,8 @@ class BookingUtils
 
     protected static function assignToExistingSchedule(Schedule $schedule, int  $testing_id)
     {
-        if ($schedule->available_slots > 0) {
-            self::createScheduleTesting($schedule, $testing_id);
-
-            $schedule->decrement('available_slots');
-        } else {
-            throw new SlotUnavailableException();
-        }
+        self::createScheduleTesting($schedule, $testing_id);
+        $schedule->decrement('available_slots');
     }
 
     protected static function createAndAssignNewSchedule(int $test_id, string $date, int $testing_id): void
@@ -87,5 +88,26 @@ class BookingUtils
             'testing_id' => $testing_id,
             'schedule_id' => $schedule->id,
         ]);
+    }
+
+    public static function getUnavailableTests(array $testIds, string $test_submission_date): array
+    {
+        return Schedule::whereIn('test_id', $testIds)
+            ->whereDate('date', $test_submission_date)
+            ->get()
+            ->filter(fn($schedule) => $schedule->available_slots === 0)
+            ->pluck('test_id')
+            ->toArray();
+    }
+
+    public static function getUnavailableTestNames(array $testIds, string $test_submission_date): array
+    {
+        $unavailableTestIds = Schedule::whereIn('test_id', $testIds)
+            ->whereDate('date', $test_submission_date)
+            ->get()
+            ->filter(fn($schedule) => $schedule->available_slots === 0)
+            ->pluck('test_id');
+
+        return Test::whereIn('id', $unavailableTestIds)->pluck('name')->toArray();
     }
 }
