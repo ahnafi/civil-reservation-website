@@ -14,6 +14,11 @@ class EditSubmissionInternalDetail extends EditRecord
 {
     protected static string $resource = SubmissionInternalDetailResource::class;
 
+    public function hasCombinedRelationManagerTabsWithContent(): bool
+    {
+        return true;
+    }
+
     protected function getHeaderActions(): array
     {
         return [
