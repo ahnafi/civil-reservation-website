@@ -121,12 +121,12 @@ class Submission extends Model
         return $this->hasMany(SubmissionTest::class);
     }
 
-    public function internalDetail(): BelongsTo
+    public function submissionInternalDetail(): BelongsTo
     {
         return $this->belongsTo(SubmissionInternalDetail::class, 'submission_internal_detail_id');
     }
 
-    public function externalDetail(): BelongsTo
+    public function submissionExternalDetail(): BelongsTo
     {
         return $this->belongsTo(SubmissionExternalDetail::class, 'submission_external_detail_id');
     }

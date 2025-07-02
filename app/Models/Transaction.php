@@ -58,7 +58,7 @@ class Transaction extends Model
             $userEmail = $transaction->submission->user->email;
             Mail::to($userEmail)->send(new TransactionPending($transaction->id));
         });
-          
+
         static::updating(function ($transaction) {
             if ($transaction->isDirty('payment_invoice_files')) {
                 $original = $transaction->getOriginal('payment_invoice_files') ?? [];
@@ -118,4 +118,5 @@ class Transaction extends Model
     {
         return $this->belongsTo(Submission::class);
     }
+
 }
