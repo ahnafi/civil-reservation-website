@@ -10,7 +10,6 @@ import { Head, Link } from "@inertiajs/react"
 import { ChevronLeft, ChevronRight, ShoppingCart, Building2, Package, Wrench, Search } from "lucide-react"
 import { useEffect, useState, useMemo } from "react"
 import { toast, ToastContainer } from "react-toastify"
-import "react-toastify/dist/ReactToastify.css"
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -51,7 +50,7 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
         setIsAdding(true)
         const existingTest: TestCart | undefined = testCart.find((item) => item.test_id === test.id)
         if (existingTest) {
-            toast.error("Test already exists in the cart", {
+            toast.error("Pengujian sudah ada di keranjang!", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
@@ -68,7 +67,7 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                 test: test,
             }
             setTestCart([...testCart, newTestCart])
-            toast.success("Test added to cart successfully!", {
+            toast.success("Pengujian berhasil ditambahkan ke keranjang!", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
