@@ -223,7 +223,7 @@ export default function MainDashboard({
                                         >
                                             <div className="mb-2 flex items-start justify-between">
                                                 <div className="flex items-center gap-2">
-                                                    <CreditCard className="size-4 text-yellow-700 dark:text-yellow-300" />
+                                                    <Banknote className="size-4 text-yellow-700 dark:text-yellow-300" />
                                                     <span className="text-sm font-medium text-neutral-900 dark:text-white">{transaction.code}</span>
                                                 </div>
                                                 <span className="rounded-full bg-yellow-200 px-2 py-1 text-xs text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200">
