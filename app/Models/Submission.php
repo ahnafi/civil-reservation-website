@@ -46,7 +46,13 @@ class Submission extends Model
                 $paddedId = str_pad($submission->id, 3, '0', STR_PAD_LEFT);
                 $date = Carbon::parse($submission->test_submission_date)->format('Ymd');
 
-                $submission->code = 'SBM-' . $paddedUserId . $paddedId;
+                if ($submission->submission_type === 'internal'){
+                    $type = 'INT';
+                } else {
+                    $type = 'EXT';
+                }
+
+                $submission->code = 'SBM-' . $type . '-' . $paddedUserId . $paddedId;
                 $submission->saveQuietly();
             } catch (\Throwable $e) {
                 Log::error('Submission code generation failed', ['error' => $e->getMessage()]);
@@ -162,7 +168,7 @@ class Submission extends Model
                 'submission_external_details.project_name',
                 'submission_external_details.project_address',
                 'submission_external_details.total_cost',
-                // Internal detail fields  
+                // Internal detail fields
                 'submission_internal_details.name',
                 'submission_internal_details.program_study',
                 'submission_internal_details.research_title',
