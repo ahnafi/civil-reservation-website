@@ -37,8 +37,10 @@ class BookingService
         array $submission_packages
     ): void {
 
-        $testIds = collect($submission_tests)->pluck('test_id')->toArray();
-        $packageTestIds = Package::whereIn('id', $submission_packages)
+        $testIds = collect($submission_tests)->pluck('test_id')->filter()->toArray();
+        $packageIds = collect($submission_packages)->pluck('package_id')->filter()->toArray();
+
+        $packageTestIds = Package::whereIn('id', $packageIds)
             ->with('tests')
             ->get()
             ->flatMap(fn($p) => $p->tests->pluck('id'))
@@ -66,9 +68,6 @@ class BookingService
         try {
 
             // 1. Hitung total harga
-            $testIds = collect($submission_tests)->pluck('test_id')->filter()->toArray();
-            $packageIds = collect($submission_packages)->pluck('package_id')->filter()->toArray();
-
             $tests = Test::whereIn('id', $testIds)->get()->keyBy('id');
             $packages = Package::whereIn('id', $packageIds)->get()->keyBy('id');
 
