@@ -2,11 +2,13 @@
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
+import { router } from '@inertiajs/react';
 import type { BreadcrumbItem, PackageCart, TestCart } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { AlertCircle, Beaker, Building2, CheckCircle2, ClipboardList, CreditCard, Minus, PackageIcon, Plus, ShoppingCart, Trash2 } from 'lucide-react';
@@ -28,6 +30,16 @@ export default function Cart() {
     const [packagesCart, setPackagesCart] = useState<PackageCart[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const handleContinueToForm = () => {
+        const testIds = testsCart.map(test => test.test_id);
+        const packageIds = packagesCart.map(pkg => pkg.package_id);
+
+        router.get('/orders/form', {
+            testIds,
+            packageIds
+        });
+    };
 
     useEffect(() => {
         try {
@@ -459,11 +471,12 @@ export default function Cart() {
                                                 </div>
                                             </CardContent>
                                             <CardFooter className="p-6 pt-0">
-                                                <Link href="/orders/form" className="w-full">
-                                                    <Button className="w-full bg-blue-600 py-3 text-base font-semibold hover:bg-blue-700">
-                                                        Lanjutkan ke Formulir Pesanan
-                                                    </Button>
-                                                </Link>
+                                                <Button
+                                                    onClick={handleContinueToForm}
+                                                    className="w-full bg-blue-600 py-3 text-base font-semibold hover:bg-blue-700"
+                                                >
+                                                    Lanjutkan ke Formulir Pesanan
+                                                </Button>
                                             </CardFooter>
                                         </Card>
                                     </div>
