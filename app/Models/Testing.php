@@ -14,35 +14,31 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class Testing extends Model
-{
-    use SoftDeletes;
-
-    protected $fillable = [
-        "code",
-        "status",
-        "note",
-        "test_date",
-        "completed_at",
-        "documents",
-        "submission_id"
-    ];
-
-    protected static function boot(): void
+    class Testing extends Model
     {
-        parent::boot();
+        use SoftDeletes;
 
-        static::created(function ($testing) {
-            // Create ScheduleTesting record
-            $bookingService = new BookingService();
-            $bookingService->storeScheduleTesting($testing->id);
+        protected $fillable = [
+            "code",
+            "status",
+            "note",
+            "test_date",
+            "completed_at",
+            "documents",
+            "submission_id"
+        ];
 
+        protected static function boot(): void
+        {
+            parent::boot();
+
+            static::created(function ($testing) {
             $submission = $testing->submission;
 
             // Generate code based on the test date and submission Code
             $date = Carbon::parse($testing->test_date)->format('Ymd');
             $submissionCode = $submission->code;
-            
+
             // Add 3 random characters to ensure uniqueness
             $randomString = Str::random(3);
 
