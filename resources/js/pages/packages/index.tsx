@@ -31,7 +31,7 @@ export default function Packages({ paginated }: { paginated: PaginatedPackage })
         setIsAdding(true)
         const existingTest: PackageCart | undefined = packageCart.find((item) => item.package_id === selectedPackage.id)
         if (existingTest) {
-            toast.error("Package already exists in the cart", {
+            toast.error("Paket sudah ada di keranjang!", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
@@ -48,7 +48,7 @@ export default function Packages({ paginated }: { paginated: PaginatedPackage })
                 quantity: 1,
             }
             setPackageCart([...packageCart, newTestCart])
-            toast.success("Package added to cart successfully!", {
+            toast.success("Paket berhasil ditambahkan ke keranjang!", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
