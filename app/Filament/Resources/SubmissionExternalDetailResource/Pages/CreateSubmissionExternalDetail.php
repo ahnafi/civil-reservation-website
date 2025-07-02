@@ -39,7 +39,7 @@ class CreateSubmissionExternalDetail extends CreateRecord
         // Buat external detail terlebih dahulu
         $externalDetail = SubmissionExternalDetail::create($externalDetailData);
 
-        // Tambahkan external_detail_id ke submission data
+        // Tambahkan submission_external_detail_id ke submission data
         $submissionData['submission_external_detail_id'] = $externalDetail->id;
 
         // Buat submission
