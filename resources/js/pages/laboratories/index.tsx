@@ -1,84 +1,93 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Laboratory } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+"use client"
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import AppLayout from "@/layouts/app-layout"
+import type { BreadcrumbItem, Laboratory } from "@/types"
+import { Head, Link } from "@inertiajs/react"
+import { Building2, MapPin, ExternalLink } from "lucide-react"
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Laboratorium',
-        href: '/laboratories',
+        title: "Laboratorium",
+        href: "/laboratories",
     },
-];
+]
 
 export default function Laboratories({ laboratories }: { laboratories: Laboratory[] }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Pengujian" />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="grid auto-rows-min grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-                    {laboratories.map((laboratory: Laboratory) => (
-                        <Card className="gap-0 p-2" key={laboratory.id}>
-                            <CardHeader className="px-0">
-                                <Link href={'/laboratory/' + laboratory.slug}>
-                                    <img
-                                        src={'/storage/' + laboratory.images[0]}
-                                        alt={laboratory.name}
-                                        className="h-48 w-full rounded-md object-cover md:h-54 lg:h-60"
-                                    />
-                                </Link>
-                                <CardTitle>
-                                    <Link href={'/laboratory/' + laboratory.slug}>
-                                        <h3 className="truncate-2-lines">{laboratory.name}</h3>
-                                    </Link>
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="px-0">
-                                <CardDescription className="mb-4 space-y-2">
-                                    <p className="truncate-2-lines">{laboratory.description}</p>
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <div className="text-light-base bg-amber-base flex items-center gap-1 rounded-md px-2 py-1" title="Ruangan">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 512 512"
-                                                className="h-4 w-4 md:h-5 md:w-5"
-                                                fill="currentColor"
-                                            >
-                                                <path d="M342.6 9.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l9.4 9.4L28.1 342.6C10.1 360.6 0 385 0 410.5L0 416c0 53 43 96 96 96l5.5 0c25.5 0 49.9-10.1 67.9-28.1L448 205.3l9.4 9.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-32-32-96-96-32-32zM205.3 256L352 109.3 402.7 160l-96 96-101.5 0z" />
-                                            </svg>
-                                            <span className="small-font-size">{laboratory.room}</span>
-                                        </div>
-                                        <div className="text-light-base bg-purple-base flex items-center gap-1 rounded-md px-2 py-1" title="Kode">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 384 512"
-                                                className="h-4 w-4 md:h-5 md:w-5"
-                                                fill="currentColor"
-                                            >
-                                                <path d="M48 0C21.5 0 0 21.5 0 48L0 464c0 26.5 21.5 48 48 48l96 0 0-80c0-26.5 21.5-48 48-48s48 21.5 48 48l0 80 96 0c26.5 0 48-21.5 48-48l0-416c0-26.5-21.5-48-48-48L48 0zM64 240c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zm112-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zM80 96l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zM272 96l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16z" />
-                                            </svg>
-                                            <span className="small-font-size">{laboratory.code}</span>
-                                        </div>
+            <Head title="Laboratorium" />
+            <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
+                <div className="mx-auto max-w-7xl">
+                    {/* Header Section */}
+                    <div className="mb-8 text-center">
+                        <h1 className="text-4xl font-bold text-zinc-900 dark:text-white mb-4">Laboratorium Kami</h1>
+                        <p className="text-lg text-zinc-600 dark:text-zinc-300 max-w-2xl mx-auto">
+                            Fasilitas laboratorium modern dengan peralatan canggih untuk berbagai kebutuhan pengujian.
+                        </p>
+                    </div>
+
+                    <div className="grid auto-rows-min grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {laboratories.map((laboratory: Laboratory) => (
+                            <Link href={"/laboratory/" + laboratory.slug} key={laboratory.id} className="block h-full">
+                                <Card className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white dark:bg-zinc-900 h-full flex flex-col">
+                                    {/* Laboratory Image */}
+                                    <div className="relative overflow-hidden">
+                                        <img
+                                            src={"/storage/" + laboratory.images[0]}
+                                            alt={laboratory.name}
+                                            className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-300 md:h-54 lg:h-60"
+                                        />
                                     </div>
-                                </CardDescription>
-                                <Link
-                                    href={'/laboratory/' + laboratory.slug}
-                                    className="bg-blue-base text-light-base flex w-fit items-center gap-1 rounded-md px-3 py-2"
-                                >
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 512 512"
-                                        className="h-4 w-4 md:h-5 md:w-5"
-                                        fill="currentColor"
-                                    >
-                                        <path d="M352 0c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9L370.7 96 201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L416 141.3l41.4 41.4c9.2 9.2 22.9 11.9 34.9 6.9s19.8-16.6 19.8-29.6l0-128c0-17.7-14.3-32-32-32L352 0zM80 32C35.8 32 0 67.8 0 112L0 432c0 44.2 35.8 80 80 80l320 0c44.2 0 80-35.8 80-80l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-320c0-8.8 7.2-16 16-16l112 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 32z" />
-                                    </svg>
-                                    <span className="small-font-size">Lihat Detail</span>
-                                </Link>
-                            </CardContent>
-                        </Card>
-                    ))}
+
+                                    <CardHeader className="px-4 pb-2">
+                                        <CardTitle>
+                                            <h3 className="text-lg font-bold text-zinc-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 min-h-[3.5rem]">
+                                                {laboratory.name}
+                                            </h3>
+                                        </CardTitle>
+                                    </CardHeader>
+
+                                    <CardContent className="px-4 pt-0 flex-1 flex flex-col">
+                                        <CardDescription className="flex-1 flex flex-col">
+                                            <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed mb-4 flex-1 line-clamp-3">
+                                                {laboratory.description}
+                                            </p>
+
+                                            {/* Badges */}
+                                            <div className="flex flex-wrap gap-2 mb-4">
+                                                <Badge
+                                                    variant="secondary"
+                                                    className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 text-xs"
+                                                >
+                                                    <MapPin className="w-3 h-3 mr-1" />
+                                                    {laboratory.room}
+                                                </Badge>
+                                                <Badge
+                                                    variant="secondary"
+                                                    className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 text-xs"
+                                                >
+                                                    <Building2 className="w-3 h-3 mr-1" />
+                                                    {laboratory.code}
+                                                </Badge>
+                                            </div>
+                                        </CardDescription>
+
+                                        {/* View Details Button */}
+                                        <div className="flex items-center justify-end mt-auto">
+                                            <div className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1 text-sm">
+                                                <ExternalLink className="h-4 w-4" />
+                                                <span>Lihat Detail</span>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </Link>
+                        ))}
+                    </div>
                 </div>
             </div>
         </AppLayout>
-    );
+    )
 }
