@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Testing;
 use App\Models\Schedule;
+use App\Exceptions\SlotUnavailableException;
 use App\Models\Submission;
 use App\Models\Package;
 use App\Models\Test;
@@ -11,90 +12,80 @@ use App\Models\ScheduleTesting;
 use Illuminate\Support\Facades\DB;
 class BookingUtils
 {
-    public static function getTestIdsFromTesting($testing_id): array
+    public static function getTestIdsFromTesting(int $testing_id): array
     {
-        $testing = Testing::findOrFail($testing_id);
+        $testing = Testing::with('submission.submissionPackages.package.tests', 'submission.submissionTests')->findOrFail($testing_id);
+        $submission = $testing->submission;
 
-        $testIds = DB::table('submission_test')
-            ->where('submission_id', $testing->submission_id)
-            ->pluck('test_id');
+        $directTestIds = $submission->submissionTests->pluck('test_id');
 
-        $packageIds = DB::table('submission_package')
-            ->where('submission_id', $testing->submission_id)
-            ->pluck('package_id');
+        $packageTestIds = $submission->submissionPackages
+            ->pluck('package')
+            ->flatMap(fn($package) => $package->tests->pluck('id'));
 
-        $packageTestIds = DB::table('package_test')
-            ->whereIn('package_id', $packageIds)
-            ->pluck('test_id');
-
-        return $testIds
+        return $directTestIds
             ->merge($packageTestIds)
+            ->unique()
+            ->values()
             ->toArray();
     }
 
-    public static function handleScheduleForTesting($testing_id, array $testIds)
+    public static function handleScheduleForTesting(int $testing_id, array $testIds): void
     {
-        $testing = Testing::findOrFail($testing_id);
-        $date = $testing->test_date;
+        DB::transaction(function () use ($testing_id, $testIds) {
+            $testing = Testing::findOrFail($testing_id);
+            $date = $testing->test_date;
 
-        foreach ($testIds as $test_id) {
-            $schedule = self::getScheduleForTestAndDate($test_id, $date);
+            foreach ($testIds as $test_id) {
+                $schedule = self::getScheduleForTestAndDate($test_id, $date);
 
-            if ($schedule) {
-                self::handleExistingSchedule($schedule, $testing_id);
-            } else {
-                self::createNewSchedule($test_id, $date, $testing_id);
+                if ($schedule) {
+                    self::assignToExistingSchedule($schedule, $testing_id);
+                } else {
+                    self::createAndAssignNewSchedule($test_id, $date, $testing_id);
+                }
             }
-        }
+        });
     }
 
-    protected static function getScheduleForTestAndDate($test_id, $date)
+    protected static function getScheduleForTestAndDate(int $test_id, string $date):  ?Schedule
     {
-        // return DB::table('schedules')
-        //     ->where('test_id', $test_id)
-        //     ->where('date', $date)
-        //     ->first();
-
-        return Schedule::query()
-            ->where('test_id', $test_id)
+        return Schedule::where('test_id', $test_id)
             ->whereDate('date', $date)
             ->first();
     }
 
-    protected static function handleExistingSchedule($schedule, $testing_id)
+    protected static function assignToExistingSchedule(Schedule $schedule, int  $testing_id)
     {
         if ($schedule->available_slots > 0) {
             self::createScheduleTesting($schedule, $testing_id);
 
-            $schedule->available_slots -= 1;
-            $schedule->save();
+            $schedule->decrement('available_slots');
         } else {
-            return response()->json([
-                'message' => 'Slot tidak tersedia untuk jadwal ini',
-            ], 400);
+            throw new SlotUnavailableException();
         }
     }
 
-    protected static function createNewSchedule($test_id, $date, $testing_id)
+    protected static function createAndAssignNewSchedule(int $test_id, string $date, int $testing_id): void
     {
-        $schedule = new Schedule();
-        $schedule->test_id = $test_id;
-        $schedule->date = $date;
+        $test = Test::findOrFail($test_id);
 
-        $schedule->available_slots = $schedule->test->daily_slot;
+        $schedule = new Schedule([
+            'test_id' => $test_id,
+            'date' => $date,
+            'available_slots' => $test->daily_slot,
+        ]);
         $schedule->save();
 
         self::createScheduleTesting($schedule, $testing_id);
-
-        $schedule->available_slots -= 1;
-        $schedule->save();
+        $schedule->decrement('available_slots');
     }
 
-    protected static function createScheduleTesting($schedule, $testing_id)
+    protected static function createScheduleTesting(Schedule $schedule, int $testing_id): void
     {
-        $scheduleTesting = new ScheduleTesting();
-        $scheduleTesting->testing_id = $testing_id;
-        $scheduleTesting->schedule_id = $schedule->id;
-        $scheduleTesting->save();
+        ScheduleTesting::create([
+            'testing_id' => $testing_id,
+            'schedule_id' => $schedule->id,
+        ]);
     }
 }
