@@ -40,7 +40,7 @@ class CreateSubmissionInternalDetail extends CreateRecord
         // Buat internal detail terlebih dahulu
         $internalDetail = SubmissionInternalDetail::create($internalDetailData);
 
-        // Tambahkan internal_detail_id ke submission data
+        // Tambahkan submission_internal_detail_id ke submission data
         $submissionData['submission_internal_detail_id'] = $internalDetail->id;
 
         // Buat submission
