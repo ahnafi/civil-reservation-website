@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Exception;
+use App\Exceptions\SlotUnavailableException;
 
 
 class BookingController extends Controller
@@ -28,25 +29,21 @@ class BookingController extends Controller
             $submissionType = $validated['submission_type'] ?? 'external';
 
             // Prepare detail data based on submission type
-            $detailData = [];
-
-            if ($submissionType === 'external') {
-                $detailData = [
+            $detailData = $submissionType === 'external'
+                ? [
                     'company_name' => $validated['company_name'],
                     'project_name' => $validated['project_name'],
                     'project_address' => $validated['project_address'],
-                ];
-            } elseif ($submissionType === 'internal') {
-                $detailData = [
+                ]
+                : [
                     'name' => $validated['name'],
                     'program_study' => $validated['program_study'],
                     'research_title' => $validated['research_title'],
                     'personnel_count' => $validated['personnel_count'],
                     'supervisor' => $validated['supervisor'],
                 ];
-            }
 
-            // Call the service with correct parameters
+            // Create the submission
             $bookingService->createSubmission(
                 $userId,
                 $submissionType,
@@ -59,7 +56,15 @@ class BookingController extends Controller
 
             return redirect()->route('orders-cart-checkout')
                 ->with('Success', 'Pengajuan Berhasil Dibuat!');
-        } catch (\Exception $e) {
+        }
+
+        catch (SlotUnavailableException $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('Error', 'Slot penuh untuk pengujian: ' . implode(', ', $e->getUnavailableTests()));
+        }
+
+        catch (\Exception $e) {
             Log::error('Submission failed:', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
