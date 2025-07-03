@@ -6,6 +6,7 @@ import { type BreadcrumbItem, Transaction } from '@/types';
 import { parseAndFormatDate } from '@/utils/date-utils';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Calendar, Check, Clock, CreditCard, Download, FileText, Link2, Receipt, XCircle } from 'lucide-react';
+import React from 'react';
 
 // Format currency helper
 const formatCurrency = (amount: number) => {
@@ -90,8 +91,8 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
             <AppLayout>
                 <Head title="Tidak Terdapat Transaksi" />
                 <div className="container mx-auto py-8">
-                    <Card>
-                        <CardContent className="p-8 text-center">
+                    <Card className="bg-white dark:bg-zinc-900">
+                        <CardContent className="p-8 text-center bg-white dark:bg-zinc-900">
                             <p>Data transaksi tidak ditemukan</p>
                             <Button variant="outline" className="mt-4" asChild>
                                 <Link href="/history/transactions">
@@ -109,12 +110,12 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Transaksi ${transaction.code}`} />
-            <div className="container mx-auto">
+            <div className="container mx-auto px-4 py-6">
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                     {/* Main content - 2/3 width on large screens */}
                     <div className="lg:col-span-2">
-                        <Card className="gap-0 overflow-hidden p-0">
-                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-slate-800">
+                        <Card className="gap-0 overflow-hidden p-0 bg-white dark:bg-zinc-900">
+                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800">
                                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
                                         <CardTitle>
@@ -128,7 +129,7 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                 </div>
                             </CardHeader>
 
-                            <CardContent className="p-4">
+                            <CardContent className="p-4 bg-white dark:bg-zinc-900">
                                 <div className="mb-6 rounded-lg border p-4">
                                     <h3 className="mb-4 font-medium">Informasi Transaksi</h3>
                                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -205,8 +206,8 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                                 )}
                                             </div>
                                             <small className="text-gray-500">
-                                                {transaction.payment_receipt_images 
-                                                    ? "Bukti pembayaran yang telah diunggah" 
+                                                {transaction.payment_receipt_images
+                                                    ? "Bukti pembayaran yang telah diunggah"
                                                     : "Bukti pembayaran belum diunggah"
                                                 }
                                             </small>
@@ -225,11 +226,11 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
 
                     {/* Sidebar - 1/3 width on large screens */}
                     <div className="lg:col-span-1">
-                        <Card className="gap-0 overflow-hidden p-0">
-                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-slate-800">
+                        <Card className="gap-0 overflow-hidden p-0 bg-white dark:bg-zinc-900">
+                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800">
                                 <CardTitle className="text-lg">Status Pembayaran</CardTitle>
                             </CardHeader>
-                            <CardContent className="p-4">
+                            <CardContent className="p-4 bg-white dark:bg-zinc-900">
                                 {transaction.status === 'success' && (
                                     <div className="rounded-lg bg-green-50 p-4 dark:bg-green-900/20">
                                         <div className="mb-2 flex items-center gap-2">
@@ -251,7 +252,7 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                                     <h4 className="font-medium text-blue-700 dark:text-blue-400">Menunggu Konfirmasi</h4>
                                                 </div>
                                                 <p className="text-sm text-blue-700 dark:text-blue-400">
-                                                    Anda telah mengirim bukti pembayaran. Menunggu konfirmasi dari pihak admin.
+                                                    Bukti pembayaran Anda telah kami terima. Admin akan memproses dalam waktu maksimal 2 x 24 jam.
                                                 </p>
                                             </div>
                                         ) : (
@@ -285,18 +286,18 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                     </div>
                                 )}
                             </CardContent>
-                            <CardFooter className="border-t bg-slate-50 p-2 dark:bg-slate-800">
+                            <CardFooter className="border-t bg-slate-50 p-2 dark:bg-zinc-800">
                                 <div className="w-full text-center text-gray-500">
                                     <small>Terakhir diperbarui: {formatDate(transaction.updated_at)}</small>
                                 </div>
                             </CardFooter>
                         </Card>
 
-                        <Card className="mt-6 gap-0 overflow-hidden p-0">
-                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-slate-800">
+                        <Card className="mt-6 gap-0 overflow-hidden p-0 bg-white dark:bg-zinc-900">
+                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800">
                                 <CardTitle className="text-lg">Ringkasan Pembayaran</CardTitle>
                             </CardHeader>
-                            <CardContent className="p-4">
+                            <CardContent className="p-4 bg-white dark:bg-zinc-900">
                                 <div className="space-y-3">
                                     <div className="flex justify-between">
                                         <span className="text-gray-600 dark:text-gray-400">Total Biaya</span>
@@ -315,16 +316,44 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                             </CardContent>
                         </Card>
 
-                        <Card className="mt-6 gap-0 overflow-hidden p-0">
-                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-slate-800">
+                        <Card className="mt-6 gap-0 p-0 dark:bg-zinc-900">
+                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800 rounded-t-lg">
                                 <CardTitle className="text-lg">Bantuan</CardTitle>
                             </CardHeader>
                             <CardContent className="p-4">
-                                <div className="space-y-2 text-sm">
-                                    <p>Jika Anda memiliki pertanyaan tentang transaksi ini, silakan hubungi tim dukungan kami.</p>
-                                    <Button variant="outline" className="w-full">
-                                        Hubungi Dukungan
-                                    </Button>
+                                <div className="space-y-4 text-sm">
+                                    <p>Jika Anda memiliki pertanyaan tentang pembayaran ini, silakan hubungi tim dukungan kami.</p>
+
+                                    <div className="space-y-3">
+                                        <div>
+                                            <div className="font-medium text-gray-900 dark:text-white">Email Support</div>
+                                            <a
+                                                href="mailto:laboratoriumsipil.unsoed@gmail.com"
+                                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                            >
+                                                laboratoriumsipil.unsoed@gmail.com
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <div className="font-medium text-gray-900 dark:text-white">WhatsApp</div>
+                                            <a
+                                                href="https://wa.me/6281393133408"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                            >
+                                                +62 813-9313-3408
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <div className="font-medium text-gray-900 dark:text-white">Jam Operasional</div>
+                                            <div className="text-gray-600 dark:text-gray-300">
+                                                Senin - Jumat<br />
+                                                08:00 - 16:00 WIB
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </CardContent>
                         </Card>
