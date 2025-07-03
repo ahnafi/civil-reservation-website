@@ -373,13 +373,13 @@ export default function Cart() {
 
                                                                     {packageItem.package.tests && packageItem.package.tests.length > 0 && (
                                                                         <div className="mt-2 rounded-md bg-zinc-100 dark:bg-zinc-700 p-2">
-                                                                            <div className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                                                                            <div className="text-base font-medium text-zinc-700 dark:text-zinc-200">
                                                                                 Termasuk:
                                                                             </div>
                                                                             <ScrollArea className="mt-1 h-16">
                                                                                 <div className="space-y-1">
                                                                                     {packageItem.package.tests.map((test, testIndex) => (
-                                                                                        <div key={testIndex} className="text-xs text-zinc-600 dark:text-zinc-400">
+                                                                                        <div key={testIndex} className="text-sm text-zinc-600 dark:text-zinc-200">
                                                                                             • {test.name}
                                                                                         </div>
                                                                                     ))}
