@@ -74,7 +74,7 @@ export default function SubmissionDetail({ submissionHistoryDetail }: { submissi
             <AppLayout>
                 <Head title="Tidak Terdapat Pengajuan" />
                 <div className="container mx-auto py-8">
-                    <Card>
+                    <Card className="dark:bg-zinc-900">
                         <CardContent className="p-8 text-center">
                             <p>Data pengajuan tidak ditemukan</p>
                             <Button variant="outline" className="mt-4">
@@ -91,12 +91,12 @@ export default function SubmissionDetail({ submissionHistoryDetail }: { submissi
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Pengajuan ${testRecord.code}`} />
-            <div className="container mx-auto">
+            <div className="container mx-auto px-4 py-6">
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                     {/* Main content - 2/3 width on large screens */}
                     <div className="lg:col-span-2">
-                        <Card className="overflow-hidden p-0">
-                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-slate-800">
+                        <Card className="overflow-hidden p-0 dark:bg-zinc-900">
+                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800">
                                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
                                         <CardTitle>
@@ -109,7 +109,7 @@ export default function SubmissionDetail({ submissionHistoryDetail }: { submissi
                                     <StatusBadge status={testRecord.status} />
                                 </div>
                             </CardHeader>
-                            <CardContent className="p-0">
+                            <CardContent className="p-4">
                                 <div className="mb-6 rounded-lg border p-4">
                                     <h3 className="mb-4 text-lg font-medium">Informasi Pengajuan</h3>
                                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -161,8 +161,8 @@ export default function SubmissionDetail({ submissionHistoryDetail }: { submissi
 
                     {/* Sidebar - 1/3 width on large screens */}
                     <div className="lg:col-span-1">
-                        <Card className="gap-0 overflow-hidden p-0">
-                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-slate-800">
+                        <Card className="gap-0 overflow-hidden p-0 dark:bg-zinc-900">
+                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800">
                                 <CardTitle className="text-lg">Status Pengajuan</CardTitle>
                             </CardHeader>
                             <CardContent className="p-4">
@@ -174,7 +174,7 @@ export default function SubmissionDetail({ submissionHistoryDetail }: { submissi
                                                 <h4 className="font-medium text-green-700 dark:text-green-400">Pengajuan Disetujui</h4>
                                             </div>
                                             <p className="text-sm text-green-700 dark:text-green-400">
-                                                Pengajuan ini telah disetujui dan siap untuk dilaksanakan sesuai jadwal.
+                                                engajuan Anda telah disetujui. Silakan menunggu konfirmasi dari admin untuk informasi lebih lanjut terkait pembayaran dan jadwal pengujian.
                                             </p>
                                         </div>
                                         <Button className="w-full">Lihat Jadwal Pengujian</Button>
@@ -188,7 +188,7 @@ export default function SubmissionDetail({ submissionHistoryDetail }: { submissi
                                             <h4 className="font-medium text-yellow-700 dark:text-yellow-400">Menunggu Persetujuan</h4>
                                         </div>
                                         <p className="text-sm text-yellow-700 dark:text-yellow-400">
-                                            Pengajuan ini sedang dalam proses review. Kami akan memberi tahu Anda setelah pengajuan disetujui.
+                                            Pengajuan ini sedang dalam proses review dengan waktu pemrosesan maksimal 2 x 24 jam. Kami akan memberi tahu Anda setelah pengajuan disetujui atau ditolak.
                                         </p>
                                     </div>
                                 )}
@@ -200,28 +200,56 @@ export default function SubmissionDetail({ submissionHistoryDetail }: { submissi
                                             <h4 className="font-medium text-red-700 dark:text-red-400">Pengajuan Ditolak</h4>
                                         </div>
                                         <p className="text-sm text-red-700 dark:text-red-400">
-                                            Pengajuan ini ditolak. Silakan hubungi admin untuk informasi lebih lanjut.
+                                            Pengajuan ini ditolak. Silakan cek email anda untuk informasi lebih lanjut mengenai alasan penolakan.
                                         </p>
                                     </div>
                                 )}
                             </CardContent>
-                            <CardFooter className="border-t bg-slate-50 p-2 dark:bg-slate-800">
+                            <CardFooter className="border-t bg-slate-50 p-2 dark:bg-zinc-800">
                                 <div className="w-full text-center text-sm text-gray-500">
                                     Terakhir diperbarui: {formatDate(testRecord.test_submission_date)}
                                 </div>
                             </CardFooter>
                         </Card>
 
-                        <Card className="mt-6 gap-0 p-0">
-                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-slate-800">
+                        <Card className="mt-6 gap-0 p-0 dark:bg-zinc-900">
+                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800 rounded-t-lg">
                                 <CardTitle className="text-lg">Bantuan</CardTitle>
                             </CardHeader>
                             <CardContent className="p-4">
-                                <div className="space-y-2 text-sm">
+                                <div className="space-y-4 text-sm">
                                     <p>Jika Anda memiliki pertanyaan tentang pengajuan ini, silakan hubungi tim dukungan kami.</p>
-                                    <Button variant="outline" className="w-full">
-                                        Hubungi Dukungan
-                                    </Button>
+
+                                    <div className="space-y-3">
+                                        <div>
+                                            <div className="font-medium text-gray-900 dark:text-white">Email Support</div>
+                                            <a
+                                                href="mailto:laboratoriumsipil.unsoed@gmail.com"
+                                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                            >
+                                                laboratoriumsipil.unsoed@gmail.com
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <div className="font-medium text-gray-900 dark:text-white">WhatsApp</div>
+                                            <a
+                                                href="https://wa.me/6281393133408"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                            >
+                                                +62 813-9313-3408
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <div className="font-medium text-gray-900 dark:text-white">Jam Operasional</div>
+                                            <div className="text-gray-600 dark:text-gray-300">
+                                                Senin - Jumat<br />
+                                                08:00 - 16:00 WIB
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </CardContent>
                         </Card>
