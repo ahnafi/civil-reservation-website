@@ -124,7 +124,6 @@ export default function Laboratory() {
                                                         >
                                                             <CardContent className="p-4">
                                                                 {/* Wrap only title + description + badges in the Link */}
-                                                                <Link href={"/test/" + test.slug} className="block">
                                                                     <h4 className="font-semibold text-zinc-900 dark:text-white mb-2">{test.name}</h4>
                                                                     <p className="mb-3 text-zinc-600 dark:text-zinc-300 text-sm line-clamp-2">
                                                                         {test.description}
@@ -145,7 +144,6 @@ export default function Laboratory() {
                                                                             {test.minimum_unit}
                                                                         </Badge>
                                                                     </div>
-                                                                </Link>
 
                                                                 <div className="flex flex-wrap items-center justify-between gap-2">
                                                                     <h4 className="font-bold text-blue-600 dark:text-blue-400">
