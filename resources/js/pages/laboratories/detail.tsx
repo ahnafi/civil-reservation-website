@@ -123,42 +123,48 @@ export default function Laboratory() {
                                                             className="border-0 shadow-md hover:shadow-lg transition-shadow duration-200 bg-zinc-50 dark:bg-zinc-800"
                                                         >
                                                             <CardContent className="p-4">
-                                                                <h4 className="font-semibold text-zinc-900 dark:text-white mb-2">{test.name}</h4>
-                                                                <p className="mb-3 text-zinc-600 dark:text-zinc-300 text-sm line-clamp-2">
-                                                                    {test.description}
-                                                                </p>
-                                                                <div className="mb-3 flex flex-wrap items-center gap-2">
-                                                                    <Badge
-                                                                        variant="secondary"
-                                                                        className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 text-xs"
-                                                                    >
-                                                                        <Wrench className="w-3 h-3 mr-1" />
-                                                                        {test.category.name}
-                                                                    </Badge>
-                                                                    <Badge
-                                                                        variant="secondary"
-                                                                        className="bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200 text-xs"
-                                                                    >
-                                                                        <Package className="w-3 h-3 mr-1" />
-                                                                        {test.minimum_unit}
-                                                                    </Badge>
-                                                                </div>
+                                                                {/* Wrap only title + description + badges in the Link */}
+                                                                <Link href={"/test/" + test.slug} className="block">
+                                                                    <h4 className="font-semibold text-zinc-900 dark:text-white mb-2">{test.name}</h4>
+                                                                    <p className="mb-3 text-zinc-600 dark:text-zinc-300 text-sm line-clamp-2">
+                                                                        {test.description}
+                                                                    </p>
+                                                                    <div className="mb-3 flex flex-wrap items-center gap-2">
+                                                                        <Badge
+                                                                            variant="secondary"
+                                                                            className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 text-xs"
+                                                                        >
+                                                                            <Wrench className="w-3 h-3 mr-1" />
+                                                                            {test.category.name}
+                                                                        </Badge>
+                                                                        <Badge
+                                                                            variant="secondary"
+                                                                            className="bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200 text-xs"
+                                                                        >
+                                                                            <Package className="w-3 h-3 mr-1" />
+                                                                            {test.minimum_unit}
+                                                                        </Badge>
+                                                                    </div>
+                                                                </Link>
+
                                                                 <div className="flex flex-wrap items-center justify-between gap-2">
                                                                     <h4 className="font-bold text-blue-600 dark:text-blue-400">
                                                                         {formatRupiah(test.price)}
                                                                     </h4>
+
                                                                     <Link
                                                                         href={"/test/" + test.slug}
                                                                         className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white flex items-center gap-1 rounded-md px-3 py-2 text-xs font-medium transition-colors duration-200"
                                                                     >
-                                                                        <ShoppingCart className="h-3 w-3" />
-                                                                        <span>Tambah ke Keranjang</span>
+                                                                        <ExternalLink className="h-3 w-3" />
+                                                                        <span>Lihat Detail Pengujian</span>
                                                                     </Link>
                                                                 </div>
                                                             </CardContent>
                                                         </Card>
                                                     ))}
                                                 </div>
+
                                                 {tests.length > 4 && (
                                                     <div className="mt-6 text-center">
                                                         <Button
