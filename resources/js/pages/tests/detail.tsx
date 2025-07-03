@@ -206,7 +206,53 @@ export default function Detail({ test }: { test: Test }) {
                                         </div>
                                     </div>
 
-
+                                    {test.packages && test.packages.length > 0 && (
+                                        <>
+                                            <Separator className="bg-zinc-200 dark:bg-zinc-700" />
+                                            <div>
+                                                <h4 className="mb-4 font-semibold text-zinc-900 dark:text-white">Tersedia dalam Paket</h4>
+                                                <div className="space-y-4">
+                                                    {test.packages.map((pkg) => (
+                                                        <Card
+                                                            key={pkg.id}
+                                                            className="bg-zinc-50 dark:bg-zinc-700 border-zinc-200 dark:border-zinc-600"
+                                                        >
+                                                            <CardContent className="p-4">
+                                                                <div className="flex items-center gap-4">
+                                                                    <div className="h-16 w-16 sm:h-20 sm:w-20 overflow-hidden rounded-md flex-shrink-0">
+                                                                        <img
+                                                                            src={`/storage/${pkg.images[0]}`}
+                                                                            alt={pkg.name}
+                                                                            className="h-full w-full object-cover"
+                                                                        />
+                                                                    </div>
+                                                                    <div className="flex-1 min-w-0">
+                                                                        <Link
+                                                                            href={`/package/${pkg.slug}`}
+                                                                            className="font-medium text-zinc-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors block truncate"
+                                                                        >
+                                                                            {pkg.name}
+                                                                        </Link>
+                                                                        <p className="text-zinc-600 dark:text-zinc-300 font-semibold">
+                                                                            {formatRupiah(pkg.price)}
+                                                                        </p>
+                                                                    </div>
+                                                                    <Button
+                                                                        variant="secondary"
+                                                                        size="sm"
+                                                                        asChild
+                                                                        className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800 flex-shrink-0"
+                                                                    >
+                                                                        <Link href={`/package/${pkg.slug}`}>Detail</Link>
+                                                                    </Button>
+                                                                </div>
+                                                            </CardContent>
+                                                        </Card>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
                                 </CardContent>
 
                                 <CardFooter className="flex flex-col gap-4 p-0 mt-8 sm:flex-row">
