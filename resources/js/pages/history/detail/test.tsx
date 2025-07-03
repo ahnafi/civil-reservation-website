@@ -5,6 +5,7 @@ import { type BreadcrumbItem, Testing } from '@/types';
 import { parseAndFormatDate } from '@/utils/date-utils';
 import { Head, Link } from '@inertiajs/react';
 import { ArrowLeft, Beaker, Calendar, Check, ClipboardCheck, Clock, Download, FileText, Info, Link2, XCircle } from 'lucide-react';
+import React from 'react';
 
 // Format date helper
 const formatDate = (dateString: string | null | undefined) => {
@@ -118,12 +119,12 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Pengujian ${testRecord.code}`} />
-            <div className="container mx-auto">
+            <div className="container mx-auto px-4 py-6">
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                     {/* Main content - 2/3 width on large screens */}
                     <div className="lg:col-span-2">
-                        <Card className="gap-0 overflow-hidden p-0">
-                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-slate-800">
+                        <Card className="gap-0 overflow-hidden p-0 bg-white dark:bg-zinc-900">
+                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800">
                                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
                                         <CardTitle>
@@ -137,7 +138,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                 </div>
                             </CardHeader>
 
-                            <CardContent className="p-4">
+                            <CardContent className="p-4 bg-white dark:bg-zinc-900">
                                 <div className="mb-6 rounded-lg border p-4">
                                     <h3 className="mb-4 text-lg font-medium">Informasi Pengujian</h3>
                                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -230,8 +231,8 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                                 {testRecord.status === 'testing'
                                                     ? 'Sedang dalam proses'
                                                     : testRecord.status === 'completed'
-                                                      ? 'Selesai'
-                                                      : 'Menunggu'}
+                                                        ? 'Selesai'
+                                                        : 'Menunggu'}
                                             </p>
                                         </div>
 
@@ -252,11 +253,11 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
 
                     {/* Sidebar - 1/3 width on large screens */}
                     <div className="lg:col-span-1">
-                        <Card className="gap-0 overflow-hidden p-0">
-                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-slate-800">
+                        <Card className="gap-0 overflow-hidden p-0 bg-white dark:bg-zinc-900">
+                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800">
                                 <CardTitle className="text-lg">Status Pengujian</CardTitle>
                             </CardHeader>
-                            <CardContent className="p-4">
+                            <CardContent className="p-4 bg-white dark:bg-zinc-900">
                                 <div className="mb-4 space-y-2">
                                     <div className="flex justify-between">
                                         <span className="text-sm font-medium">Progres</span>
@@ -322,18 +323,18 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                     )}
                                 </div>
                             </CardContent>
-                            <CardFooter className="border-t bg-slate-50 p-2 dark:bg-slate-800">
+                            <CardFooter className="border-t bg-slate-50 p-2 dark:bg-zinc-800">
                                 <div className="small-font-size w-full text-center text-gray-500">
                                     Terakhir diperbarui: {formatDate(testRecord.updated_at)}
                                 </div>
                             </CardFooter>
                         </Card>
 
-                        <Card className="mt-6 gap-0 overflow-hidden p-0">
-                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-slate-800">
+                        <Card className="mt-6 gap-0 overflow-hidden p-0 bg-white dark:bg-zinc-900">
+                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800">
                                 <CardTitle className="text-lg">Pengingat Pengujian</CardTitle>
                             </CardHeader>
-                            <CardContent className="p-4">
+                            <CardContent className="p-4 bg-white dark:bg-zinc-900">
                                 <div className="space-y-4">
                                     <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
                                         <h4 className="mb-2 flex items-center gap-2 font-medium text-blue-700 dark:text-blue-400">
@@ -347,24 +348,48 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                         </ul>
                                     </div>
 
-                                    <Button variant="outline" className="w-full">
-                                        <Calendar className="mr-2 h-4 w-4" />
-                                        Tambahkan ke Kalender
-                                    </Button>
                                 </div>
                             </CardContent>
                         </Card>
 
-                        <Card className="mt-6 gap-0 overflow-hidden p-0">
-                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-slate-800">
+                        <Card className="mt-6 gap-0 p-0 dark:bg-zinc-900">
+                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800 rounded-t-lg">
                                 <CardTitle className="text-lg">Bantuan</CardTitle>
                             </CardHeader>
                             <CardContent className="p-4">
-                                <div className="small-font-size space-y-4">
+                                <div className="space-y-4 text-sm">
                                     <p>Jika Anda memiliki pertanyaan tentang pengujian ini, silakan hubungi tim dukungan kami.</p>
-                                    <Button variant="outline" className="w-full">
-                                        Hubungi Dukungan
-                                    </Button>
+
+                                    <div className="space-y-3">
+                                        <div>
+                                            <div className="font-medium text-gray-900 dark:text-white">Email Support</div>
+                                            <a
+                                                href="mailto:laboratoriumsipil.unsoed@gmail.com"
+                                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                            >
+                                                laboratoriumsipil.unsoed@gmail.com
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <div className="font-medium text-gray-900 dark:text-white">WhatsApp</div>
+                                            <a
+                                                href="https://wa.me/6281393133408"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                            >
+                                                +62 813-9313-3408
+                                            </a>
+                                        </div>
+                                        <div>
+                                            <div className="font-medium text-gray-900 dark:text-white">Jam Operasional</div>
+                                            <div className="text-gray-600 dark:text-gray-300">
+                                                Senin - Jumat<br />
+                                                08:00 - 16:00 WIB
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                             </CardContent>
                         </Card>
