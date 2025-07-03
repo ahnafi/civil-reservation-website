@@ -35,12 +35,6 @@ class BookingUtils
         $testing = Testing::findOrFail($testing_id);
         $date = $testing->test_date;
 
-        $unavailableTestNames = self::getUnavailableTestNames($testIds, $date);
-
-        if (!empty($unavailableTestNames)) {
-            throw new SlotUnavailableException($unavailableTestNames);
-        }
-
         DB::transaction(function () use ($testing_id, $testIds, $date) {
             foreach ($testIds as $test_id) {
                 $schedule = self::getScheduleForTestAndDate($test_id, $date);
@@ -64,7 +58,10 @@ class BookingUtils
     protected static function assignToExistingSchedule(Schedule $schedule, int  $testing_id)
     {
         self::createScheduleTesting($schedule, $testing_id);
-        $schedule->decrement('available_slots');
+
+        if($schedule->available_slots > 0){
+            $schedule->decrement('available_slots');
+        }
     }
 
     protected static function createAndAssignNewSchedule(int $test_id, string $date, int $testing_id): void
@@ -79,7 +76,10 @@ class BookingUtils
         $schedule->save();
 
         self::createScheduleTesting($schedule, $testing_id);
-        $schedule->decrement('available_slots');
+
+        if($schedule->available_slots > 0) {
+            $schedule->decrement('available_slots');
+        }
     }
 
     protected static function createScheduleTesting(Schedule $schedule, int $testing_id): void
