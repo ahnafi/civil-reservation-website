@@ -21,8 +21,6 @@ import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, Transaction } from '@/types';
 
 // Available payment methods with account details
-// Data Enum yang akan digunakan untuk menampilkan pilihan metode pembayaran
-// "BANK JATENG", "BANK MANDIRI", "BANK BNI", "BANK BRI", "BANK BSI", "BANK BTN"
 const PAYMENT_METHODS = [
     {
         id: 'BANK_JATENG',
@@ -102,7 +100,6 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
     const [isUploading, setIsUploading] = useState(false);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [isSuccess, setIsSuccess] = useState(false);
-    // const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -122,8 +119,6 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
             href: `/payment/${transaction.code}`,
         },
     ];
-
-    console.log('Transaction Detail:', transaction);
 
     // Inertia form
     const { data, setData, post, processing, errors, reset } = useInertiaForm<PaymentFormData>({
@@ -163,19 +158,6 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
 
     // Check if payment is overdue
     const isOverdue = new Date() > new Date(transaction.payment_deadline);
-
-    // const selectedPaymentMethod = PAYMENT_METHODS.find((method) => method.id === form.watch('payment_method'));
-
-    // Copy account number to clipboard
-    // const copyToClipboard = async (text: string, type: string) => {
-    //     try {
-    //         await navigator.clipboard.writeText(text);
-    //         setCopiedAccount(type);
-    //         setTimeout(() => setCopiedAccount(null), 2000);
-    //     } catch (err) {
-    //         console.error('Failed to copy: ', err);
-    //     }
-    // };
 
     // Simulate file upload progress
     const simulateUpload = () => {
@@ -221,16 +203,13 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
         if (input) input.value = '';
     };
 
-    console.log('Transaction Data:', transaction);
-
     const handleSubmit = (formData: FormValues) => {
         // Sync data with Inertia form
         setData('payment_method', formData.payment_method);
 
         // Submit with Inertia
-        post(route('submit-payment'), {
+        post('/submit-payment', {
             onSuccess: () => {
-                // console.log('Submitting payment with data:', formData);
                 setIsSuccess(true);
                 reset();
                 setImagePreview(null);
@@ -286,7 +265,7 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Pembayaran" />
 
-            <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+            <div className="min-h-screen bg-gray-50 dark:bg-black">
                 <div className="container mx-auto px-4 py-8">
                     {/* Approval Status Header */}
                     <div className="mb-12">
@@ -318,7 +297,7 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
                                 )}
 
                                 {/* Submission Summary */}
-                                <Card className="border-0 bg-white shadow-sm dark:bg-gray-800">
+                                <Card className="border-0 bg-white shadow-sm dark:bg-zinc-900">
                                     <CardHeader className="pb-4">
                                         <div className="flex items-center space-x-3">
                                             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
@@ -403,7 +382,7 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
                                 </Card>
 
                                 {/* Payment Instructions */}
-                                <Card className="border-0 bg-white shadow-sm dark:bg-gray-800">
+                                <Card className="border-0 bg-white shadow-sm dark:bg-zinc-900">
                                     <CardHeader className="pb-4">
                                         <div className="flex items-center space-x-3">
                                             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30">
@@ -444,7 +423,7 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
                                 <Form {...form}>
                                     <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
                                         {/* Payment Method Selection */}
-                                        <Card className="border-0 bg-white shadow-sm dark:bg-gray-800">
+                                        <Card className="border-0 bg-white shadow-sm dark:bg-zinc-900">
                                             <CardHeader className="pb-4">
                                                 <div className="flex items-center space-x-3">
                                                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/30">
@@ -504,7 +483,7 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
                                         </Card>
 
                                         {/* Payment Proof Upload */}
-                                        <Card className="border-0 bg-white shadow-sm dark:bg-gray-800">
+                                        <Card className="border-0 bg-white shadow-sm dark:bg-zinc-900">
                                             <CardHeader className="pb-4">
                                                 <div className="flex items-center space-x-3">
                                                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/30">
@@ -555,7 +534,7 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
                                                                             {/* Image Preview */}
                                                                             <div className="relative rounded-lg border-2 border-gray-200 dark:border-gray-600">
                                                                                 <img
-                                                                                    src={imagePreview}
+                                                                                    src={imagePreview || "/placeholder.svg"}
                                                                                     alt="Preview bukti pembayaran"
                                                                                     className="h-64 w-full rounded-lg object-cover"
                                                                                 />
@@ -648,7 +627,7 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
                             <div className="lg:col-span-1">
                                 <div className="sticky top-6 space-y-6">
                                     {/* Contact Information */}
-                                    <Card className="border-0 shadow-sm">
+                                    <Card className="border-0 shadow-sm dark:bg-zinc-900">
                                         <CardHeader>
                                             <CardTitle className="flex items-center text-lg">
                                                 <div className="mr-3 flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/30">
@@ -680,7 +659,7 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
                                     </Card>
 
                                     {/* Tips Payment */}
-                                    <Card className="border-0 shadow-sm">
+                                    <Card className="border-0 shadow-sm dark:bg-zinc-900">
                                         <CardHeader>
                                             <CardTitle className="flex items-center text-lg">
                                                 <div className="mr-3 flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/30">
