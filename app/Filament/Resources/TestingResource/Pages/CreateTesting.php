@@ -5,6 +5,7 @@ namespace App\Filament\Resources\TestingResource\Pages;
 use App\Exceptions\SlotUnavailableException;
 use App\Filament\Resources\TestingResource;
 use App\Services\BookingService;
+use App\Services\BookingUtils;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
@@ -17,21 +18,20 @@ class CreateTesting extends CreateRecord
     {
         $record = parent::handleRecordCreation($data);
 
-        try {
-            // Use your service instead of direct BookingUtils calls
-            app(BookingService::class)->storeScheduleTesting($record->id);
+        $testIds = BookingUtils::getTestIdsFromTesting($record->id);
 
-        } catch (SlotUnavailableException $e) {
+        $unavailableTestNames = BookingUtils::getUnavailableTestNames($testIds, $record->test_date);
+
+        app(BookingService::class)->storeScheduleTesting($record->id);
+
+        if(!empty($unavailableTestNames)) {
             Notification::make()
-                ->title('Gagal membuat jadwal pengujian')
-                ->body($e->getMessage())
-                ->danger()
+                ->title('Pengujian berhasil dibuat, tapi jadwal penuh!')
+                ->body('Pengujian berhasil dibuat, namun slot jadwal pada tanggal tersebut telah penuh. Silakan atur ulang tanggal pengujian atau sesuaikan jadwal secara manual jika diperlukan.')
+                ->warning()
+                ->persistent()
                 ->send();
 
-            // Optional: remove the created testing record if schedule creation failed
-            $record->delete();
-
-            // Stop the redirect/confirmation
             $this->halt();
         }
 
