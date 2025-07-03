@@ -161,6 +161,24 @@ class TransactionsRelationManager extends RelationManager
                         'success' => 'Diterima',
                         'failed' => 'Ditolak',
                     ]),
+                Tables\Filters\Filter::make('created_at')
+                    ->form([
+                        Forms\Components\DatePicker::make('created_from')
+                            ->label('Tanggal Dibuat Dari'),
+                        Forms\Components\DatePicker::make('created_until')
+                            ->label('Tanggal Dibuat Sampai'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    }),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
