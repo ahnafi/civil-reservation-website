@@ -119,7 +119,6 @@ export default function Packages({ paginated }: { paginated: PaginatedPackage })
                                     <h3 className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">
                                         {formatRupiah(data.price)}
                                     </h3>
-                                    <p className="text-sm text-zinc-500 dark:text-zinc-400">{data.tests?.length || 0} tes termasuk</p>
                                 </div>
 
                                 {data.tests && data.tests.length > 0 && (
