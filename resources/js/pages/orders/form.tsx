@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import AppLayout from "@/layouts/app-layout"
 import { cn } from "@/lib/utils"
+import { router } from "@inertiajs/react"
 import type { BreadcrumbItem } from "@/types"
 import { formatDate } from "@/utils/date-utils"
 import { Head, Link, useForm, usePage } from "@inertiajs/react"
@@ -107,6 +108,25 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
         user.role === "admin" ? "external" : (user.role as "external" | "internal"),
     )
 
+    const searchParams = new URLSearchParams(window.location.search);
+
+    const paramsTestIds = Array.from(searchParams.entries())
+        .filter(([key]) => key.startsWith("testIds["))
+        .map(([, value]) => Number(value));
+
+    const paramsPackageIds = Array.from(searchParams.entries())
+        .filter(([key]) => key.startsWith("packageIds["))
+        .map(([, value]) => Number(value));
+
+    const noParams = paramsTestIds.length === 0 && paramsPackageIds.length === 0;
+    const cartNotEmpty = localStorage.getItem("tests") !== null || localStorage.getItem("packages") !== null;
+
+    const tests = JSON.parse(localStorage.getItem("tests") || "[]");
+    const packages = JSON.parse(localStorage.getItem("packages") || "[]");
+
+    const testIds = tests.map((test: SimplifiedTest) => test.test_id);
+    const packageIds = packages.map((pkg: SimplifiedPackage) => pkg.package_id);
+
     const [externalForm, setExternalForm] = useState<ExternalForm>({
         company_name: "",
         project_name: "",
@@ -132,7 +152,6 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
         submission_tests: [],
         submission_packages: [],
     })
-    console.info("Initial form data:", data)
 
     // Helper function untuk format tanggal ke YYYY-MM-DD
     const formatDateForSubmission = (date: Date | undefined): string | undefined => {
@@ -157,7 +176,6 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
                 }
                 setExternalForm(parsedForm)
             } catch (error) {
-                console.error("Error parsing saved external form:", error)
                 localStorage.removeItem("external_form")
             }
         }
@@ -171,7 +189,6 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
                 }
                 setInternalForm(parsedForm)
             } catch (error) {
-                console.error("Error parsing saved internal form:", error)
                 localStorage.removeItem("internal_form")
             }
         }
@@ -275,9 +292,6 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
 
         post(route("createSubmission"), {
             onSuccess: (page) => {
-                // Ambil submission ID dari response jika ada
-                console.log("Submission created successfully:", page)
-
                 reset()
                 localStorage.removeItem("tests")
                 localStorage.removeItem("packages")
@@ -285,9 +299,15 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
                 localStorage.removeItem("internal_form")
             },
             onError: (errors) => {
-                console.error("Submission errors:", errors)
             },
         })
+    }
+
+    if (cartNotEmpty && noParams) {
+        router.get("/orders/form", {
+            testIds,
+            packageIds,
+        });
     }
 
     if (cartEmpty) {
@@ -321,7 +341,8 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
     }
 
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
+
+            <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Formulir Pesanan" />
 
             <div className="min-h-screen bg-zinc-50 dark:bg-black">
@@ -377,12 +398,6 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
                                             <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                                         </div>
                                         <div>
-                                            {fullSlotDate &&
-                                                fullSlotDate.map((id, index) => (
-                                                    <p key={index} className="text-zinc-600 dark:text-zinc-400">
-                                                        Test ID: {id}
-                                                    </p>
-                                                ))}
                                             <CardTitle className="text-xl text-zinc-900 dark:text-white">Informasi Pesanan</CardTitle>
                                             <p className="text-sm text-zinc-600 dark:text-zinc-400">
                                                 Isi detail {submissionType === "external" ? "proyek dan perusahaan" : "penelitian dan akademik"}{" "}
@@ -411,7 +426,7 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
                                                         <SelectItem value="external" className="text-zinc-900 dark:text-white">
                                                             <div className="flex items-center space-x-2">
                                                                 <Building2 className="h-4 w-4" />
-                                                                <span>External (Perusahaan/Industri)</span>
+                                                                <span>Eksternal (Perusahaan/Industri)</span>
                                                             </div>
                                                         </SelectItem>
                                                         <SelectItem value="internal" className="text-zinc-900 dark:text-white">
