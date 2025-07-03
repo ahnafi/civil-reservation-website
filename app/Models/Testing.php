@@ -13,6 +13,8 @@ use App\Services\BookingService;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Models\Schedule;
+use Illuminate\Support\Facades\DB;
 
     class Testing extends Model
     {
@@ -72,6 +74,14 @@ use Illuminate\Support\Str;
                     }
                 }
             }
+
+            DB::transaction(function () use ($model) {
+                foreach ($model->schedules as $schedule) {
+                    $schedule->increment('available_slots');
+                }
+
+                $model->schedules()->detach();
+            });
         });
 
     }
