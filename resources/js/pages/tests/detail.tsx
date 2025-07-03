@@ -312,7 +312,7 @@ export default function Detail({ test }: { test: Test }) {
                                                 asChild
                                                 className="p-0 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
                                             >
-                                                <Link href={`/laboratories/${test.laboratory.slug}`}>Lihat Detail Laboratorium →</Link>
+                                                <Link href={`/laboratory/${test.laboratory.slug}`}>Lihat Detail Laboratorium →</Link>
                                             </Button>
                                         </div>
                                     </div>
