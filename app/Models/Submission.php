@@ -34,6 +34,8 @@ class Submission extends Model
 
     protected $casts = [
         'documents' => 'array',
+        "approval_date" => "datetime",
+        "test_submission_date" => "date"
     ];
 
     protected static function boot(): void
@@ -46,7 +48,7 @@ class Submission extends Model
                 $paddedId = str_pad($submission->id, 3, '0', STR_PAD_LEFT);
                 $date = Carbon::parse($submission->test_submission_date)->format('Ymd');
 
-                if ($submission->submission_type === 'internal'){
+                if ($submission->submission_type === 'internal') {
                     $type = 'INT';
                 } else {
                     $type = 'EXT';
@@ -83,14 +85,6 @@ class Submission extends Model
                 }
             }
         });
-    }
-
-
-    protected function casts(): array
-    {
-        return [
-            "approval_date" => "datetime"
-        ];
     }
 
     public function user(): BelongsTo

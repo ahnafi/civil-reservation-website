@@ -104,9 +104,22 @@ class SubmissionExternalDetailResource extends Resource
                         Forms\Components\DateTimePicker::make('approval_date')
                             ->label('Tanggal diterima'),
 
-                        Forms\Components\DateTimePicker::make('test_submission_date')
+                        Forms\Components\DatePicker::make('test_submission_date')
                             ->label('Tanggal pengujian')
-                            ->required(),
+                            ->required()
+                            ->minDate(now())
+                            ->rule(function () {
+                                return function (string $attribute, $value, \Closure $fail) {
+                                    if ($value) {
+                                        $date = Carbon::parse($value);
+                                        // 6 = Sabtu, 0 = Minggu
+                                        if ($date->dayOfWeek === 6 || $date->dayOfWeek === 0) {
+                                            $fail('Tanggal pengujian tidak dapat dilakukan pada hari Sabtu atau Minggu.');
+                                        }
+                                    }
+                                };
+                            })
+                            ->helperText('Catatan: Pengujian tidak dapat dijadwalkan pada hari Sabtu dan Minggu.'),
 
                         Forms\Components\FileUpload::make('documents')
                             ->label('Lampiran')
@@ -329,6 +342,45 @@ class SubmissionExternalDetailResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\Filter::make('created_at')
+                    ->form([
+                        Forms\Components\DatePicker::make('created_from')
+                            ->label('Tanggal Dibuat Dari'),
+                        Forms\Components\DatePicker::make('created_until')
+                            ->label('Tanggal Dibuat Sampai'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    }),
+                Tables\Filters\Filter::make('test_submission_date')
+                    ->form([
+                        Forms\Components\DatePicker::make('test_date_from')
+                            ->label('Tanggal Pengujian Dari'),
+                        Forms\Components\DatePicker::make('test_date_until')
+                            ->label('Tanggal Pengujian Sampai'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->whereHas('submission', function (Builder $query) use ($data) {
+                                $query
+                                    ->when(
+                                        $data['test_date_from'],
+                                        fn (Builder $query, $date): Builder => $query->whereDate('test_submission_date', '>=', $date),
+                                    )
+                                    ->when(
+                                        $data['test_date_until'],
+                                        fn (Builder $query, $date): Builder => $query->whereDate('test_submission_date', '<=', $date),
+                                    );
+                            });
+                    }),
             ])
             ->actions([
                 Tables\Actions\Action::make("Terima")

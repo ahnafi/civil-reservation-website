@@ -59,8 +59,21 @@ class TestingsRelationManager extends RelationManager
                         }
                     }),
 
-                Forms\Components\DateTimePicker::make('test_date')
+                Forms\Components\DatePicker::make('test_date')
                     ->label('Tanggal Pengujian')
+                    ->minDate(now())
+                    ->rule(function () {
+                        return function (string $attribute, $value, \Closure $fail) {
+                            if ($value) {
+                                $date = Carbon::parse($value);
+                                // 6 = Sabtu, 0 = Minggu
+                                if ($date->dayOfWeek === 6 || $date->dayOfWeek === 0) {
+                                    $fail('Tanggal pengujian tidak dapat dilakukan pada hari Sabtu atau Minggu.');
+                                }
+                            }
+                        };
+                    })
+                    ->helperText('Catatan: Pengujian tidak dapat dijadwalkan pada hari Sabtu dan Minggu.')
                     ->default(fn() => $this->getOwnerRecord()->submission->test_submission_date ?? now())
                     ->nullable(),
 
@@ -105,7 +118,25 @@ class TestingsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('completed_at')->label('Selesai')->dateTime(),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\Filter::make('test_date')
+                    ->form([
+                        Forms\Components\DatePicker::make('test_date_from')
+                            ->label('Tanggal Pengujian Dari'),
+                        Forms\Components\DatePicker::make('test_date_until')
+                            ->label('Tanggal Pengujian Sampai'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['test_date_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('test_date', '>=', $date),
+                            )
+                            ->when(
+                                $data['test_date_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('test_date', '<=', $date),
+                            );
+                    }),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()

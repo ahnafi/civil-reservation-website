@@ -47,7 +47,18 @@ class TestingResource extends Resource
                     ->relationship("submission", "code", fn($query) => $query->orderBy('created_at', 'desc'))
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->reactive()
+                    ->afterStateUpdated(function ($state, Set $set) {
+                        if ($state) {
+                            $submission = \App\Models\Submission::find($state);
+                            if ($submission && $submission->test_submission_date) {
+                                // Convert datetime to date format for DatePicker
+                                $testDate = Carbon::parse($submission->test_submission_date)->format('Y-m-d');
+                                $set('test_date', $testDate);
+                            }
+                        }
+                    }),
 
                 ToggleButtons::make('status')
                     ->visibleOn(["edit", "view"])
@@ -78,8 +89,21 @@ class TestingResource extends Resource
                         }
                     }),
 
-                Forms\Components\DateTimePicker::make('test_date')
+                Forms\Components\DatePicker::make('test_date')
                     ->label('Tanggal Pengujian')
+                    ->minDate(now())
+                    ->rule(function () {
+                        return function (string $attribute, $value, \Closure $fail) {
+                            if ($value) {
+                                $date = Carbon::parse($value);
+                                // 6 = Sabtu, 0 = Minggu
+                                if ($date->dayOfWeek === 6 || $date->dayOfWeek === 0) {
+                                    $fail('Tanggal pengujian tidak dapat dilakukan pada hari Sabtu atau Minggu.');
+                                }
+                            }
+                        };
+                    })
+                    ->helperText('Catatan: Pengujian tidak dapat dijadwalkan pada hari Sabtu dan Minggu.')
                     ->nullable(),
 
                 Forms\Components\DateTimePicker::make('completed_at')
@@ -109,7 +133,7 @@ class TestingResource extends Resource
                     ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                         $extension = $file->getClientOriginalExtension();
 
-                        $id   = $get('id') ?? -1;
+                        $id = $get('id') ?? -1;
 
                         return FileNaming::generateTestingResult($id, $extension);
                     })
@@ -167,6 +191,24 @@ class TestingResource extends Resource
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\Filter::make('test_date')
+                    ->form([
+                        Forms\Components\DatePicker::make('test_date_from')
+                            ->label('Tanggal Pengujian Dari'),
+                        Forms\Components\DatePicker::make('test_date_until')
+                            ->label('Tanggal Pengujian Sampai'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['test_date_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('test_date', '>=', $date),
+                            )
+                            ->when(
+                                $data['test_date_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('test_date', '<=', $date),
+                            );
+                    }),
             ])
             ->actions([
 
@@ -206,13 +248,6 @@ class TestingResource extends Resource
                     Tables\Actions\DeleteAction::make(),
                 ])
             ]);
-        //            ->bulkActions([
-        //                Tables\Actions\BulkActionGroup::make([
-        //                    Tables\Actions\DeleteBulkAction::make(),
-        //                    Tables\Actions\ForceDeleteBulkAction::make(),
-        //                    Tables\Actions\RestoreBulkAction::make(),
-        //                ]),
-        //            ]);
     }
 
     public static function getRelations(): array

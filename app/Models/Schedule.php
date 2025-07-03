@@ -24,4 +24,20 @@ class Schedule extends Model
     {
         return $this->belongsToMany(Testing::class)->withTimestamps();
     }
+
+    // Helper accessor untuk menghitung slot yang terpakai
+    public function getUsedSlotsAttribute(): int
+    {
+        return $this->testings()
+            ->whereHas('submission', function ($query) {
+                $query->where('status', 'approved');
+            })
+            ->count();
+    }
+
+    // Helper accessor untuk menghitung slot yang tersisa
+    public function getRemainingSlotsAttribute(): int
+    {
+        return $this->available_slots - $this->used_slots;
+    }
 }
