@@ -1,10 +1,22 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, SubmissionSchedule } from '@/types';
+import { type BreadcrumbItem, SubmissionSchedule, Testing, Transaction } from '@/types';
 import { parseAndFormatDate } from '@/utils/date-utils';
-import { Head } from '@inertiajs/react';
-import { ArrowLeft, Beaker, Building2, ClipboardCheck, Clock, FileText, Package } from 'lucide-react';
+import { Head, Link } from '@inertiajs/react';
+import {
+    ArrowLeft,
+    HardHat,
+    Beaker,
+    Building2,
+    ClipboardCheck,
+    Clock,
+    FileText,
+    Package,
+    CreditCard,
+    ExternalLink,
+    Hammer
+} from 'lucide-react';
 import React from 'react';
 
 // Helper function to format date
@@ -49,15 +61,26 @@ const StatusBadge = ({ status }: { status: string }) => {
     );
 };
 
-export default function SubmissionDetail({ submissionHistoryDetail }: { submissionHistoryDetail: SubmissionSchedule[] }) {
+export default function SubmissionDetail({ submissionHistoryDetail, relatedTransaction, relatedTesting }: {
+    submissionHistoryDetail: SubmissionSchedule[],
+    relatedTransaction: Transaction[],
+    relatedTesting: Testing[]
+}) {
     // Get the first submission record
     const testRecord: SubmissionSchedule = submissionHistoryDetail[0];
 
+    const transactionStatusMap: Record<string, string> = {
+        success: 'Sukses',
+        pending: 'Pending',
+        failed: 'Gagal',
+    };
+
+    const testingStatusMap: Record<string, string> = {
+        testing: "Menunggu Pengujian",
+        completed: "Selesai",
+    };
+
     const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Riwayat',
-            href: '/history',
-        },
         {
             title: 'Pengajuan',
             href: '/history/submissions',
@@ -94,13 +117,15 @@ export default function SubmissionDetail({ submissionHistoryDetail }: { submissi
             <div className="container mx-auto px-4 py-6">
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                     {/* Main content - 2/3 width on large screens */}
-                    <div className="lg:col-span-2">
+                    <div className="lg:col-span-2 gap-6">
                         <Card className="overflow-hidden p-0 dark:bg-zinc-900">
                             <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800">
                                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
                                         <CardTitle>
-                                            <h2>Detail Pengajuan</h2>
+                                            <h2>
+                                                Detail Pengujian {testRecord.submission_type === 'internal' ? 'Internal' : testRecord.submission_type === 'external' ? 'Eksternal' : ''}
+                                            </h2>
                                         </CardTitle>
                                         <CardDescription>
                                             <p>Informasi pengajuan pengujian kode {testRecord.code}</p>
@@ -114,10 +139,34 @@ export default function SubmissionDetail({ submissionHistoryDetail }: { submissi
                                     <h3 className="mb-4 text-lg font-medium">Informasi Pengajuan</h3>
                                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                         <InfoItem icon={<FileText className="h-5 w-5" />} label="Kode Pengajuan" value={testRecord.code} />
-                                        <InfoItem icon={<Building2 className="h-5 w-5" />} label="Nama Perusahaan" value={testRecord.company_name} />
+
+                                        { testRecord.submission_type === 'external' && (
+                                                <>
+                                                    <InfoItem icon={<Building2 className="h-5 w-5" />} label="Nama Perusahaan" value={testRecord.company_name} />
+                                                    <InfoItem icon={<Building2 className="h-5 w-5" />} label="Nama Proyek" value={testRecord.project_name} />
+                                                    <InfoItem icon={<Building2 className="h-5 w-5" />} label="Nama Proyek" value={testRecord.project_address} />
+                                                </>
+                                            )
+                                        }
+
+                                        { testRecord.submission_type === 'internal' && (
+                                            <>
+                                                <InfoItem icon={<Building2 className="h-5 w-5" />} label="Nama Penelti" value={testRecord.researcher_name} />
+                                                <InfoItem icon={<Building2 className="h-5 w-5" />} label="Judul Penelitian" value={testRecord.research_title} />
+                                                <InfoItem icon={<Building2 className="h-5 w-5" />} label="Jumlah Personel" value={String(testRecord.personnel_count)} />
+                                                <InfoItem icon={<Building2 className="h-5 w-5" />} label="Nama Supervisor" value={testRecord.supervisor} />
+                                            </>
+                                        )
+                                        }
+
                                         <InfoItem
                                             icon={<Clock className="h-5 w-5" />}
                                             label="Tanggal Pengajuan"
+                                            value={formatDate(testRecord.created_at)}
+                                        />
+                                        <InfoItem
+                                            icon={<Clock className="h-5 w-5" />}
+                                            label="Tanggal Pengujian Diajukan"
                                             value={formatDate(testRecord.test_submission_date)}
                                         />
                                         <InfoItem
@@ -128,26 +177,101 @@ export default function SubmissionDetail({ submissionHistoryDetail }: { submissi
                                     </div>
                                 </div>
                                 <div className="rounded-lg border p-4">
-                                    <h3 className="mb-4 text-lg font-medium">Detail Pengujian</h3>
+                                    <h3 className="mb-4 text-lg font-medium">Detail Pengujian </h3>
                                     <div className="flex flex-col gap-4">
-                                        {testRecord.package_id ? (
+                                        {testRecord.package_id ? (() => {
+                                            const packageImages = Array.isArray(testRecord.package_images)
+                                                ? testRecord.package_images
+                                                : JSON.parse(testRecord.package_images || '[]');
+                                            return (
+                                                <div>
+                                                    <div className="mb-2 flex items-center gap-2">
+                                                        <Package className="h-5 w-5 text-blue-600" />
+                                                        <h4 className="font-medium">Paket Pengujian</h4>
+                                                    </div>
+                                                    <div className="ml-7 rounded-sm bg-blue-50 p-2 lg:p-4 dark:bg-blue-900/20">
+                                                        <Link
+                                                            href={`/package/${testRecord.package_slug}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="flex items-center gap-4"
+                                                        >
+                                                            <img
+                                                                src={`/storage/${packageImages[0]}`}
+                                                                alt={testRecord.package_name}
+                                                                className="h-20 w-20 rounded-md object-cover"
+                                                            />
+                                                            <div className="flex flex-col">
+                                                                <p className="font-medium">{testRecord.package_name}</p>
+                                                                <p className="text-sm text-gray-600 dark:text-gray-300">
+                                                                    Harga Paket: Rp {testRecord.package_price.toLocaleString('id-ID')}
+                                                                </p>
+                                                            </div>
+                                                        </Link>
+                                                    </div>
+
+                                                    <div className="ml-7 mt-4 rounded-lg bg-blue-100 p-3 text-right font-semibold dark:bg-blue-800/30">
+                                                        Total: Rp {testRecord.package_price.toLocaleString('id-ID')}
+                                                    </div>
+                                                </div>
+                                            );
+                                        })() : testRecord.test_id ? (
                                             <div>
                                                 <div className="mb-2 flex items-center gap-2">
-                                                    <Package className="h-5 w-5 text-blue-600" />
-                                                    <h4 className="font-medium">Paket Pengujian</h4>
-                                                </div>
-                                                <div className="ml-7 rounded-lg bg-blue-50 p-2 lg:p-4 dark:bg-blue-900/20">
-                                                    <p className="font-medium">{testRecord.package_name}</p>
-                                                </div>
-                                            </div>
-                                        ) : testRecord.test_id ? (
-                                            <div>
-                                                <div className="mb-2 flex items-center gap-2">
-                                                    <Beaker className="h-5 w-5 text-blue-600" />
+                                                    <HardHat className="h-5 w-5 text-blue-600" />
                                                     <h4 className="font-medium">Pengujian Tunggal</h4>
                                                 </div>
-                                                <div className="ml-7 rounded-lg bg-blue-50 p-2 lg:p-4 dark:bg-blue-900/20">
-                                                    <p className="font-medium">{testRecord.test_name}</p>
+
+                                                <div className="flex flex-col gap-2 rounded-lg p-2 lg:p-4">
+                                                    {submissionHistoryDetail.map((record: SubmissionSchedule) => {
+                                                        const testImages: string[] = Array.isArray(record.test_images)
+                                                            ? record.test_images
+                                                            : JSON.parse(record.test_images || '[]');
+
+                                                        const subtotal = record.quantity * record.test_price;
+
+                                                        return (
+                                                            <Link
+                                                                key={record.test_name}
+                                                                href={`/test/${record.test_slug}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="ml-7 rounded-lg bg-blue-50 p-2 lg:p-4 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-800/40 transition-colors"
+                                                            >
+                                                                <div className="flex items-center gap-4">
+                                                                    <img
+                                                                        src={`/storage/${testImages[0]}`}
+                                                                        alt={record.test_name}
+                                                                        className="h-20 w-20 rounded-md object-cover"
+                                                                    />
+                                                                    <div className="flex flex-col justify-center w-full">
+                                                                        <div className="flex justify-between text-sm font-medium">
+                <span>
+                  {record.test_name} × {record.quantity}
+                </span>
+                                                                            {testRecord.submission_type === 'external' && (
+                                                                                <span>Subtotal: Rp {subtotal.toLocaleString('id-ID')}</span>
+                                                                            )}
+                                                                        </div>
+                                                                        {testRecord.submission_type === 'external' && (
+                                                                            <p className="text-sm text-gray-600 dark:text-gray-300">
+                                                                                Harga Satuan: Rp {record.test_price.toLocaleString('id-ID')}
+                                                                            </p>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </Link>
+                                                        );
+                                                    })}
+
+                                                    {testRecord.submission_type === 'external' && (
+                                                        <div className="ml-7 mt-4 rounded-lg bg-blue-100 p-3 text-right font-semibold dark:bg-blue-800/30">
+                                                            Total: Rp{" "}
+                                                            {submissionHistoryDetail
+                                                                .reduce((acc, record) => acc + record.quantity * record.test_price, 0)
+                                                                .toLocaleString("id-ID")}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         ) : (
@@ -155,6 +279,117 @@ export default function SubmissionDetail({ submissionHistoryDetail }: { submissi
                                         )}
                                     </div>
                                 </div>
+
+                                {testRecord.status === 'approved' && relatedTransaction && (
+                                    <div className="mt-4 rounded-lg border p-4">
+                                        <div className="mb-2 flex items-center gap-2">
+                                            <CreditCard className="h-5 w-5" />
+                                            <h4 className="font-medium">Transaksi Terkait</h4>
+                                        </div>
+                                        <p className="text-sm mb-3">
+                                            Dikarenakan transaksi terkait pengujian ini telah dibuat, silakan cek detail transaksi untuk informasi lebih lanjut.
+                                        </p>
+
+                                        <div className="space-y-3">
+                                            {relatedTransaction.map((transaction: Transaction) => (
+                                            <div
+                                                key={transaction.code}
+                                                className="rounded-md border p-3 shadow-sm "
+                                            >
+                                                <div className="flex justify-between text-sm font-medium">
+                                                    <span>Kode Transaksi:</span>
+                                                    <span>{transaction.code}</span>
+                                                </div>
+                                                <div className="flex justify-between text-sm">
+                                                    <span>Status:</span>
+                                                    <span
+                                                        className={`capitalize font-semibold ${
+                                                            transaction.status === 'success'
+                                                                ? 'text-green-600'
+                                                                : transaction.status === 'pending'
+                                                                    ? 'text-yellow-600'
+                                                                    : 'text-red-600'
+                                                        }`}
+                                                    >
+                                                          {transactionStatusMap[transaction.status] || transaction.status}
+                                                    </span>
+                                                </div>
+                                                <div className="flex justify-between text-sm">
+                                                    <span>Jumlah:</span>
+                                                    <span>Rp {transaction.amount.toLocaleString('id-ID')}</span>
+                                                </div>
+                                                <div className="flex justify-between text-sm">
+                                                    <span>Batas Pembayaran:</span>
+                                                    <span>{transaction.payment_deadline}</span>
+                                                </div>
+                                                <div className="mt-2 text-right">
+                                                    <Link
+                                                        href={`/history/transaction/${transaction.code}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-sm text-blue-600 hover:underline inline-flex items-center gap-1"
+                                                    >
+                                                        <span>Lihat Detail</span>
+                                                        <ExternalLink className="w-4 h-4" />
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                        ))}
+                                        </div>
+                                    </div>
+                                )}
+
+
+                                {testRecord.status === 'approved' && relatedTesting && (
+                                    <div className="mt-4 rounded-lg border p-4">
+                                        <div className="mb-2 flex items-center gap-2">
+                                            <Hammer className="h-5 w-5" />
+                                            <h4 className="font-medium">Pengujian Terkait</h4>
+                                        </div>
+                                        <p className="text-sm mb-3">
+                                            Dikarenakan pengujian terkait pengajuan ini telah dibuat, silakan cek detail pengujian untuk informasi lebih lanjut.
+                                        </p>
+                                        {relatedTesting.map((testing: Testing) => (
+                                            <div
+                                                key={testing.code}
+                                                className="rounded-md border p-3 shadow-sm "
+                                            >
+                                                <div className="flex justify-between text-sm font-medium">
+                                                    <span>Kode Pengujian:</span>
+                                                    <span>{testing.code}</span>
+                                                </div>
+                                                <div className="flex justify-between text-sm">
+                                                    <span>Status:</span>
+                                                    <span
+                                                        className={`capitalize font-semibold ${
+                                                            testing.status === 'completed'
+                                                                ? 'text-green-600'
+                                                                : 'text-yellow-600'
+                                                        }`}
+                                                    >
+                                                          {testingStatusMap[testing.status] || testing.status}
+                                                        </span>
+                                                </div>
+                                                <div className="flex justify-between text-sm">
+                                                    <span>Tanggal Pengujian:</span>
+                                                    <span>{testing.test_date}</span>
+                                                </div>
+                                                <div className="mt-2 text-right">
+                                                    <Link
+                                                        href={`/history/test/${testing.code}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-sm text-blue-600 hover:underline inline-flex items-center gap-1"
+                                                    >
+                                                        <span>Lihat Detail</span>
+                                                        <ExternalLink className="w-4 h-4" />
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
                             </CardContent>
                         </Card>
                     </div>
@@ -174,10 +409,9 @@ export default function SubmissionDetail({ submissionHistoryDetail }: { submissi
                                                 <h4 className="font-medium text-green-700 dark:text-green-400">Pengajuan Disetujui</h4>
                                             </div>
                                             <p className="text-sm text-green-700 dark:text-green-400">
-                                                engajuan Anda telah disetujui. Silakan menunggu konfirmasi dari admin untuk informasi lebih lanjut terkait pembayaran dan jadwal pengujian.
+                                                Pengajuan Anda telah disetujui. Silakan menunggu konfirmasi dari admin untuk informasi lebih lanjut terkait pembayaran dan jadwal pengujian.
                                             </p>
                                         </div>
-                                        <Button className="w-full">Lihat Jadwal Pengujian</Button>
                                     </>
                                 )}
 
