@@ -16,13 +16,13 @@ import {
     Building2,
     CheckCircle2,
     ClipboardList,
-    CreditCard,
+    CreditCard, HardHat,
     Minus,
     PackageIcon,
     Plus,
     ShoppingCart,
-    Trash2,
-} from "lucide-react"
+    Trash2
+} from 'lucide-react';
 import { useEffect, useState } from "react"
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -209,7 +209,7 @@ export default function Cart() {
                                             <div className="mb-8">
                                                 <div className="mb-4 flex items-center gap-2">
                                                     <div className="bg-blue-100 dark:bg-blue-900 p-1.5 rounded-full">
-                                                        <Beaker className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                                        <HardHat className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                                                     </div>
                                                     <h3 className="font-semibold text-zinc-900 dark:text-white">Pengujian Individual</h3>
                                                     <Badge
