@@ -14,6 +14,7 @@ import { type NavItem, SharedData } from '@/types';
 import { Link , usePage} from '@inertiajs/react';
 import {
     BookOpen,
+    ClipboardPen,
     CalendarDays,
     PanelsTopLeft,
     FileText,
@@ -56,9 +57,9 @@ const serviceNavItems: NavItem[] = [
 
 const orderNavItems: NavItem[] = [
     {
-        title: 'Keranjang',
+        title: 'Reservasi Pengujian',
         url: '/orders/cart',
-        icon: ShoppingCart,
+        icon: ClipboardPen,
     },
     {
         title: 'Hasil Pengujian',
@@ -119,7 +120,7 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain label="Layanan" items={serviceNavItems} />
-                <NavMain label="Pesanan" items={orderNavItems} />
+                <NavMain label="Reservasi" items={orderNavItems} />
                 <NavMain label="Riwayat" items={historyNavItems} />
                 { user.role === 'admin' && (
                     <NavMain label="Admin" items={adminItems} />
