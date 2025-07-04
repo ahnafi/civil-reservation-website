@@ -159,11 +159,6 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                                     </div>
                                     <div className="flex flex-col items-end">
                                         <h2 className="text-3xl font-bold text-blue-600 dark:text-blue-400">{formatRupiah(data.price)}</h2>
-                                        {savings > 0 && (
-                                            <p className="text-sm text-green-600 dark:text-green-400 font-medium">
-                                                Hemat {formatRupiah(savings)} ({savingsPercentage}%)
-                                            </p>
-                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -275,40 +270,30 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                                             <CardHeader className="p-0">
                                                 <CardTitle className="text-xl mb-2 text-zinc-900 dark:text-white">Tentang Paket Ini</CardTitle>
                                                 <CardDescription className="text-sm sm:text-base text-zinc-600 dark:text-zinc-300">
-                                                    Detail lengkap tentang paket pengujian kualitas air
+                                                    {data.description}
                                                 </CardDescription>
                                             </CardHeader>
-                                            <CardContent className="space-y-6 p-0 mt-6">
-                                                <div>
-                                                    <h3 className="text-lg mb-3 font-semibold text-zinc-900 dark:text-white">Deskripsi</h3>
-                                                    <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed">{data.description}</p>
-                                                </div>
+                                            <CardContent className="space-y-6 p-0">
                                                 <div>
                                                     <h3 className="text-lg mb-3 font-semibold text-zinc-900 dark:text-white">Manfaat Paket</h3>
                                                     <ul className="space-y-3">
                                                         <li className="flex items-start gap-3">
                                                             <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-500" />
                                                             <span className="text-zinc-600 dark:text-zinc-300">
-                                Analisis komprehensif untuk memastikan kualitas air memenuhi standar
-                              </span>
+                                                            Laporan lengkap hasil pengujian
+                                                          </span>
                                                         </li>
                                                         <li className="flex items-start gap-3">
                                                             <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-500" />
                                                             <span className="text-zinc-600 dark:text-zinc-300">
-                                Lebih hemat dibandingkan pembelian terpisah
-                              </span>
+                                                            Pelayanan maksimal dan tercepat
+                                                          </span>
                                                         </li>
                                                         <li className="flex items-start gap-3">
                                                             <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-500" />
                                                             <span className="text-zinc-600 dark:text-zinc-300">
-                                Laporan lengkap hasil pengujian dengan interpretasi
-                              </span>
-                                                        </li>
-                                                        <li className="flex items-start gap-3">
-                                                            <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-500" />
-                                                            <span className="text-zinc-600 dark:text-zinc-300">
-                                Ditangani oleh teknisi laboratorium berpengalaman
-                              </span>
+                                                            Ditangani oleh teknisi laboratorium dan lapangan berpengalaman
+                                                          </span>
                                                         </li>
                                                     </ul>
                                                 </div>
@@ -333,9 +318,11 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                                                         >
                                                             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                                                                 <div className="flex items-center gap-4">
-                                                                    <div className="bg-blue-100 dark:bg-blue-900 flex h-16 w-16 items-center justify-center rounded-lg">
-                                                                        <BarChart3 className="text-blue-600 dark:text-blue-400 h-8 w-8" />
-                                                                    </div>
+                                                                    <img
+                                                                        src={"/storage/" + test.images[0]}
+                                                                        alt={test.name}
+                                                                        className="h-16 w-16 rounded-md object-cover"
+                                                                    />
                                                                     <div>
                                                                         <h4 className="font-semibold text-zinc-900 dark:text-white">{test.name}</h4>
                                                                         <div className="text-zinc-600 dark:text-zinc-300 flex items-center gap-2 text-sm mt-1">
@@ -359,7 +346,7 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                                                                         asChild
                                                                         className="border-zinc-300 dark:border-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-700 bg-transparent"
                                                                     >
-                                                                        <Link href={`/tests/${test.slug}`}>Detail</Link>
+                                                                        <Link href={`/test/${test.slug}`}>Detail</Link>
                                                                     </Button>
                                                                 </div>
                                                             </div>
