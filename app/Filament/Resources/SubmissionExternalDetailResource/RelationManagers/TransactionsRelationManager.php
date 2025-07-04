@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SubmissionExternalDetailResource\RelationManagers;
 
+use App\Services\FileNaming;
 use App\Services\TransactionService;
 use Filament\Forms;
 use Filament\Forms\Components\ToggleButtons;
@@ -15,6 +16,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class TransactionsRelationManager extends RelationManager
 {
@@ -98,14 +100,40 @@ class TransactionsRelationManager extends RelationManager
 
                 Forms\Components\FileUpload::make('payment_invoice_files')
                     ->label('Invoice Pembayaran')
-                    ->openable()
-                    ->directory('payment_invoice'),
+                    ->columnSpanFull()
+                    ->acceptedFileTypes([
+                        'application/pdf',
+                        'application/msword',
+                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    ])
+                    ->visibility('public')
+                    ->directory('payment_invoice_files')
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                        $extension = $file->getClientOriginalExtension();
+
+                        $id = $get('id') ?? -1;
+
+                        return FileNaming::generateInvoiceName($id, $extension);
+                    }),
+
 
                 Forms\Components\FileUpload::make('payment_receipt_images')
                     ->hiddenOn("create")
+                    ->columnSpanFull()
                     ->label('Bukti Pembayaran')
-                    ->openable()
-                    ->directory('payment_receipts'),
+                    ->image()
+                    ->imageEditor()
+                    ->previewable(true)
+                    ->imagePreviewHeight('150')
+                    ->visibility('public')
+                    ->directory('payment_receipt_images')
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                        $extension = $file->getClientOriginalExtension();
+
+                        $id = $get('id') ?? -1;
+
+                        return FileNaming::generatePaymentReceiptName($id, $extension);
+                    }),
 
                 Forms\Components\Textarea::make('note')
                     ->label('Catatan')
@@ -187,7 +215,7 @@ class TransactionsRelationManager extends RelationManager
                         $externalDetail = $this->getOwnerRecord();
                         $submission = $externalDetail->submission;
                         $data['submission_id'] = $submission?->id;
-                        
+
                         // Remove any manually set code as the model will generate it
                         unset($data['code']);
 
