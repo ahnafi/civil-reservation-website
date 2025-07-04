@@ -103,10 +103,6 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: 'Riwayat',
-            href: '/history',
-        },
-        {
             title: 'Pengajuan',
             href: '/history/submissions',
         },
@@ -368,7 +364,7 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
                                                     </div>
                                                     <Button variant="outline" size="sm" asChild>
                                                         <a
-                                                            href={`/storage/${transaction.payment_invoice_files}`}
+                                                            href={`/storage/${transaction.payment_invoice_files[0]}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                         >
