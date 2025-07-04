@@ -68,13 +68,21 @@ const InfoItem = ({ icon, label, value }: { icon: React.ReactNode; label: string
 export default function TransactionDetail({ transactionHistoryDetail }: { transactionHistoryDetail: Transaction[] }) {
     // Get the first transaction record
     const transaction: Transaction = transactionHistoryDetail[0];
-    console.log('Transaction Detail:', transaction);
+
+    const handleMultiDownload = (files: string[]) => {
+        files.forEach((file) => {
+            const link = document.createElement("a");
+            link.href = `/storage/${file}`;
+            link.download = file.split("/").pop() || "download";
+            link.target = "_blank"; // optional
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    };
+
 
     const breadcrumbs: BreadcrumbItem[] = [
-        {
-            title: 'Riwayat',
-            href: '/history',
-        },
         {
             title: 'Daftar Transaksi',
             href: '/history/transactions',
@@ -181,10 +189,11 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                                     <FileText className="h-5 w-5 text-blue-600" />
                                                     <h4 className="font-medium">Invoice Pembayaran</h4>
                                                 </div>
-                                                <Button size="sm" variant="ghost" asChild>
-                                                    <a href={`/storage/${transaction.payment_invoice_files}`} target="_blank">
+                                                <Button size="sm"
+                                                        variant="ghost"
+                                                        onClick={() => handleMultiDownload(transaction.payment_invoice_files || [])}
+                                                        >
                                                         <Download className="h-4 w-4" />
-                                                    </a>
                                                 </Button>
                                             </div>
                                             <small className="text-gray-500">Invoice pembayaran untuk transaksi ini</small>
@@ -196,10 +205,12 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                                     <h4 className="font-medium">Bukti Pembayaran</h4>
                                                 </div>
                                                 {transaction.payment_receipt_images ? (
-                                                    <Button size="sm" variant="ghost" asChild>
-                                                        <a href={`/storage/${transaction.payment_receipt_images}`} target="_blank" rel="noopener noreferrer">
+                                                    <Button
+                                                        size="sm"
+                                                        variant="ghost"
+                                                        onClick={() => handleMultiDownload(transaction.payment_receipt_images || [])}
+                                                    >
                                                             <Download className="h-4 w-4" />
-                                                        </a>
                                                     </Button>
                                                 ) : (
                                                     <span className="text-sm text-gray-400 italic">Belum tersedia</span>
