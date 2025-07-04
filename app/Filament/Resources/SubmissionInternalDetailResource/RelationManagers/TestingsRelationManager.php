@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SubmissionInternalDetailResource\RelationManagers;
 
+use App\Services\FileNaming;
 use Filament\Forms;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Services\TestingService;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class TestingsRelationManager extends RelationManager
 {
@@ -101,8 +103,17 @@ class TestingsRelationManager extends RelationManager
                         'application/x-7z-compressed',
                     ])
                     ->openable()
-                    ->helperText('Format file yang diterima: PDF, DOC, DOCX, ZIP, RAR, 7Z.')
                     ->columnSpanFull()
+                    ->openable()
+                    ->helperText('Format file yang diterima: PDF, DOC, DOCX.')
+                    ->columnSpanFull()
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                        $extension = $file->getClientOriginalExtension();
+
+                        $id = $get('id') ?? -1;
+
+                        return FileNaming::generateTestingResult($id, $extension);
+                    })
             ]);
     }
 
@@ -172,7 +183,7 @@ class TestingsRelationManager extends RelationManager
                         $internalDetail = $this->getOwnerRecord();
                         $submission = $internalDetail->submission;
                         $data['submission_id'] = $submission?->id;
-                        
+
                         // Remove any manually set code as the model will generate it
                         unset($data['code']);
 
