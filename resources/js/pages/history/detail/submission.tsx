@@ -222,6 +222,7 @@ export default function SubmissionDetail({ submissionHistoryDetail, relatedTrans
                                                         <Package className="h-5 w-5 text-blue-600" />
                                                         <h4 className="font-medium">Paket Pengujian</h4>
                                                     </div>
+
                                                     <div className="ml-7 rounded-sm bg-blue-50 p-2 lg:p-4 dark:bg-blue-900/20">
                                                         <Link
                                                             href={`/package/${testRecord.package_slug}`}
@@ -236,16 +237,23 @@ export default function SubmissionDetail({ submissionHistoryDetail, relatedTrans
                                                             />
                                                             <div className="flex flex-col">
                                                                 <p className="font-medium">{testRecord.package_name}</p>
-                                                                <p className="text-sm text-gray-600 dark:text-gray-300">
-                                                                    Harga Paket: Rp {testRecord.package_price.toLocaleString('id-ID')}
-                                                                </p>
+
+                                                                {/* Harga hanya ditampilkan jika external */}
+                                                                {testRecord.submission_type === 'external' && (
+                                                                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                                                                        Harga Paket: Rp {testRecord.package_price.toLocaleString('id-ID')}
+                                                                    </p>
+                                                                )}
                                                             </div>
                                                         </Link>
                                                     </div>
 
-                                                    <div className="ml-7 mt-4 rounded-lg bg-blue-100 p-3 text-right font-semibold dark:bg-blue-800/30">
-                                                        Total: Rp {testRecord.package_price.toLocaleString('id-ID')}
-                                                    </div>
+                                                    {/* Total hanya ditampilkan jika external */}
+                                                    {testRecord.submission_type === 'external' && (
+                                                        <div className="ml-7 mt-4 rounded-lg bg-blue-100 p-3 text-right font-semibold dark:bg-blue-800/30">
+                                                            Total: Rp {testRecord.package_price.toLocaleString('id-ID')}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             );
                                         })() : testRecord.test_id ? (
@@ -279,9 +287,9 @@ export default function SubmissionDetail({ submissionHistoryDetail, relatedTrans
                                                                     />
                                                                     <div className="flex flex-col justify-center w-full">
                                                                         <div className="flex justify-between text-sm font-medium">
-                <span>
-                  {record.test_name} × {record.quantity}
-                </span>
+                                                                            <span>
+                                                                              {record.test_name} × {record.quantity}
+                                                                            </span>
                                                                             {testRecord.submission_type === 'external' && (
                                                                                 <span>Subtotal: Rp {subtotal.toLocaleString('id-ID')}</span>
                                                                             )}
@@ -313,7 +321,7 @@ export default function SubmissionDetail({ submissionHistoryDetail, relatedTrans
                                     </div>
                                 </div>
 
-                                {testRecord.status === 'approved' && relatedTransaction && (
+                                {testRecord.status === 'approved' && testRecord.submission_type === 'external' && relatedTransaction && (
                                     <div className="mt-4 rounded-lg border p-4">
                                         <div className="mb-2 flex items-center gap-2">
                                             <CreditCard className="h-5 w-5" />
