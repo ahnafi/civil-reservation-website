@@ -756,13 +756,23 @@ class SubmissionSeeder extends Seeder
         $submissionTests = [
             [
                 'submission_id' => 1,
-                'test_id' => 1,
-                'quantity' => 2,
+                'test_id'       => 2,
+                'quantity'      => 1,
+            ],
+            [
+                'submission_id' => 1,
+                'test_id'       => 3,
+                'quantity'      => 2,
             ],
             [
                 'submission_id' => 3,
-                'test_id' => 2,
-                'quantity' => 1,
+                'test_id'       => 4,
+                'quantity'      => 1,
+            ],
+            [
+                'submission_id' => 3,
+                'test_id'       => 5,
+                'quantity'      => 1,
             ],
             [
                 'submission_id' => 4,
@@ -771,8 +781,13 @@ class SubmissionSeeder extends Seeder
             ],
             [
                 'submission_id' => 6,
-                'test_id' => 4,
-                'quantity' => 2,
+                'test_id'       => 7,
+                'quantity'      => 2,
+            ],
+            [
+                'submission_id' => 6,
+                'test_id'       => 8,
+                'quantity'      => 1,
             ],
             [
                 'submission_id' => 7,
@@ -786,8 +801,18 @@ class SubmissionSeeder extends Seeder
             ],
             [
                 'submission_id' => 10,
-                'test_id' => 7,
-                'quantity' => 1,
+                'test_id'       => 9,
+                'quantity'      => 1,
+            ],
+            [
+                'submission_id' => 10,
+                'test_id'       => 10,
+                'quantity'      => 1,
+            ],
+            [
+                'submission_id' => 10,
+                'test_id'       => 11,
+                'quantity'      => 1,
             ],
             [
                 'submission_id' => 12,
@@ -841,8 +866,23 @@ class SubmissionSeeder extends Seeder
                 'quantity'      => 3,
             ],
             [
+                'submission_id' => 26,
+                'test_id'       => 4,
+                'quantity'      => 1,
+            ],
+            [
                 'submission_id' => 28,
                 'test_id'       => 4,
+                'quantity'      => 1,
+            ],
+            [
+                'submission_id' => 28,
+                'test_id'       => 5,
+                'quantity'      => 2,
+            ],
+            [
+                'submission_id' => 30,
+                'test_id'       => 6,
                 'quantity'      => 1,
             ],
             [
@@ -874,6 +914,11 @@ class SubmissionSeeder extends Seeder
                 'submission_id' => 40,
                 'test_id'       => 10,
                 'quantity'      => 1,
+            ],
+            [
+                'submission_id' => 40,
+                'test_id'       => 11,
+                'quantity'      => 2,
             ],
             [
                 'submission_id' => 42,
