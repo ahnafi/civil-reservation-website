@@ -8,13 +8,18 @@ import {
     ArrowLeft,
     HardHat,
     Beaker,
-    Building2,
+    User,
+    Users,
+    UserCheck,
     ClipboardCheck,
     Clock,
     FileText,
     Package,
     CreditCard,
     ExternalLink,
+    Factory,
+    FolderKanban,
+    MapPin,
     Hammer
 } from 'lucide-react';
 import React from 'react';
@@ -140,24 +145,52 @@ export default function SubmissionDetail({ submissionHistoryDetail, relatedTrans
                                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                                         <InfoItem icon={<FileText className="h-5 w-5" />} label="Kode Pengajuan" value={testRecord.code} />
 
-                                        { testRecord.submission_type === 'external' && (
-                                                <>
-                                                    <InfoItem icon={<Building2 className="h-5 w-5" />} label="Nama Perusahaan" value={testRecord.company_name} />
-                                                    <InfoItem icon={<Building2 className="h-5 w-5" />} label="Nama Proyek" value={testRecord.project_name} />
-                                                    <InfoItem icon={<Building2 className="h-5 w-5" />} label="Nama Proyek" value={testRecord.project_address} />
-                                                </>
-                                            )
-                                        }
-
-                                        { testRecord.submission_type === 'internal' && (
+                                        {testRecord.submission_type === 'external' && (
                                             <>
-                                                <InfoItem icon={<Building2 className="h-5 w-5" />} label="Nama Penelti" value={testRecord.researcher_name} />
-                                                <InfoItem icon={<Building2 className="h-5 w-5" />} label="Judul Penelitian" value={testRecord.research_title} />
-                                                <InfoItem icon={<Building2 className="h-5 w-5" />} label="Jumlah Personel" value={String(testRecord.personnel_count)} />
-                                                <InfoItem icon={<Building2 className="h-5 w-5" />} label="Nama Supervisor" value={testRecord.supervisor} />
+                                                <InfoItem
+                                                    icon={<Factory className="h-5 w-5" />}
+                                                    label="Nama Perusahaan"
+                                                    value={testRecord.company_name}
+                                                />
+                                                <InfoItem
+                                                    icon={<FolderKanban className="h-5 w-5" />}
+                                                    label="Nama Proyek"
+                                                    value={testRecord.project_name}
+                                                />
+                                                <InfoItem
+                                                    icon={<MapPin className="h-5 w-5" />}
+                                                    label="Alamat Proyek"
+                                                    value={testRecord.project_address}
+                                                />
                                             </>
-                                        )
-                                        }
+                                        )}
+
+
+                                        {testRecord.submission_type === 'internal' && (
+                                            <>
+                                                <InfoItem
+                                                    icon={<User className="h-5 w-5" />}
+                                                    label="Nama Peneliti"
+                                                    value={testRecord.researcher_name}
+                                                />
+                                                <InfoItem
+                                                    icon={<FileText className="h-5 w-5" />}
+                                                    label="Judul Penelitian"
+                                                    value={testRecord.research_title}
+                                                />
+                                                <InfoItem
+                                                    icon={<Users className="h-5 w-5" />}
+                                                    label="Jumlah Personel"
+                                                    value={String(testRecord.personnel_count)}
+                                                />
+                                                <InfoItem
+                                                    icon={<UserCheck className="h-5 w-5" />}
+                                                    label="Nama Supervisor"
+                                                    value={testRecord.supervisor}
+                                                />
+                                            </>
+                                        )}
+
 
                                         <InfoItem
                                             icon={<Clock className="h-5 w-5" />}
