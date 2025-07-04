@@ -139,20 +139,99 @@ export interface PageProps {
     }>;
 }
 
-// Submission Type
+// Base Submission Detail
+export type BaseSubmission = {
+    id: number;
+    code: string;
+    submission_type: 'internal' | 'external';
+    test_submission_date: string | null;
+    status: string;
+    user_note: string | null;
+
+    test_id: number | null;
+    package_id: number | null;
+
+    test_name: string | null;
+    package_name: string | null;
+
+    lab_id: number | null;
+    lab_code: string | null;
+    lab_name: string | null;
+};
+
+// Internal Submission Type
+export type InternalSubmission = BaseSubmission & {
+    submission_type: 'internal';
+
+    name: string;
+    program_study: string;
+    research_title: string;
+    personnel_count: number;
+    supervisor: string;
+
+    company_name: null;
+    project_name: null;
+    project_address: null;
+    total_cost: null;
+};
+
+// External Submission Type
+export type ExternalSubmission = BaseSubmission & {
+    submission_type: 'external';
+
+    // External detail fields
+    company_name: string;
+    project_name: string;
+    project_address: string;
+    total_cost: number;
+
+    // Internal fields are always null
+    name: null;
+    program_study: null;
+    research_title: null;
+    personnel_count: null;
+    supervisor: null;
+};
+
+export type SubmissionWithDetails = InternalSubmission | ExternalSubmission;
+
+// External Submission Type
 export interface SubmissionSchedule {
     id: number;
     code: string;
-    company_name: string;
     test_submission_date: string;
+    submission_type: 'internal' | 'external';
     status: string;
+
     test_id: number;
-    package_id: number;
     test_name: string;
+    test_slug: string;
+    quantity: number;
+    test_price: number;
+    test_images: string[];
+
+    package_id: number;
     package_name: string;
+    package_slug: string;
+    package_price: number;
+    package_images: string[];
+
     lab_id: number;
     lab_code: string;
     lab_name: string;
+
+    // external details
+    company_name: string;
+    project_name: string;
+    project_address: string;
+
+    researcher_name: string;
+    program_study: string;
+    research_title: string;
+    personnel_count: number;
+    supervisor: string;
+
+    created_at: string;
 }
 
 // Schedule Type
@@ -190,8 +269,8 @@ export interface Transaction {
     note?: string;
     status: TransactionStatus;
     submission_code: string;
-    payment_invoice_files?: string;
-    payment_receipt_images?: string;
+    payment_invoice_files?: string[];
+    payment_receipt_images?: string[];
     payment_deadline: string;
     payment_date?: string;
     submission_id: number;
