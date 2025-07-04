@@ -113,16 +113,6 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
         }).format(value)
     }
 
-    // Calculate savings from individual test prices
-    let totalIndividualPrice = 0
-    let savings = 0
-    let savingsPercentage = 0
-
-    if (data.tests) {
-        totalIndividualPrice = data.tests.reduce((total, test) => total + test.price, 0)
-        savings = totalIndividualPrice - (data.price || 0)
-        savingsPercentage = totalIndividualPrice > 0 ? Math.round((savings / totalIndividualPrice) * 100) : 0
-    }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
