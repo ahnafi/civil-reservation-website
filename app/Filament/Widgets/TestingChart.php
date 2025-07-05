@@ -39,7 +39,6 @@ class TestingChart extends ChartWidget
         ->where('created_at', '>=', $startDate)
         ->where('created_at', '<=', $endDate)
         ->groupBy('month', 'status')
-        ->orderBy('created_at')
         ->get()
         ->groupBy('month');
         
@@ -51,7 +50,6 @@ class TestingChart extends ChartWidget
         ->where('created_at', '>=', $startDate)
         ->where('created_at', '<=', $endDate)
         ->groupBy('month')
-        ->orderBy('created_at')
         ->get()
         ->keyBy('month');
         
