@@ -528,6 +528,9 @@ export default function Cart() {
                                                     onClick={handleContinueToForm}
                                                     className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 py-3 text-base font-semibold text-white"
                                                 >
+                                                    <span>
+                                                        <ClipboardList className="w-8 h-8"/>
+                                                    </span>
                                                     Lanjutkan ke Formulir Pesanan
                                                 </Button>
                                             </CardFooter>
