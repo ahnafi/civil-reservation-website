@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import AppLayout from "@/layouts/app-layout"
 import type { BreadcrumbItem } from "@/types"
+import React from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -110,7 +111,7 @@ export default function Checkout() {
                                         <Alert className="border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-950/50">
                                             <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                                             <AlertDescription className="text-blue-800 dark:text-blue-200">
-                                                Tim admin kami akan meninjau pengajuan Anda dalam waktu 1-3 hari kerja. Anda akan menerima
+                                                Tim admin kami akan meninjau pengajuan Anda dalam waktu 1-2 hari kerja. Anda akan menerima
                                                 notifikasi melalui email dan dapat memantau status di riwayat pengajuan.
                                             </AlertDescription>
                                         </Alert>
@@ -191,11 +192,23 @@ export default function Checkout() {
                                             <div className="space-y-3 text-sm">
                                                 <div>
                                                     <div className="font-medium text-zinc-900 dark:text-white">Email Support</div>
-                                                    <div className="text-zinc-600 dark:text-zinc-300">support@labsipil.com</div>
+                                                    <a
+                                                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                                        href="mailto:laboratoriumsipil.unsoed@gmail.com"
+                                                    >
+                                                        laboratoriumsipil.unsoed@gmail.com
+                                                    </a>
                                                 </div>
                                                 <div>
                                                     <div className="font-medium text-zinc-900 dark:text-white">Telepon</div>
-                                                    <div className="text-zinc-600 dark:text-zinc-300">(024) 1234-5678</div>
+                                                    <a
+                                                        href="https://wa.me/6281393133408"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                                    >
+                                                        +62 813-9313-3408
+                                                    </a>
                                                 </div>
                                                 <div>
                                                     <div className="font-medium text-zinc-900 dark:text-white">Jam Operasional</div>
