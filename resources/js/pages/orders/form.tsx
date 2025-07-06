@@ -1,5 +1,15 @@
 "use client"
 
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
@@ -108,24 +118,24 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
         user.role === "admin" ? "external" : (user.role as "external" | "internal"),
     )
 
-    const searchParams = new URLSearchParams(window.location.search);
+    const searchParams = new URLSearchParams(window.location.search)
 
     const paramsTestIds = Array.from(searchParams.entries())
         .filter(([key]) => key.startsWith("testIds["))
-        .map(([, value]) => Number(value));
+        .map(([, value]) => Number(value))
 
     const paramsPackageIds = Array.from(searchParams.entries())
         .filter(([key]) => key.startsWith("packageIds["))
-        .map(([, value]) => Number(value));
+        .map(([, value]) => Number(value))
 
-    const noParams = paramsTestIds.length === 0 && paramsPackageIds.length === 0;
-    const cartNotEmpty = localStorage.getItem("tests") !== null || localStorage.getItem("packages") !== null;
+    const noParams = paramsTestIds.length === 0 && paramsPackageIds.length === 0
+    const cartNotEmpty = localStorage.getItem("tests") !== null || localStorage.getItem("packages") !== null
 
-    const tests = JSON.parse(localStorage.getItem("tests") || "[]");
-    const packages = JSON.parse(localStorage.getItem("packages") || "[]");
+    const tests = JSON.parse(localStorage.getItem("tests") || "[]")
+    const packages = JSON.parse(localStorage.getItem("packages") || "[]")
 
-    const testIds = tests.map((test: SimplifiedTest) => test.test_id);
-    const packageIds = packages.map((pkg: SimplifiedPackage) => pkg.package_id);
+    const testIds = tests.map((test: SimplifiedTest) => test.test_id)
+    const packageIds = packages.map((pkg: SimplifiedPackage) => pkg.package_id)
 
     const [externalForm, setExternalForm] = useState<ExternalForm>({
         company_name: "",
@@ -152,6 +162,8 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
         submission_tests: [],
         submission_packages: [],
     })
+
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false)
 
     // Helper function untuk format tanggal ke YYYY-MM-DD
     const formatDateForSubmission = (date: Date | undefined): string | undefined => {
@@ -290,6 +302,13 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
             return
         }
 
+        // Show confirmation dialog instead of submitting directly
+        setShowConfirmDialog(true)
+    }
+
+    const handleConfirmSubmit = () => {
+        setShowConfirmDialog(false)
+
         post(route("createSubmission"), {
             onSuccess: (page) => {
                 reset()
@@ -298,8 +317,7 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
                 localStorage.removeItem("external_form")
                 localStorage.removeItem("internal_form")
             },
-            onError: (errors) => {
-            },
+            onError: (errors) => {},
         })
     }
 
@@ -307,7 +325,7 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
         router.get("/orders/form", {
             testIds,
             packageIds,
-        });
+        })
     }
 
     if (cartEmpty) {
@@ -341,8 +359,7 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
     }
 
     return (
-
-            <AppLayout breadcrumbs={breadcrumbs}>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Formulir Pesanan" />
 
             <div className="min-h-screen bg-zinc-50 dark:bg-black">
@@ -984,6 +1001,36 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
                     </div>
                 </div>
             </div>
+            <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+                <AlertDialogContent className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700">
+                    <AlertDialogHeader>
+                        <AlertDialogTitle className="text-zinc-900 dark:text-white">Konfirmasi Pengajuan</AlertDialogTitle>
+                        <AlertDialogDescription className="text-zinc-600 dark:text-zinc-400">
+                            Apakah Anda yakin ingin mengirim pengajuan ini? Pastikan semua informasi yang Anda masukkan sudah benar
+                            karena pengajuan tidak dapat diubah setelah dikirim.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel className="border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800">
+                            Batal
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={handleConfirmSubmit}
+                            className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white"
+                            disabled={processing}
+                        >
+                            {processing ? (
+                                <>
+                                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                                    Memproses...
+                                </>
+                            ) : (
+                                "Ya, Kirim Pengajuan"
+                            )}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </AppLayout>
     )
 }
