@@ -73,6 +73,8 @@ export default function SubmissionDetail({ submissionHistoryDetail, relatedTrans
 }) {
     // Get the first submission record
     const testRecord: SubmissionSchedule = submissionHistoryDetail[0];
+    const packageExists = submissionHistoryDetail.some((record: SubmissionSchedule) => record.package_id);
+    const testExists = submissionHistoryDetail.some((record: SubmissionSchedule) => record.test_id);
 
     const transactionStatusMap: Record<string, string> = {
         success: 'Sukses',
@@ -142,7 +144,7 @@ export default function SubmissionDetail({ submissionHistoryDetail, relatedTrans
                             <CardContent className="p-4">
                                 <div className="mb-6 rounded-lg border p-4">
                                     <h3 className="mb-4 text-lg font-medium">Informasi Pengajuan</h3>
-                                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                    <div className="InfoItem grid grid-cols-1 gap-4 md:grid-cols-2">
                                         <InfoItem icon={<FileText className="h-5 w-5" />} label="Kode Pengajuan" value={testRecord.code} />
 
                                         {testRecord.submission_type === 'external' && (
@@ -212,10 +214,17 @@ export default function SubmissionDetail({ submissionHistoryDetail, relatedTrans
                                 <div className="rounded-lg border p-4">
                                     <h3 className="mb-4 text-lg font-medium">Detail Pengujian </h3>
                                     <div className="flex flex-col gap-4">
-                                        {testRecord.package_id ? (() => {
-                                            const packageImages = Array.isArray(testRecord.package_images)
-                                                ? testRecord.package_images
-                                                : JSON.parse(testRecord.package_images || '[]');
+
+                                        {packageExists && (() => {
+                                            const externalPackages = submissionHistoryDetail.filter(
+                                                (pkg: SubmissionSchedule) => pkg.package_id && pkg.submission_type === 'external'
+                                            );
+
+                                            const totalPackagePrice = externalPackages.reduce(
+                                                (acc, pkg) => acc + pkg.package_price,
+                                                0
+                                            );
+
                                             return (
                                                 <div>
                                                     <div className="mb-2 flex items-center gap-2">
@@ -223,99 +232,134 @@ export default function SubmissionDetail({ submissionHistoryDetail, relatedTrans
                                                         <h4 className="font-medium">Paket Pengujian</h4>
                                                     </div>
 
-                                                    <div className="ml-7 rounded-sm bg-blue-50 p-2 lg:p-4 dark:bg-blue-900/20">
-                                                        <Link
-                                                            href={`/package/${testRecord.package_slug}`}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="flex items-center gap-4"
-                                                        >
-                                                            <img
-                                                                src={`/storage/${packageImages[0]}`}
-                                                                alt={testRecord.package_name}
-                                                                className="h-20 w-20 rounded-md object-cover"
-                                                            />
-                                                            <div className="flex flex-col">
-                                                                <p className="font-medium">{testRecord.package_name}</p>
+                                                    <div className="flex flex-col gap-2 rounded-lg p-2 lg:p-4">
+                                                        {externalPackages.map((pkg: SubmissionSchedule) => {
+                                                        if(!pkg.package_id) {
+                                                            return null;
+                                                        }
 
-                                                                {/* Harga hanya ditampilkan jika external */}
-                                                                {testRecord.submission_type === 'external' && (
-                                                                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                                                                        Harga Paket: Rp {testRecord.package_price.toLocaleString('id-ID')}
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                        </Link>
+                                                        const packageImages: string[] = Array.isArray(pkg.package_images)
+                                                            ? pkg.package_images
+                                                            : JSON.parse(pkg.package_images || '[]');
+
+                                                        return (
+                                                            <React.Fragment key={pkg.package_id}>
+                                                                <div className="ml-3 rounded-sm bg-blue-50 p-2 lg:p-4 dark:bg-blue-900/20">
+                                                                    <Link
+                                                                        href={`/package/${pkg.package_slug}`}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="flex items-center justify-between gap-4"
+                                                                    >
+                                                                        <div className="flex items-center gap-4">
+                                                                            <img
+                                                                                src={`/storage/${packageImages[0]}`}
+                                                                                alt={pkg.package_name}
+                                                                                className="h-20 w-20 rounded-md object-cover"
+                                                                            />
+                                                                            <div className="flex flex-col">
+                                                                                <p className="font-medium">{pkg.package_name}</p>
+                                                                            </div>
+                                                                        </div>
+
+                                                                        <p className="text-sm font-medium text-right min-w-[150px]">
+                                                                            Subtotal: <span className="font-medium">Rp {pkg.package_price.toLocaleString('id-ID')}</span>
+                                                                        </p>
+                                                                    </Link>
+                                                                </div>
+                                                            </React.Fragment>
+                                                        );
+                                                    })}
                                                     </div>
 
-                                                    {/* Total hanya ditampilkan jika external */}
-                                                    {testRecord.submission_type === 'external' && (
-                                                        <div className="ml-7 mt-4 rounded-lg bg-blue-100 p-3 text-right font-semibold dark:bg-blue-800/30">
-                                                            Total: Rp {testRecord.package_price.toLocaleString('id-ID')}
+                                                    {/* Show grand total */}
+                                                    {externalPackages.length > 0 && (
+                                                        <div className="ml-7 mt-6 rounded-lg bg-blue-200 p-4 text-right font-bold dark:bg-blue-700/30">
+                                                            Total: Rp {totalPackagePrice.toLocaleString('id-ID')}
                                                         </div>
                                                     )}
                                                 </div>
                                             );
-                                        })() : testRecord.test_id ? (
-                                            <div>
-                                                <div className="mb-2 flex items-center gap-2">
-                                                    <HardHat className="h-5 w-5 text-blue-600" />
-                                                    <h4 className="font-medium">Pengujian Tunggal</h4>
-                                                </div>
+                                        })()}
 
-                                                <div className="flex flex-col gap-2 rounded-lg p-2 lg:p-4">
-                                                    {submissionHistoryDetail.map((record: SubmissionSchedule) => {
-                                                        const testImages: string[] = Array.isArray(record.test_images)
-                                                            ? record.test_images
-                                                            : JSON.parse(record.test_images || '[]');
 
-                                                        const subtotal = record.quantity * record.test_price;
+                                        {testExists && (() => {
+                                            const externalTests = submissionHistoryDetail.filter(
+                                                (test: SubmissionSchedule) => test.test_id && test.submission_type === 'external'
+                                            );
 
-                                                        return (
-                                                            <Link
-                                                                key={record.test_name}
-                                                                href={`/test/${record.test_slug}`}
-                                                                target="_blank"
-                                                                rel="noopener noreferrer"
-                                                                className="ml-7 rounded-lg bg-blue-50 p-2 lg:p-4 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-800/40 transition-colors"
-                                                            >
-                                                                <div className="flex items-center gap-4">
-                                                                    <img
-                                                                        src={`/storage/${testImages[0]}`}
-                                                                        alt={record.test_name}
-                                                                        className="h-20 w-20 rounded-md object-cover"
-                                                                    />
-                                                                    <div className="flex flex-col justify-center w-full">
-                                                                        <div className="flex justify-between text-sm font-medium">
-                                                                            <span>
-                                                                              {record.test_name} × {record.quantity}
-                                                                            </span>
-                                                                            {testRecord.submission_type === 'external' && (
-                                                                                <span>Subtotal: Rp {subtotal.toLocaleString('id-ID')}</span>
-                                                                            )}
+                                            const totalTestPrice = externalTests.reduce(
+                                                (acc, test) => acc + (test.quantity * test.test_price),
+                                                0
+                                            );
+
+                                            return (
+                                                <div>
+                                                    <div className="mb-2 flex items-center gap-2">
+                                                        <HardHat className="h-5 w-5 text-blue-600" />
+                                                        <h4 className="font-medium">Pengujian Tunggal</h4>
+                                                    </div>
+
+                                                    <div className="flex flex-col gap-2 rounded-lg p-2 lg:p-4">
+                                                        {submissionHistoryDetail.map((test: SubmissionSchedule) => {
+                                                            if (!test.test_id) {
+                                                                return null;
+                                                            }
+
+                                                            const testImages: string[] = Array.isArray(test.test_images)
+                                                                ? test.test_images
+                                                                : JSON.parse(test.test_images || '[]');
+
+                                                            const subtotal = test.quantity * test.test_price;
+
+                                                            return (
+                                                                <React.Fragment key={test.test_id}>
+                                                                    <Link
+                                                                        href={`/test/${test.test_slug}`}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="ml-3 rounded-lg bg-blue-50 p-2 lg:p-4 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-800/40 transition-colors"
+                                                                    >
+                                                                        <div className="flex items-center gap-4">
+                                                                            <img
+                                                                                src={`/storage/${testImages[0]}`}
+                                                                                alt={test.test_name}
+                                                                                className="h-20 w-20 rounded-md object-cover"
+                                                                            />
+                                                                            <div className="flex flex-col justify-center w-full">
+                                                                                <div className="flex justify-between text-sm font-medium">
+                                            <span>
+                                                {test.test_name} × {test.quantity}
+                                            </span>
+                                                                                    {test.submission_type === 'external' && (
+                                                                                        <span>Subtotal: Rp {subtotal.toLocaleString('id-ID')}</span>
+                                                                                    )}
+                                                                                </div>
+                                                                                {test.submission_type === 'external' && (
+                                                                                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                                                                                        Harga Satuan: Rp {test.test_price.toLocaleString('id-ID')}
+                                                                                    </p>
+                                                                                )}
+                                                                            </div>
                                                                         </div>
-                                                                        {testRecord.submission_type === 'external' && (
-                                                                            <p className="text-sm text-gray-600 dark:text-gray-300">
-                                                                                Harga Satuan: Rp {record.test_price.toLocaleString('id-ID')}
-                                                                            </p>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                            </Link>
-                                                        );
-                                                    })}
+                                                                    </Link>
+                                                                </React.Fragment>
+                                                            );
+                                                        })}
+                                                    </div>
 
-                                                    {testRecord.submission_type === 'external' && (
-                                                        <div className="ml-7 mt-4 rounded-lg bg-blue-100 p-3 text-right font-semibold dark:bg-blue-800/30">
-                                                            Total: Rp{" "}
-                                                            {submissionHistoryDetail
-                                                                .reduce((acc, record) => acc + record.quantity * record.test_price, 0)
-                                                                .toLocaleString("id-ID")}
+                                                    {/* Show grand total for external tests */}
+                                                    {externalTests.length > 0 && (
+                                                        <div className="ml-7 mt-6 rounded-lg bg-blue-200 p-4 text-right font-bold dark:bg-blue-700/30">
+                                                            Total: Rp {totalTestPrice.toLocaleString('id-ID')}
                                                         </div>
                                                     )}
                                                 </div>
-                                            </div>
-                                        ) : (
+                                            );
+                                        })()}
+
+
+                                        {!testExists && !packageExists && (
                                             <p className="text-gray-500 dark:text-gray-400">Tidak ada detail pengujian</p>
                                         )}
                                     </div>
