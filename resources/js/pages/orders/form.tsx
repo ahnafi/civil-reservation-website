@@ -345,7 +345,7 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
                             <Link href="/orders/cart">
                                 <Button
                                     size="lg"
-                                    className="px-8 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white"
+                                    className="px-8 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white cursor-pointer"
                                 >
                                     <ShoppingCart className="mr-2 h-5 w-5" />
                                     Kembali ke Keranjang
@@ -892,7 +892,7 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
                                             <Button
                                                 type="submit"
                                                 disabled={processing}
-                                                className="h-12 w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700 px-8 text-white sm:w-auto"
+                                                className="h-12 w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700 px-8 text-white sm:w-auto cursor-pointer"
                                             >
                                                 {processing ? (
                                                     <>
@@ -1011,12 +1011,12 @@ export default function ReservationForm({ fullSlotDate }: { fullSlotDate: number
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel className="border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800">
+                        <AlertDialogCancel className="border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer">
                             Batal
                         </AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleConfirmSubmit}
-                            className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white"
+                            className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white cursor-pointer"
                             disabled={processing}
                         >
                             {processing ? (
