@@ -1,19 +1,28 @@
-import React, { useState } from "react"
+"use client"
+
+import type React from "react"
+import { useState } from "react"
 import { Head, Link, useForm } from "@inertiajs/react"
 import {
-    ArrowLeft, Beaker, Calendar, Check, ClipboardCheck,
-    Clock, Download, Edit, FileText, Info, Link2, Star, XCircle
+    ArrowLeft,
+    Beaker,
+    Calendar,
+    Check,
+    ClipboardCheck,
+    Clock,
+    Download,
+    Edit,
+    FileText,
+    Info,
+    Link2,
+    Star,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {
-    Card, CardContent, CardDescription,
-    CardFooter, CardHeader, CardTitle
-} from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import AppLayout from "@/layouts/app-layout"
 import type { BreadcrumbItem, Testing } from "@/types"
 import { parseAndFormatDate } from "@/utils/date-utils"
-
 
 // Format date helper
 const formatDate = (dateString: string | null | undefined) => {
@@ -71,8 +80,8 @@ const StatusBadge = ({ status, testDate }: { status: string; testDate: string })
             {icon}
             {displayStatus}
         </div>
-    );
-};
+    )
+}
 
 // Info item component
 const InfoItem = ({
@@ -100,27 +109,27 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
     console.info("Testing Detail Page - Test Record:", testRecord)
 
     // Review form state
-    const [showReviewForm, setShowReviewForm] = useState(false);
-    const [editMode, setEditMode] = useState(false);
-    const [reviewSuccess, setReviewSuccess] = useState(false);
+    const [showReviewForm, setShowReviewForm] = useState(false)
+    const [editMode, setEditMode] = useState(false)
+    const [reviewSuccess, setReviewSuccess] = useState(false)
 
     // Inertia form for review submission
     const { data, setData, post, put, processing, errors, reset } = useForm({
         rating: testRecord?.reviews?.rating || 0,
-        content: testRecord?.reviews?.content || '',
+        content: testRecord?.reviews?.content || "",
         testing_id: testRecord?.id || 0,
-    });
+    })
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: "Pengujian",
-            href: "/history/tests",
+            href: "/history/testings",
         },
         {
-            title: `${testRecord?.code || 'Unknown'}`,
-            href: `/history/test/${testRecord?.code || 'unknown'}`,
+            title: `${testRecord?.code || "Unknown"}`,
+            href: `/history/testings/${testRecord?.code || "unknown"}`,
         },
-    ];
+    ]
 
     // Update form data when editing existing review
     const initializeEditForm = () => {
@@ -129,91 +138,91 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                 rating: testRecord.reviews.rating,
                 content: testRecord.reviews.content,
                 testing_id: testRecord.id,
-            });
+            })
         }
-        setEditMode(true);
-        setShowReviewForm(true);
-    };
+        setEditMode(true)
+        setShowReviewForm(true)
+    }
 
     // Handle review submission (create or update)
     const handleReviewSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+        e.preventDefault()
 
         if (data.rating === 0) {
-            alert('Silakan berikan rating untuk pengujian ini');
-            return;
+            alert("Silakan berikan rating untuk pengujian ini")
+            return
         }
 
-        if (data.content.trim() === '') {
-            alert('Silakan berikan komentar tentang pengujian ini');
-            return;
+        if (data.content.trim() === "") {
+            alert("Silakan berikan komentar tentang pengujian ini")
+            return
         }
 
         if (editMode && testRecord.reviews) {
             // Update existing review
-            put(route('reviews.update', testRecord.reviews.id), {
+            put(`/reviews/${testRecord.reviews.id}`, {
                 onSuccess: () => {
-                    setReviewSuccess(true);
-                    setShowReviewForm(false);
-                    setEditMode(false);
+                    setReviewSuccess(true)
+                    setShowReviewForm(false)
+                    setEditMode(false)
                     setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
+                        window.location.reload()
+                    }, 1500)
                 },
                 onError: (errors) => {
-                    console.error('Review update errors:', errors);
+                    console.error("Review update errors:", errors)
                     if (errors.message) {
-                        alert(errors.message);
+                        alert(errors.message)
                     } else {
-                        alert('Terjadi kesalahan saat memperbarui review');
+                        alert("Terjadi kesalahan saat memperbarui review")
                     }
                 },
-            });
+            })
         } else {
             // Create new review
-            post(route('reviews.store'), {
+            post("/reviews", {
                 onSuccess: () => {
-                    setReviewSuccess(true);
-                    setShowReviewForm(false);
-                    reset();
+                    setReviewSuccess(true)
+                    setShowReviewForm(false)
+                    reset()
                     setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
+                        window.location.reload()
+                    }, 1500)
                 },
                 onError: (errors) => {
-                    console.error('Review submission errors:', errors);
+                    console.error("Review submission errors:", errors)
                     if (errors.message) {
-                        alert(errors.message);
+                        alert(errors.message)
                     } else {
-                        alert('Terjadi kesalahan saat mengirim review');
+                        alert("Terjadi kesalahan saat mengirim review")
                     }
                 },
-            });
+            })
         }
-    };
+    }
 
     // Handle star rating
     const handleStarClick = (rating: number) => {
-        setData('rating', rating);
-    };
+        setData("rating", rating)
+    }
 
     // Reset form and states
     const resetForm = () => {
-        setShowReviewForm(false);
-        setEditMode(false);
+        setShowReviewForm(false)
+        setEditMode(false)
         if (testRecord.reviews) {
             setData({
                 rating: testRecord.reviews.rating,
                 content: testRecord.reviews.content,
                 testing_id: testRecord.id,
-            });
+            })
         } else {
-            setData({ rating: 0, content: '', testing_id: testRecord.id });
+            setData({ rating: 0, content: "", testing_id: testRecord.id })
         }
-    };
+    }
 
     // Check if testing is completed
-    const isTestingCompleted = testRecord?.status === 'completed' && testRecord?.completed_at;
+    const isTestingCompleted = testRecord?.status === "completed" && testRecord?.completed_at
 
     // If no data, show a message
     if (!testRecord) {
@@ -320,7 +329,7 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                             label="ID Pengajuan"
                                             value={
                                                 <Link
-                                                    href={`/history/submission/${testRecord.submission_code}`}
+                                                    href={`/history/submissions/${testRecord.submission_code}`}
                                                     className="text-blue-600 hover:underline"
                                                 >
                                                     Lihat Pengajuan #{testRecord.submission_code}
@@ -416,31 +425,49 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                     </div>
                                 </div>
 
+                                {/* Documents Section - Fixed to handle both string and array */}
                                 {testRecord.documents && (
                                     <div className="mb-6 rounded-lg border p-4">
                                         <h3 className="mb-4 text-lg font-medium">Dokumen Hasil Pengujian</h3>
                                         <div className="grid grid-cols-1 gap-4">
-                                            {testRecord.documents.map((document, index) => (
-                                                <div key={index} className="rounded-lg border p-4">
+                                            {Array.isArray(testRecord.documents) ? (
+                                                testRecord.documents.map((document, index) => (
+                                                    <div key={index} className="rounded-lg border p-4">
+                                                        <div className="mb-3 flex items-center justify-between">
+                                                            <div className="flex items-center gap-2">
+                                                                <FileText className="h-5 w-5 text-blue-600" />
+                                                                <h4 className="font-medium">Hasil Pengujian {index + 1}</h4>
+                                                            </div>
+                                                            <Button size="sm" variant="ghost" asChild>
+                                                                <a href={`/storage/${document}`} target="_blank" rel="noopener noreferrer">
+                                                                    <Download className="h-4 w-4" />
+                                                                </a>
+                                                            </Button>
+                                                        </div>
+                                                        <p className="text-sm text-gray-500">Laporan hasil pengujian yang telah dilakukan</p>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="rounded-lg border p-4">
                                                     <div className="mb-3 flex items-center justify-between">
                                                         <div className="flex items-center gap-2">
                                                             <FileText className="h-5 w-5 text-blue-600" />
-                                                            <h4 className="font-medium">Hasil Pengujian {index + 1}</h4>
+                                                            <h4 className="font-medium">Hasil Pengujian</h4>
                                                         </div>
                                                         <Button size="sm" variant="ghost" asChild>
-                                                            <a href={`/storage/${document}`} target="_blank" rel="noopener noreferrer">
+                                                            <a href={`/storage/${testRecord.documents}`} target="_blank" rel="noopener noreferrer">
                                                                 <Download className="h-4 w-4" />
                                                             </a>
                                                         </Button>
                                                     </div>
                                                     <p className="text-sm text-gray-500">Laporan hasil pengujian yang telah dilakukan</p>
                                                 </div>
-                                            ))}
+                                            )}
                                         </div>
                                     </div>
                                 )}
 
-                                {/* ✅ Enhanced Review Section */}
+                                {/* Enhanced Review Section */}
                                 {isTestingCompleted && (
                                     <div className="mb-6 rounded-lg border p-4">
                                         <h3 className="mb-4 text-lg font-medium">Review Pengujian</h3>
@@ -457,8 +484,8 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                                                     key={star}
                                                                     className={`h-5 w-5 ${
                                                                         star <= testRecord.reviews.rating
-                                                                            ? 'fill-yellow-400 text-yellow-400'
-                                                                            : 'text-gray-300'
+                                                                            ? "fill-yellow-400 text-yellow-400"
+                                                                            : "text-gray-300"
                                                                     }`}
                                                                 />
                                                             ))}
@@ -471,12 +498,14 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                                 </div>
                                                 <p className="mb-3 text-gray-700 dark:text-gray-300">{testRecord.reviews.content}</p>
                                                 <div className="flex items-center justify-between">
-                                                    <p className="text-xs text-gray-500">Dikirim pada {formatDate(testRecord.reviews.created_at)}</p>
+                                                    <p className="text-xs text-gray-500">
+                                                        Dikirim pada {formatDate(testRecord.reviews.created_at)}
+                                                    </p>
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
                                                         onClick={initializeEditForm}
-                                                        className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700"
+                                                        className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 bg-transparent"
                                                     >
                                                         <Edit className="h-4 w-4" />
                                                         Edit Review
@@ -502,7 +531,7 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                                     <form onSubmit={handleReviewSubmit} className="space-y-4">
                                                         <div className="mb-3 flex items-center justify-between">
                                                             <h4 className="text-md font-medium">
-                                                                {editMode ? 'Edit Review Anda' : 'Berikan Review'}
+                                                                {editMode ? "Edit Review Anda" : "Berikan Review"}
                                                             </h4>
                                                             {editMode && (
                                                                 <div className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
@@ -526,8 +555,8 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                                                         <Star
                                                                             className={`h-8 w-8 ${
                                                                                 star <= data.rating
-                                                                                    ? 'fill-yellow-400 text-yellow-400'
-                                                                                    : 'text-gray-300 hover:text-yellow-200'
+                                                                                    ? "fill-yellow-400 text-yellow-400"
+                                                                                    : "text-gray-300 hover:text-yellow-200"
                                                                             }`}
                                                                         />
                                                                     </button>
@@ -543,7 +572,7 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                                             </label>
                                                             <Textarea
                                                                 value={data.content}
-                                                                onChange={(e) => setData('content', e.target.value)}
+                                                                onChange={(e) => setData("content", e.target.value)}
                                                                 placeholder="Bagikan pengalaman Anda tentang layanan pengujian ini..."
                                                                 className="min-h-[100px]"
                                                                 maxLength={1000}
@@ -557,12 +586,12 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                                                 {processing ? (
                                                                     <>
                                                                         <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                                                                        {editMode ? 'Memperbarui...' : 'Mengirim...'}
+                                                                        {editMode ? "Memperbarui..." : "Mengirim..."}
                                                                     </>
                                                                 ) : editMode ? (
-                                                                    'Perbarui Review'
+                                                                    "Perbarui Review"
                                                                 ) : (
-                                                                    'Kirim Review'
+                                                                    "Kirim Review"
                                                                 )}
                                                             </Button>
                                                             <Button type="button" variant="outline" onClick={resetForm} disabled={processing}>
@@ -583,8 +612,8 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                                     <Check className="h-5 w-5 text-green-600" />
                                                     <p className="text-green-700 dark:text-green-400">
                                                         {editMode
-                                                            ? 'Review berhasil diperbarui. Terima kasih atas feedback Anda!'
-                                                            : 'Review berhasil dikirim. Terima kasih atas feedback Anda!'}
+                                                            ? "Review berhasil diperbarui. Terima kasih atas feedback Anda!"
+                                                            : "Review berhasil dikirim. Terima kasih atas feedback Anda!"}
                                                     </p>
                                                 </div>
                                             </div>
@@ -660,23 +689,6 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                         </div>
                                     )}
 
-                                    {testRecord.status === 'completed' && (
-                                        <div className="rounded-lg bg-green-50 p-4 dark:bg-green-900/20">
-                                            <div className="mb-2 flex items-center gap-2">
-                                                <Check className="h-5 w-5 text-green-600" />
-                                                <h4 className="font-medium text-green-700 dark:text-green-400">Pengujian Selesai</h4>
-                                            </div>
-                                            <p className="text-sm text-green-700 dark:text-green-400">
-                                                Pengujian telah selesai pada {formatDate(testRecord.completed_at)}.
-                                                {testRecord.documents &&
-                                                    testRecord.documents.length > 0 &&
-                                                    ' Dokumen hasil pengujian tersedia untuk diunduh.'}
-                                            </p>
-                                        </div>
-                                    )}
-
-                                    {testRecord.status === 'cancelled' && (
-                                        <div className="rounded-lg bg-red-50 p-4 dark:bg-red-900/20">
                                     {/* Scenario 3: Testing - After test date (Memproses Hasil) */}
                                     {testRecord.status === "testing" && new Date() >= new Date(testRecord.test_date) && (
                                         <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
@@ -717,7 +729,6 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                             <li>Hasil pengujian akan tersedia setelah proses selesai</li>
                                         </ul>
                                     </div>
-
                                 </div>
                             </CardContent>
                         </Card>
@@ -761,7 +772,6 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </CardContent>
                         </Card>
