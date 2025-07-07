@@ -1,208 +1,318 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, PaginatedTests, Test, TestCart } from '@/types';
-import { Head, Link } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useEffect, useState } from 'react';
+"use client"
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import AppLayout from "@/layouts/app-layout"
+import type { BreadcrumbItem, PaginatedTests, Test, TestCart } from "@/types"
+import { Head, Link } from "@inertiajs/react"
+import { ChevronLeft, ChevronRight, ShoppingCart, Building2, Package, Wrench, Search } from "lucide-react"
+import { useEffect, useState, useMemo } from "react"
+import { toast, ToastContainer } from "react-toastify"
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Pengujian',
-        href: '/tests',
+        title: "Pengujian",
+        href: "/tests",
     },
-];
+]
 
 export default function Tests({ tests }: { tests: PaginatedTests }) {
-    const [testCart, setTestCart] = useState<TestCart[]>([]);
-    const [isAdding, setIsAdding] = useState(false);
+    const [testCart, setTestCart] = useState<TestCart[]>([])
+    const [isAdding, setIsAdding] = useState(false)
+    const [searchQuery, setSearchQuery] = useState("")
 
     useEffect(() => {
-        const savedTest = localStorage.getItem('tests');
+        const savedTest = localStorage.getItem("tests")
         if (savedTest) {
-            const parsedTest = JSON.parse(savedTest);
-            setTestCart(parsedTest);
+            const parsedTest = JSON.parse(savedTest)
+            setTestCart(parsedTest)
         }
-    }, []);
+    }, [])
+
+    // Filter tests based on search query
+    const filteredTests = useMemo(() => {
+        if (!searchQuery.trim()) {
+            return tests.data
+        }
+
+        return tests.data.filter(
+            (test) =>
+                test.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                test.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                test.category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                test.laboratory.code.toLowerCase().includes(searchQuery.toLowerCase()),
+        )
+    }, [tests.data, searchQuery])
 
     const handleAddTestToCart = (test: Test) => {
-        setIsAdding(true);
-        const existingTest: TestCart | undefined = testCart.find((item) => item.test_id === test.id);
+        setIsAdding(true)
+        const existingTest: TestCart | undefined = testCart.find((item) => item.test_id === test.id)
         if (existingTest) {
-            alert('Test already exists in the cart');
-            setIsAdding(false);
+            toast.error("Pengujian sudah ada di keranjang!", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            })
+            setIsAdding(false)
         } else {
             const newTestCart: TestCart = {
                 test_id: test.id,
                 slug: test.slug,
                 unit: test.minimum_unit,
                 test: test,
-            };
-            setTestCart([...testCart, newTestCart]);
-            alert('Test added to cart');
-            localStorage.setItem('tests', JSON.stringify([...testCart, newTestCart]));
-            setIsAdding(false);
+            }
+            setTestCart([...testCart, newTestCart])
+            toast.success("Pengujian berhasil ditambahkan ke keranjang!", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            })
+            localStorage.setItem("tests", JSON.stringify([...testCart, newTestCart]))
+            setIsAdding(false)
         }
-    };
+    }
 
-    const formatRupiah = (value: number, currency = 'IDR') => {
-        return new Intl.NumberFormat('id-ID', {
-            style: 'currency',
+    const formatRupiah = (value: number, currency = "IDR") => {
+        return new Intl.NumberFormat("id-ID", {
+            style: "currency",
             currency: currency,
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
-        }).format(value);
-    };
+        }).format(value)
+    }
+
+    const truncateText = (text: string, maxLength = 100) => {
+        if (text.length <= maxLength) return text
+        return text.substring(0, maxLength) + "..."
+    }
 
     const renderPaginationLinks = () => {
-        const { links, current_page, last_page } = tests;
+        const { links, current_page, last_page } = tests
 
-        const numberedLinks = links.filter((link) => !link.label.includes('Sebelumnya') && !link.label.includes('Berikutnya'));
+        const numberedLinks = links.filter(
+            (link) => !link.label.includes("Sebelumnya") && !link.label.includes("Berikutnya"),
+        )
 
         return (
-            <div className="small-font-size mt-6 flex items-center justify-center gap-1">
-                <Button variant="outline" size="icon" disabled={current_page === 1} asChild={current_page !== 1}>
+            <div className="mt-8 flex items-center justify-center gap-2">
+                <Button
+                    variant="outline"
+                    size="icon"
+                    disabled={current_page === 1}
+                    asChild={current_page !== 1}
+                    className="border-zinc-300 dark:border-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 bg-transparent"
+                >
                     {current_page !== 1 ? (
-                        <Link href={tests.prev_page_url || '#'}>
+                        <Link href={tests.prev_page_url || "#"}>
                             <ChevronLeft className="h-4 w-4" />
                         </Link>
                     ) : (
                         <span>
-                            <ChevronLeft className="h-4 w-4" />
-                        </span>
+              <ChevronLeft className="h-4 w-4" />
+            </span>
                     )}
                 </Button>
                 {numberedLinks.map((link, i: number) => (
                     <Button
                         key={i}
-                        variant={link.active ? 'default' : 'outline'}
+                        variant={link.active ? "default" : "outline"}
                         size="sm"
-                        className={link.active ? 'bg-blue-600 hover:bg-blue-700' : ''}
+                        className={
+                            link.active
+                                ? "bg-blue-600 hover:bg-blue-700 text-white"
+                                : "border-zinc-300 dark:border-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                        }
                         asChild={!link.active}
                     >
                         {!link.active ? (
-                            <Link href={link.url || '#'} dangerouslySetInnerHTML={{ __html: link.label }} />
+                            <Link href={link.url || "#"} dangerouslySetInnerHTML={{ __html: link.label }} />
                         ) : (
                             <span dangerouslySetInnerHTML={{ __html: link.label }} />
                         )}
                     </Button>
                 ))}
-                <Button variant="outline" size="icon" disabled={current_page === last_page} asChild={current_page !== last_page}>
+                <Button
+                    variant="outline"
+                    size="icon"
+                    disabled={current_page === last_page}
+                    asChild={current_page !== last_page}
+                    className="border-zinc-300 dark:border-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 bg-transparent"
+                >
                     {current_page !== last_page ? (
-                        <Link href={tests.next_page_url || '#'}>
+                        <Link href={tests.next_page_url || "#"}>
                             <ChevronRight className="h-4 w-4" />
                         </Link>
                     ) : (
                         <span>
-                            <ChevronRight className="h-4 w-4" />
-                        </span>
+              <ChevronRight className="h-4 w-4" />
+            </span>
                     )}
                 </Button>
             </div>
-        );
-    };
+        )
+    }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Pengujian" />
-            <div className="flex h-full flex-col gap-4 rounded-xl p-4">
-                <div className="grid auto-rows-min grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {tests.data.map((data: Test) => (
-                        <Card className="gap-0 p-2" key={data.id}>
-                            <CardHeader className="px-0">
-                                <Link href={'/test/' + data.slug}>
-                                    <img
-                                        src={'/storage/' + data.images}
-                                        alt={data.name}
-                                        className="h-48 w-full rounded-md object-cover md:h-54 lg:h-60"
-                                    />
-                                </Link>
-                                <CardTitle>
-                                    <Link href={'/test/' + data.slug}>
-                                        <h3 className="truncate-2-lines">{data.name}</h3>
-                                    </Link>
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="px-0">
-                                <CardDescription className="mb-4 space-y-2">
-                                    <p className="truncate-2-lines">{data.description}</p>
-                                    <div className="flex flex-wrap items-center gap-2">
-                                        <div className="text-light-base bg-amber-base flex items-center gap-1 rounded-md px-2 py-1" title="Satuan">
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 512 512"
-                                                className="h-4 w-4 md:h-5 md:w-5"
-                                                fill="currentColor"
-                                            >
-                                                <path d="M342.6 9.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l9.4 9.4L28.1 342.6C10.1 360.6 0 385 0 410.5L0 416c0 53 43 96 96 96l5.5 0c25.5 0 49.9-10.1 67.9-28.1L448 205.3l9.4 9.4c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-32-32-96-96-32-32zM205.3 256L352 109.3 402.7 160l-96 96-101.5 0z" />
-                                            </svg>
-                                            <span className="small-font-size">{data.category.name}</span>
-                                        </div>
-                                        <div
-                                            className="text-light-base bg-purple-base flex items-center gap-1 rounded-md px-2 py-1"
-                                            title="Laboratorium"
-                                        >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 384 512"
-                                                className="h-4 w-4 md:h-5 md:w-5"
-                                                fill="currentColor"
-                                            >
-                                                <path d="M48 0C21.5 0 0 21.5 0 48L0 464c0 26.5 21.5 48 48 48l96 0 0-80c0-26.5 21.5-48 48-48s48 21.5 48 48l0 80 96 0c26.5 0 48-21.5 48-48l0-416c0-26.5-21.5-48-48-48L48 0zM64 240c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zm112-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zM80 96l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16zm80 16c0-8.8 7.2-16 16-16l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32zM272 96l32 0c8.8 0 16 7.2 16 16l0 32c0 8.8-7.2 16-16 16l-32 0c-8.8 0-16-7.2-16-16l0-32c0-8.8 7.2-16 16-16z" />
-                                            </svg>
-                                            <span className="small-font-size">{data.laboratory.code}</span>
-                                        </div>
-                                        <div
-                                            className="text-light-base bg-teal-base flex items-center gap-1 rounded-md px-2 py-1"
-                                            title="Minimum Pemesanan"
-                                        >
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                viewBox="0 0 448 512"
-                                                fill="currentColor"
-                                                className="h-4 w-4 md:h-5 md:w-5"
-                                            >
-                                                <path d="M160 112c0-35.3 28.7-64 64-64s64 28.7 64 64l0 48-128 0 0-48zm-48 48l-64 0c-26.5 0-48 21.5-48 48L0 416c0 53 43 96 96 96l256 0c53 0 96-43 96-96l0-208c0-26.5-21.5-48-48-48l-64 0 0-48C336 50.1 285.9 0 224 0S112 50.1 112 112l0 48zm24 48a24 24 0 1 1 0 48 24 24 0 1 1 0-48zm152 24a24 24 0 1 1 48 0 24 24 0 1 1 -48 0z" />
-                                            </svg>
-                                            <span className="small-font-size">{data.minimum_unit}</span>
-                                        </div>
+            <div className="min-h-screen bg-zinc-50 dark:bg-black p-6">
+                <div className="mx-auto max-w-7xl">
+                    {/* Header Section */}
+                    <div className="mb-8 text-center">
+                        <h1 className="text-4xl font-bold text-zinc-900 dark:text-white mb-4">Katalog Pengujian</h1>
+                        <p className="text-lg text-zinc-600 dark:text-zinc-300 max-w-2xl mx-auto mb-6">
+                            Temukan berbagai layanan pengujian berkualitas tinggi untuk kebutuhan analisis Anda.
+                        </p>
+
+                        {/* Search Bar */}
+                        <div className="max-w-md mx-auto relative">
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 h-4 w-4" />
+                            <Input
+                                type="text"
+                                placeholder="Cari pengujian, kategori, atau laboratorium..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-10 pr-4 py-2 w-full border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Search Results Info */}
+                    {searchQuery && (
+                        <div className="mb-6 text-center">
+                            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                Menampilkan {filteredTests.length} hasil untuk "{searchQuery}"
+                            </p>
+                        </div>
+                    )}
+
+                    {/* Tests Grid */}
+                    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {filteredTests.map((data: Test) => (
+                            <Link href={"/test/" + data.slug} key={data.id} className="block h-full">
+                                <Card className="group overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-white dark:bg-zinc-900 h-full flex flex-col">
+                                    {/* Test Image */}
+                                    <div className="relative overflow-hidden">
+                                        <img
+                                            src={"/storage/" + data.images}
+                                            alt={data.name}
+                                            className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                        />
                                     </div>
-                                </CardDescription>
-                                <div className="flex flex-wrap items-center justify-between">
-                                    <h4 className="font-semibold">{formatRupiah(data.price)}</h4>
-                                    <Button
-                                        onClick={() => handleAddTestToCart(data)}
-                                        variant="outline"
-                                        disabled={isAdding}
-                                        className="flex cursor-pointer items-center justify-between gap-1 rounded-md px-3 py-2"
-                                    >
-                                        <svg
-                                            className="h-4 w-4 md:h-5 md:w-5"
-                                            aria-hidden="true"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                stroke="currentColor"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth="2"
-                                                d="M4 4h1.5L8 16m0 0h8m-8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm.75-3H7.5M11 7H6.312M17 4v6m-3-3h6"
-                                            ></path>
-                                        </svg>
-                                        <span className="small-font-size">Tambah ke Keranjang</span>
-                                    </Button>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    ))}
+
+                                    <CardHeader className="px-4">
+                                        <CardTitle>
+                                            <h1 className="text-lg font-bold text-zinc-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                                                {data.name}
+                                            </h1>
+                                        </CardTitle>
+                                    </CardHeader>
+
+                                    <CardContent className="px-4 flex-1 flex flex-col">
+                                        <CardDescription className="flex-1 flex flex-col">
+                                            <div className="text-xl font-bold text-blue-600 dark:text-blue-400 mb-3">
+                                                {formatRupiah(data.price)}
+                                            </div>
+
+                                            <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed mb-4 flex-1">
+                                                {truncateText(data.description, 120)}
+                                            </p>
+
+                                            {/* Badges */}
+                                            <div className="flex flex-wrap gap-2 mb-4">
+                                                <Badge
+                                                    variant="secondary"
+                                                    className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 text-xs"
+                                                >
+                                                    <Wrench className="w-3 h-3 mr-1" />
+                                                    {data.category.name}
+                                                </Badge>
+                                                <Badge
+                                                    variant="secondary"
+                                                    className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200 text-xs"
+                                                >
+                                                    <Building2 className="w-3 h-3 mr-1" />
+                                                    {data.laboratory.code}
+                                                </Badge>
+                                                <Badge
+                                                    variant="secondary"
+                                                    className="bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200 text-xs"
+                                                >
+                                                    <Package className="w-3 h-3 mr-1" />
+                                                    {data.minimum_unit}
+                                                </Badge>
+                                            </div>
+                                        </CardDescription>
+
+                                        {/* Add to Cart Button */}
+                                        <div className="flex items-center justify-end mt-auto">
+                                            <Button
+                                                onClick={(e) => {
+                                                    e.preventDefault()
+                                                    e.stopPropagation()
+                                                    handleAddTestToCart(data)
+                                                }}
+                                                disabled={isAdding}
+                                                size="sm"
+                                                className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1"
+                                            >
+                                                <ShoppingCart className="h-4 w-4" />
+                                                <span className="text-xs">Tambah ke keranjang</span>
+                                            </Button>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </Link>
+                        ))}
+                    </div>
+
+                    {/* No Results Message */}
+                    {searchQuery && filteredTests.length === 0 && (
+                        <div className="text-center py-12">
+                            <div className="text-zinc-400 dark:text-zinc-500 mb-4">
+                                <Search className="h-16 w-16 mx-auto mb-4" />
+                                <h3 className="text-xl font-semibold mb-2">Tidak ada hasil ditemukan</h3>
+                                <p>Coba gunakan kata kunci yang berbeda atau periksa ejaan Anda.</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Pagination - Only show when not searching */}
+                    {!searchQuery && renderPaginationLinks()}
+
+                    {/* Results Info */}
+                    <div className="mt-6 text-center">
+            <span className="text-sm text-zinc-500 dark:text-zinc-400">
+              {searchQuery
+                  ? `Menampilkan ${filteredTests.length} hasil pencarian`
+                  : `Menampilkan ${tests.from} hingga ${tests.to} dari ${tests.total} pengujian`}
+            </span>
+                    </div>
+
+                    {/* Toast Container */}
+                    <ToastContainer
+                        position="top-right"
+                        autoClose={3000}
+                        hideProgressBar={false}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover
+                        theme="colored"
+                        className="mt-16"
+                    />
                 </div>
-                {renderPaginationLinks()}
-                <span className="small-font-size col mt-4 text-center text-gray-500">
-                    Menampilkan {tests.from} hingga {tests.to} dari {tests.total} pengujian
-                </span>
             </div>
         </AppLayout>
-    );
+    )
 }

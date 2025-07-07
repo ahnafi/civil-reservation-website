@@ -44,7 +44,11 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                // Widgets\FilamentInfoWidget::class,
+                \App\Filament\Widgets\SubmissionOverview::class,
+                \App\Filament\Widgets\TestingChart::class,
+                \App\Filament\Widgets\SuccessfulTransactions::class,
+                \App\Filament\Widgets\PendingExternalSubmissionsTable::class,
+                \App\Filament\Widgets\PendingInternalSubmissionsTable::class,
             ])
             ->middleware([
                 EncryptCookies::class,

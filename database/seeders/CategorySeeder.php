@@ -21,10 +21,13 @@ class CategorySeeder extends Seeder
                 "name" => "Titik"
             ],
             [
-                "name" => "Ha",
+                "name" => "Ha"
             ],
             [
-                "name" => "Meter",
+                "name" => "Meter"
+            ],
+            [
+                "name" => "m"
             ]
         ];
 

@@ -34,6 +34,8 @@ class Submission extends Model
 
     protected $casts = [
         'documents' => 'array',
+        "approval_date" => "datetime",
+        "test_submission_date" => "date"
     ];
 
     protected static function boot(): void
@@ -46,7 +48,7 @@ class Submission extends Model
                 $paddedId = str_pad($submission->id, 3, '0', STR_PAD_LEFT);
                 $date = Carbon::parse($submission->test_submission_date)->format('Ymd');
 
-                if ($submission->submission_type === 'internal'){
+                if ($submission->submission_type === 'internal') {
                     $type = 'INT';
                 } else {
                     $type = 'EXT';
@@ -83,14 +85,6 @@ class Submission extends Model
                 }
             }
         });
-    }
-
-
-    protected function casts(): array
-    {
-        return [
-            "approval_date" => "datetime"
-        ];
     }
 
     public function user(): BelongsTo
@@ -156,10 +150,18 @@ class Submission extends Model
                 'submissions.test_submission_date',
                 'submissions.status',
                 'submissions.user_note',
+                'submissions.created_at',
                 'submission_test.test_id',
+                'submission_test.quantity',
                 'submission_package.package_id',
                 'tests.name as test_name',
+                'tests.price as test_price',
+                'tests.slug as test_slug',
+                'tests.images as test_images',
                 'packages.name as package_name',
+                'packages.price as package_price',
+                'packages.slug as package_slug',
+                'packages.images as package_images',
                 DB::raw('COALESCE(test_labs.id, package_labs.id) as lab_id'),
                 DB::raw('COALESCE(test_labs.code, package_labs.code) as lab_code'),
                 DB::raw('COALESCE(test_labs.name, package_labs.name) as lab_name'),
@@ -169,7 +171,7 @@ class Submission extends Model
                 'submission_external_details.project_address',
                 'submission_external_details.total_cost',
                 // Internal detail fields
-                'submission_internal_details.name',
+                'submission_internal_details.name as researcher_name',
                 'submission_internal_details.program_study',
                 'submission_internal_details.research_title',
                 'submission_internal_details.personnel_count',

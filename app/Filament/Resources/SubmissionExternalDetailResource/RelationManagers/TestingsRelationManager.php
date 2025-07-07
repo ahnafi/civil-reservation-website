@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\SubmissionExternalDetailResource\RelationManagers;
 
+use App\Services\BookingService;
+use App\Services\BookingUtils;
+use App\Services\FileNaming;
 use Filament\Forms;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
@@ -17,6 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Services\TestingService;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class TestingsRelationManager extends RelationManager
 {
@@ -57,8 +61,21 @@ class TestingsRelationManager extends RelationManager
                         }
                     }),
 
-                Forms\Components\DateTimePicker::make('test_date')
+                Forms\Components\DatePicker::make('test_date')
                     ->label('Tanggal Pengujian')
+                    ->minDate(now())
+                    ->rule(function () {
+                        return function (string $attribute, $value, \Closure $fail) {
+                            if ($value) {
+                                $date = Carbon::parse($value);
+                                // 6 = Sabtu, 0 = Minggu
+                                if ($date->dayOfWeek === 6 || $date->dayOfWeek === 0) {
+                                    $fail('Tanggal pengujian tidak dapat dilakukan pada hari Sabtu atau Minggu.');
+                                }
+                            }
+                        };
+                    })
+                    ->helperText('Catatan: Pengujian tidak dapat dijadwalkan pada hari Sabtu dan Minggu.')
                     ->default(fn() => $this->getOwnerRecord()->submission->test_submission_date ?? now())
                     ->nullable(),
 
@@ -103,22 +120,60 @@ class TestingsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('completed_at')->label('Selesai')->dateTime(),
             ])
             ->filters([
-                Tables\Filters\TrashedFilter::make()
+                Tables\Filters\TrashedFilter::make(),
+                Tables\Filters\Filter::make('test_date')
+                    ->form([
+                        Forms\Components\DatePicker::make('test_date_from')
+                            ->label('Tanggal Pengujian Dari'),
+                        Forms\Components\DatePicker::make('test_date_until')
+                            ->label('Tanggal Pengujian Sampai'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['test_date_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('test_date', '>=', $date),
+                            )
+                            ->when(
+                                $data['test_date_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('test_date', '<=', $date),
+                            );
+                    }),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->mutateFormDataUsing(function (array $data) {
-                        // Set submission_id - the Testing model will auto-generate the code
                         $externalDetail = $this->getOwnerRecord();
                         $submission = $externalDetail->submission;
+
                         $data['submission_id'] = $submission?->id;
-                        
-                        // Remove any manually set code as the model will generate it
                         unset($data['code']);
 
                         return $data;
                     })
-                    ->successNotificationTitle('Pengujian berhasil dibuat'),
+                    ->action(function (array $data, RelationManager $livewire) {
+                        $record = $livewire->getRelationship()->create($data);
+                        $testIds = BookingUtils::getTestIdsFromTesting($record->id);
+                        app(BookingService::class)->storeScheduleTesting($record->id);
+
+                        $unavailableTestNames = BookingUtils::getUnavailableTestNames($testIds, $record->test_date);
+
+                        if (!empty($unavailableTestNames)) {
+                            Notification::make()
+                                ->title('Pengujian berhasil dibuat, tapi jadwal penuh!')
+                                ->body('Pengujian berhasil dibuat, namun slot jadwal pada tanggal tersebut telah penuh. Silakan atur ulang tanggal pengujian atau sesuaikan jadwal secara manual jika diperlukan.')
+                                ->warning()
+                                ->persistent()
+                                ->send();
+                        } else{
+                            Notification::make()
+                                ->title("Pengujian berhasil dibuat")
+                                ->success()
+                                ->send();
+                        }
+
+                        return $record;
+                    })
             ])
             ->actions([
                 Tables\Actions\Action::make("Selesaikan")
@@ -138,8 +193,15 @@ class TestingsRelationManager extends RelationManager
                                 'application/x-7z-compressed',
                             ])
                             ->openable()
-                            ->helperText('Format file yang diterima: PDF, DOC, DOCX, ZIP, RAR, 7Z.')
-                            ->columnSpanFull(),
+                            ->helperText('Format file yang diterima: PDF, DOC, DOCX.')
+                            ->columnSpanFull()
+                            ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                                $extension = $file->getClientOriginalExtension();
+
+                                $id = $get('id') ?? -1;
+
+                                return FileNaming::generateTestingResult($id, $extension);
+                            }),
 
                         Forms\Components\Textarea::make('note')
                             ->columnSpanFull()

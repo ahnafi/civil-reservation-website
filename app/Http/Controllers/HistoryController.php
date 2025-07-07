@@ -76,13 +76,31 @@ class HistoryController extends Controller
 
     public function submissionHistoryDetail($code): Response
     {
+        $submissionId = Submission::query()
+            ->where('user_id', auth()->id())
+            ->where('code', $code)
+            ->value('id');
+
         $submissionHistoryDetail = Submission::withUserScheduleJoin()
             ->where('submissions.user_id', auth()->id())
             ->where('submissions.code', $code)
             ->get();
 
+        $relatedTransaction = Transaction::query()
+            ->where('submission_id', $submissionId)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $relatedTesting = Testing::query()
+            ->where('submission_id', $submissionId)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+
         return Inertia::render('history/detail/submission', [
             'submissionHistoryDetail' => $submissionHistoryDetail,
+            'relatedTransaction' => $relatedTransaction,
+            'relatedTesting' => $relatedTesting,
         ]);
     }
 

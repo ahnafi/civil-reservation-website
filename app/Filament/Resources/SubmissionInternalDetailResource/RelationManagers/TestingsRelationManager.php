@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SubmissionInternalDetailResource\RelationManagers;
 
+use App\Services\FileNaming;
 use Filament\Forms;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Services\TestingService;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class TestingsRelationManager extends RelationManager
 {
@@ -57,8 +59,21 @@ class TestingsRelationManager extends RelationManager
                         }
                     }),
 
-                Forms\Components\DateTimePicker::make('test_date')
+                Forms\Components\DatePicker::make('test_date')
                     ->label('Tanggal Pengujian')
+                    ->minDate(now())
+                    ->rule(function () {
+                        return function (string $attribute, $value, \Closure $fail) {
+                            if ($value) {
+                                $date = Carbon::parse($value);
+                                // 6 = Sabtu, 0 = Minggu
+                                if ($date->dayOfWeek === 6 || $date->dayOfWeek === 0) {
+                                    $fail('Tanggal pengujian tidak dapat dilakukan pada hari Sabtu atau Minggu.');
+                                }
+                            }
+                        };
+                    })
+                    ->helperText('Catatan: Pengujian tidak dapat dijadwalkan pada hari Sabtu dan Minggu.')
                     ->default(fn() => $this->getOwnerRecord()->submission->test_submission_date ?? now())
                     ->nullable(),
 
@@ -88,8 +103,17 @@ class TestingsRelationManager extends RelationManager
                         'application/x-7z-compressed',
                     ])
                     ->openable()
-                    ->helperText('Format file yang diterima: PDF, DOC, DOCX, ZIP, RAR, 7Z.')
                     ->columnSpanFull()
+                    ->openable()
+                    ->helperText('Format file yang diterima: PDF, DOC, DOCX.')
+                    ->columnSpanFull()
+                    ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
+                        $extension = $file->getClientOriginalExtension();
+
+                        $id = $get('id') ?? -1;
+
+                        return FileNaming::generateTestingResult($id, $extension);
+                    })
             ]);
     }
 
@@ -133,6 +157,24 @@ class TestingsRelationManager extends RelationManager
                         'testing' => 'Sedang Berjalan',
                         'completed' => 'Selesai',
                     ]),
+                Tables\Filters\Filter::make('test_date')
+                    ->form([
+                        Forms\Components\DatePicker::make('test_date_from')
+                            ->label('Tanggal Pengujian Dari'),
+                        Forms\Components\DatePicker::make('test_date_until')
+                            ->label('Tanggal Pengujian Sampai'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['test_date_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('test_date', '>=', $date),
+                            )
+                            ->when(
+                                $data['test_date_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('test_date', '<=', $date),
+                            );
+                    }),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
@@ -141,7 +183,7 @@ class TestingsRelationManager extends RelationManager
                         $internalDetail = $this->getOwnerRecord();
                         $submission = $internalDetail->submission;
                         $data['submission_id'] = $submission?->id;
-                        
+
                         // Remove any manually set code as the model will generate it
                         unset($data['code']);
 

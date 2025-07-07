@@ -58,6 +58,10 @@ class PackageResource extends Resource
                     ->label('Nama Paket')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\Select::make('laboratory_id')
+                    ->label("Lab")
+                    ->relationship('laboratory', 'name')
+                    ->required(),
                 Forms\Components\Select::make("tests")
                     ->relationship("tests", "name")
                     ->label("Pilih Pengujian")

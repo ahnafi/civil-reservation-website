@@ -13,6 +13,8 @@ use App\Services\BookingService;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Models\Schedule;
+use Illuminate\Support\Facades\DB;
 
     class Testing extends Model
     {
@@ -42,11 +44,11 @@ use Illuminate\Support\Str;
             // Add 3 random characters to ensure uniqueness
             $randomString = Str::random(3);
 
-            $testing->code = 'UJI-' . $submissionCode . '-' . $date . '-' . strtoupper($randomString);
+            $testing->code = 'UJI-' . $submissionCode . '-' . strtoupper($randomString);
             $testing->saveQuietly();
 //             send mail
-            $userEmail = $testing->submission->user->email;
-            Mail::to($userEmail)->send(new TestingWip($testing->id));
+             $userEmail = $testing->submission->user->email;
+             Mail::to($userEmail)->send(new TestingWip($testing->id));
         });
 
         static::updating(function ($model) {
@@ -72,6 +74,14 @@ use Illuminate\Support\Str;
                     }
                 }
             }
+
+            DB::transaction(function () use ($model) {
+                foreach ($model->schedules as $schedule) {
+                    $schedule->increment('available_slots');
+                }
+
+                $model->schedules()->detach();
+            });
         });
 
     }

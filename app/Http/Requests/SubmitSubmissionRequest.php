@@ -26,7 +26,7 @@ class SubmitSubmissionRequest extends FormRequest
         return [
 
             'submission_type' => ['required', 'in:internal,external'],
-            
+
             // Field khusus external
             'company_name' => ['required_if:submission_type,external'],
             'project_name' => ['required_if:submission_type,external'],
@@ -56,6 +56,37 @@ class SubmitSubmissionRequest extends FormRequest
             'submission_packages.*.package_id' => 'required|exists:packages,id',
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'submission_type.required' => 'Jenis pengajuan wajib diisi.',
+
+            'company_name.required_if' => 'Nama perusahaan wajib diisi.',
+            'project_name.required_if' => 'Nama proyek wajib diisi.',
+            'project_address.required_if' => 'Alamat proyek wajib diisi.',
+
+            'name.required_if' => 'Nama pengusul wajib diisi.',
+            'program_study.required_if' => 'Program studi wajib diisi.',
+            'research_title.required_if' => 'Judul penelitian wajib diisi.',
+
+            'test_submission_date.required' => 'Tanggal pengajuan pengujian wajib diisi.',
+            'test_submission_date.date' => 'Format tanggal pengajuan uji tidak valid.',
+
+            'submission_tests.required_without' => 'Minimal satu pengujian atau paket harus dipilih.',
+            'submission_tests.array' => 'Format data pengujian tidak valid.',
+            'submission_tests.*.test_id.required' => 'Jenis pengujian wajib diisi.',
+            'submission_tests.*.test_id.exists' => 'Jenis pengujian tidak ditemukan.',
+            'submission_tests.*.unit.required' => 'Jumlah unit pengujian wajib diisi.',
+            'submission_tests.*.unit.integer' => 'Jumlah unit pengujian harus berupa angka.',
+
+            'submission_packages.required_without' => 'Minimal satu paket atau pengujian harus dipilih.',
+            'submission_packages.array' => 'Format data paket tidak valid.',
+            'submission_packages.*.package_id.required' => 'Paket pengujian wajib diisi.',
+            'submission_packages.*.package_id.exists' => 'Paket pengujian tidak ditemukan.',
+        ];
+    }
+
 
     public function withValidator(Validator $validator): void
     {

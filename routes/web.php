@@ -29,9 +29,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Get Booking Page
     Route::get('orders/cart', [CartController::class, 'cart'])->name('orders-cart');
-    Route::get('orders/form', function () {
-        return Inertia::render('orders/form');
-    })->name('orders-cart-form');
+    Route::get('orders/form', [CartController::class, 'form'])->name('orders-cart-form');
     Route::get('orders/checkout', function () {
         return Inertia::render('orders/checkout');
     })->name('orders-cart-checkout');
@@ -57,6 +55,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('history/transactions', [HistoryController::class, "transactionsHistory"])->name('history-transactions');
     Route::get('history/transaction/{transaction:code}', [HistoryController::class, "transactionHistoryDetail"])->name('history-transactions-detail');
     Route::post('cart/add', [BookingController::class, 'addToCart'])->name('cart.add');
+
+    // Get Tutorial Page
+    Route::get('tutorial', function () {
+        return Inertia::render('tutorial/index');
+    })->name('tutorial');
 
     // Post Page
     Route::post('payment', [BookingController::class, 'submitPayment'])->name('submit-payment');

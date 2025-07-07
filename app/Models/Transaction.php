@@ -44,9 +44,9 @@ class Transaction extends Model
             $userId = $submission?->user_id ?? '000';
 
             $uuid = Str::uuid()->toString();
-            $shortUuid = substr(str_replace('-', '', $uuid), 0, 6);
+            $shortUuid = strtoupper(substr(str_replace('-', '', $uuid), 0, 3));
 
-            $transaction->code = 'CVL-U' . $userId . '-' . $submissionCode . '-' . $shortUuid . '-' . now()->format('Ymd');
+            $transaction->code = 'CVL-' . $submissionCode . '-' . $shortUuid;
 
             if (is_null($transaction->payment_deadline)) {
                 $transaction->payment_deadline = now()->addDay();

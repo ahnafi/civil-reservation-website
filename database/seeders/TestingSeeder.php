@@ -6,6 +6,7 @@ use App\Models\Submission;
 use App\Models\Testing;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use App\Services\BookingService;
 
 class TestingSeeder extends Seeder
 {
@@ -14,6 +15,8 @@ class TestingSeeder extends Seeder
      */
     public function run(): void
     {
+        $bookingService = new BookingService();
+
         $testings = [
             [
                 "submission_id" => 2,
@@ -138,7 +141,9 @@ class TestingSeeder extends Seeder
         ];
 
         foreach ($testings as $testing) {
-            Testing::create($testing);
+            $created_testing =  Testing::create($testing);
+
+            $bookingService->storeScheduleTesting($created_testing->id);
         }
 
 
