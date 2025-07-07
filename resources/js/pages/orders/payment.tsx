@@ -204,15 +204,15 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
         setData('payment_method', formData.payment_method);
 
         // Submit with Inertia
-        post('/submit-payment', {
+        post(route('submit-payment'), {
             onSuccess: () => {
-                setIsSuccess(true);
-                reset();
-                setImagePreview(null);
-                form.reset();
+            setIsSuccess(true);
+            reset();
+            setImagePreview(null);
+            form.reset();
             },
             onError: (errors) => {
-                console.error('Payment submission errors:', errors);
+            console.error('Payment submission errors:', errors);
             },
         });
     };
