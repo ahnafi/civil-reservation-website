@@ -32,7 +32,7 @@ class HistoryController extends Controller
         ]);
     }
 
-    public function testsHistory(): Response
+    public function testingHistory(): Response
     {
         $userTestings = Testing::query()
             ->join('submissions', 'testings.submission_id', '=', 'submissions.id')
@@ -45,7 +45,7 @@ class HistoryController extends Controller
         $packages = Package::select(['id', 'name'])->get();
         $laboratories = Laboratory::select(['id', 'code', 'name'])->get();
 
-        return Inertia::render('history/tests', [
+        return Inertia::render('history/testings', [
             'userTestings' => $userTestings,
             'tests' => $tests,
             'packages' => $packages,
@@ -118,17 +118,17 @@ class HistoryController extends Controller
         ]);
     }
 
-    public function testHistoryDetail($code): Response
+    public function testingHistoryDetail($code): Response
     {
-        $testHistoryDetail = Testing::query()
+        $testingHistoryDetail = Testing::query()
             ->join('submissions', 'testings.submission_id', '=', 'submissions.id')
             ->where('submissions.user_id', auth()->id())
-            ->orderBy('testings.created_at', 'desc')
+            ->where('testings.code', $code)
             ->select('testings.*', 'submissions.code as submission_code')
             ->get();
 
-        return Inertia::render('history/detail/test', [
-            'testHistoryDetail' => $testHistoryDetail,
+        return Inertia::render('history/detail/testing', [
+            'testingHistoryDetail' => $testingHistoryDetail,
         ]);
     }
 }
