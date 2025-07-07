@@ -186,7 +186,8 @@ export const externalSubmissionColumns: ColumnDef<ExternalSubmission>[] = [
                     href={`/history/submission/${row.original.code}`}
                     className="cursor-pointer rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
                 >
-                    Lihat Detail
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Lihat Detail</span>
                 </Link>
             </div>
         ),
@@ -306,7 +307,8 @@ export const internalSubmissionColumns: ColumnDef<InternalSubmission>[] = [
                     href={`/history/submission/${row.original.code}`}
                     className="cursor-pointer rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
                 >
-                    Lihat Detail
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Lihat Detail</span>
                 </Link>
             </div>
         ),
@@ -419,7 +421,9 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
                     <div
                         className={`items-center rounded-lg px-3 py-1.5 text-center text-sm font-medium text-white capitalize shadow-sm ${statusColor}`}
                     >
-                        {status}
+                        {
+                            transactionStatusMap[status]
+                        }
                     </div>
                 </div>
             );
@@ -434,7 +438,8 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
                     href={`/history/transaction/${row.original.code}`}
                     className="cursor-pointer rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
                 >
-                    Lihat Detail
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Lihat Detail</span>
                 </Link>
             </div>
         ),
@@ -460,7 +465,7 @@ export const testingColumns: ColumnDef<Testing>[] = [
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
                 className="flex w-[5rem] justify-center text-center"
             >
-                Tanggal
+                Tanggal Pengujian
                 <ArrowUpDown />
             </Button>
         ),
@@ -505,6 +510,7 @@ export const testingColumns: ColumnDef<Testing>[] = [
                     </div>
                 </div>
             );
+            );
         },
     },
     {
@@ -516,7 +522,8 @@ export const testingColumns: ColumnDef<Testing>[] = [
                     href={`/history/test/${row.original.code}`}
                     className="cursor-pointer rounded-lg bg-blue-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
                 >
-                    Lihat Detail
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Lihat Detail</span>
                 </Link>
             </div>
         ),

@@ -1,4 +1,4 @@
-'use client';
+"use client"
 
 import {
     AlertDialog,
@@ -9,21 +9,22 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Separator } from '@/components/ui/separator';
-import { Textarea } from '@/components/ui/textarea';
-import AppLayout from '@/layouts/app-layout';
-import { cn } from '@/lib/utils';
-import type { BreadcrumbItem } from '@/types';
-import { formatDate } from '@/utils/date-utils';
-import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+} from "@/components/ui/alert-dialog"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Separator } from "@/components/ui/separator"
+import { Textarea } from "@/components/ui/textarea"
+import AppLayout from "@/layouts/app-layout"
+import { cn } from "@/lib/utils"
+import { router } from "@inertiajs/react"
+import type { BreadcrumbItem } from "@/types"
+import { formatDate } from "@/utils/date-utils"
+import { Head, Link, useForm, usePage } from "@inertiajs/react"
 import {
     ArrowLeft,
     ArrowRight,
@@ -339,7 +340,7 @@ export default function ReservationForm() {
                             <Link href="/orders/cart">
                                 <Button
                                     size="lg"
-                                    className="bg-blue-600 px-8 py-3 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                                    className="px-8 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white cursor-pointer"
                                 >
                                     <ShoppingCart className="mr-2 h-5 w-5" />
                                     Kembali ke Keranjang
@@ -883,7 +884,7 @@ export default function ReservationForm() {
                                             <Button
                                                 type="submit"
                                                 disabled={processing}
-                                                className="h-12 w-full bg-gradient-to-r from-blue-600 to-blue-700 px-8 text-white hover:from-blue-700 hover:to-blue-800 sm:w-auto dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700"
+                                                className="h-12 w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700 px-8 text-white sm:w-auto cursor-pointer"
                                             >
                                                 {processing ? (
                                                     <>
@@ -1000,12 +1001,12 @@ export default function ReservationForm() {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel className="border-zinc-300 text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800">
+                        <AlertDialogCancel className="border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer">
                             Batal
                         </AlertDialogCancel>
                         <AlertDialogAction
                             onClick={handleConfirmSubmit}
-                            className="bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                            className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white cursor-pointer"
                             disabled={processing}
                         >
                             {processing ? (

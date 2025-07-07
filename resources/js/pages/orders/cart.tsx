@@ -526,7 +526,7 @@ export default function Cart() {
                                             <CardFooter className="p-6 pt-0">
                                                 <Button
                                                     onClick={handleContinueToForm}
-                                                    className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 py-3 text-base font-semibold text-white"
+                                                    className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 py-3 text-base font-semibold text-white cursor-pointer"
                                                 >
                                                     <span>
                                                         <ClipboardList className="w-8 h-8"/>
@@ -560,7 +560,7 @@ function EmptyCart() {
                 <Link href="/tests">
                     <Button
                         size="lg"
-                        className="px-8 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white"
+                        className="px-8 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white cursor-pointer"
                     >
                         <ShoppingCart className="mr-2 h-5 w-5" />
                         Jelajahi Pengujian

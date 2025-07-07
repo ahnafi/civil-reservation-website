@@ -76,7 +76,7 @@ const historyNavItems: NavItem[] = [
     },
     {
         title: 'Pengujian',
-        url: '/history/tests',
+        url: '/history/testings',
         icon: History,
     },
 ];

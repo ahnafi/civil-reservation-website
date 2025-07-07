@@ -19,7 +19,10 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Schedule({ tests }: { tests: SimpleOption[] }) {
+export default function Schedule({ tests, laboratories }: {
+    tests: SimpleOption[],
+    laboratories: LaboratorySimple[]
+}) {
     const [selectedTest, setSelectedTest] = useState<SimpleOption | null>(null);
     const [testData, setTestData] = useState<testForSchedule | null>(null);
     const [schedules, setSchedules] = useState<scheduleForSchedule[] | null>(null);
@@ -316,9 +319,11 @@ export default function Schedule({ tests }: { tests: SimpleOption[] }) {
                             </div>
 
                             <div className="p-6">
-                                <div className="schedule-list space-y-4">
+                                <div className="space-y-6">
                                     {schedules
-                                        .filter((schedule) => isWithinDateRange(new Date(schedule.date), initialDate, finalDate))
+                                        .filter(schedule =>
+                                            isWithinDateRange(new Date(schedule.date), initialDate, finalDate)
+                                        )
                                         .map((schedule: scheduleForSchedule) => (
                                             <div
                                                 key={schedule.id}
@@ -332,8 +337,9 @@ export default function Schedule({ tests }: { tests: SimpleOption[] }) {
                                                             month: 'long',
                                                             day: 'numeric',
                                                             weekday: 'long',
+                                                            weekday: 'long',
                                                         })}
-                                                    </div>
+                                                    </h3>
                                                 </div>
 
                                                 {/* Schedule Details */}

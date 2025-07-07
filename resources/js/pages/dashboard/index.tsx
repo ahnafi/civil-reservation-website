@@ -4,7 +4,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, SharedData, SubmissionSchedule, Testing, Transaction } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import { AlertCircle, Banknote, CheckCircle, ClipboardList, Clock, CreditCard, FileText, Hammer, HardHat, XCircle } from 'lucide-react';
+import { AlertCircle, Banknote, CheckCircle, ClipboardList,
+    CreditCard, FileText, Hammer, HardHat, XCircle } from 'lucide-react';
 import { ToastContainer } from 'react-toastify';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -207,7 +208,7 @@ export default function MainDashboard({
                     {userTransactions?.filter((transaction) => transaction.status === 'pending').length > 0 && (
                         <div className="rounded-xl border border-yellow-300 bg-yellow-50 p-6 shadow-lg dark:border-yellow-700 dark:bg-yellow-950/40">
                             <div className="mb-4 flex items-center gap-3">
-                                <AlertCircle className="size-5 text-yellow-700 dark:text-yellow-300" />
+                                <CreditCard className="size-5 text-yellow-700 dark:text-yellow-300" />
                                 <h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-100">Transaksi Menunggu Pembayaran</h3>
                                 <span className="rounded-full bg-yellow-300 px-2 py-1 text-xs font-medium text-yellow-900 dark:bg-yellow-700 dark:text-yellow-100">
                                     {userTransactions?.filter((transaction) => transaction.status === 'pending').length} item
@@ -279,9 +280,6 @@ export default function MainDashboard({
                                             <div className="text-sm text-neutral-600 dark:text-neutral-400">
                                                 {formatDateTimeWithWeekday(testing.test_date)}
                                             </div>
-                                            <div className="text-xs text-neutral-500 dark:text-neutral-500">
-                                                Dibuat: {formatDate(testing.created_at)}
-                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -304,11 +302,11 @@ export default function MainDashboard({
 
                     {/* Tests Waiting for Results Reminder */}
                     {userWaitResultTestings && userWaitResultTestings.length > 0 ? (
-                        <div className="rounded-xl border border-blue-300 bg-blue-50 p-6 shadow-lg dark:border-blue-700 dark:bg-blue-950/40">
+                        <div className="rounded-xl border border-green-300 bg-green-50 p-6 shadow-lg dark:border-green-700 dark:bg-green-950/40">
                             <div className="mb-4 flex items-center gap-3">
-                                <ClipboardList className="size-5 text-blue-700 dark:text-blue-300" />
-                                <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100"> Pengujian Menunggu Hasil</h3>
-                                <span className="rounded-full bg-blue-300 px-2 py-1 text-xs font-medium text-blue-900 dark:bg-blue-700 dark:text-blue-100">
+                                <HardHat className="size-5 text-green-700 dark:text-green-300" />
+                                <h3 className="text-lg font-semibold text-green-900 dark:text-green-100"> Pengujian Menunggu Hasil</h3>
+                                <span className="rounded-full bg-green-300 px-2 py-1 text-xs font-medium text-green-900 dark:bg-green-700 dark:text-green-100">
                                     {userWaitResultTestings.length} item
                                 </span>
                             </div>
@@ -316,11 +314,11 @@ export default function MainDashboard({
                                 {userWaitResultTestings.map((testing) => (
                                     <div
                                         key={testing.id}
-                                        className="rounded-lg border border-blue-300 bg-white p-4 shadow-sm dark:border-blue-600 dark:bg-neutral-800"
+                                        className="rounded-lg border border-green-300 bg-white p-4 shadow-sm dark:border-green-600 dark:bg-neutral-800"
                                     >
                                         <div className="mb-2 flex items-start justify-between">
                                             <div className="flex items-center gap-2">
-                                                <Clock className="size-4 text-blue-700 dark:text-blue-300" />
+                                                <Hammer className="size-4 text-green-700 dark:text-green-300" />
                                                 <span className="text-sm font-medium text-neutral-900 dark:text-white">
                                                     {testing.code || testing.submission_code}
                                                 </span>
@@ -357,7 +355,7 @@ export default function MainDashboard({
                     {/* Recent Submissions */}
                     <div className="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
                         <div className="mb-4 flex items-center gap-3">
-                            <FileText className="size-5 text-blue-600 dark:text-blue-400" />
+                            <FileText className="size-5 text-green-600 dark:text-blue-400" />
                             <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">Pengajuan Reservasi Terbaru</h3>
                         </div>
                         <div className="max-h-80 space-y-3 overflow-y-auto">
@@ -368,7 +366,7 @@ export default function MainDashboard({
                                 >
                                     <div className="flex items-center gap-3">
                                         <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-900/30">
-                                            <Hammer className="size-4 text-blue-600 dark:text-blue-400" />
+                                            <ClipboardList className="size-4 text-blue-600 dark:text-blue-400" />
                                         </div>
                                         <div>
                                             <div className="font-medium text-neutral-900 dark:text-white">{submission.code}</div>
@@ -463,7 +461,7 @@ export default function MainDashboard({
                                 >
                                     <div className="flex items-center gap-3">
                                         <div className="rounded-full bg-orange-100 p-2 dark:bg-orange-900/30">
-                                            <Clock className="size-4 text-orange-600 dark:text-orange-400" />
+                                            <Hammer className="size-4 text-orange-600 dark:text-orange-400" />
                                         </div>
                                         <div>
                                             <div className="font-medium text-neutral-900 dark:text-white">
@@ -486,7 +484,7 @@ export default function MainDashboard({
                         </div>
                         <div className="mt-4 text-center">
                             <a
-                                href="/history/tests" // placeholder link
+                                href="/history/testings" // placeholder link
                                 className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-700"
                             >
                                 <HardHat className="size-4" />

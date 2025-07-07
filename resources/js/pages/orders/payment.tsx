@@ -362,7 +362,7 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <Button variant="outline" size="sm" asChild>
+                                                    <Button className="cursor-pointer" variant="outline" size="sm" asChild>
                                                         <a
                                                             href={`/storage/${transaction.payment_invoice_files[0]}`}
                                                             target="_blank"

@@ -161,14 +161,14 @@ export default function Checkout() {
                                     <Link href="/history/submissions">
                                         <Button
                                             variant="outline"
-                                            className="h-12 w-full px-6 sm:w-auto border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 bg-transparent"
+                                            className="h-12 w-full px-6 sm:w-auto border-zinc-300 dark:border-zinc-600 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 bg-transparent cursor-pointer"
                                         >
                                             <Eye className="mr-2 h-4 w-4" />
                                             Lihat Riwayat Pengajuan
                                         </Button>
                                     </Link>
                                     <Link href="/orders/cart">
-                                        <Button className="h-12 w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700 px-8 text-white sm:w-auto">
+                                        <Button className="h-12 w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 dark:from-blue-500 dark:to-blue-600 dark:hover:from-blue-600 dark:hover:to-blue-700 px-8 text-white sm:w-auto cursor-pointer">
                                             Buat Pengajuan Baru
                                         </Button>
                                     </Link>

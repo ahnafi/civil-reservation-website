@@ -259,7 +259,7 @@ export default function Detail({ test }: { test: Test }) {
                                     <Button
                                         disabled={isAdding}
                                         onClick={() => handleAddTestToCart(test)}
-                                        className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold h-12 w-full rounded-lg px-6 py-3 text-center transition-colors duration-200 flex items-center justify-center gap-2"
+                                        className="bg-blue-600 cursor-pointer hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold h-12 w-full rounded-lg px-6 py-3 text-center transition-colors duration-200 flex items-center justify-center gap-2 text-xl"
                                     >
                                         <ShoppingCart className="h-5 w-5" />
                                         {isAdding ? "Menambahkan..." : "Pesan Sekarang"}
