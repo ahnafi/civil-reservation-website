@@ -1,76 +1,117 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Testing } from '@/types';
-import { parseAndFormatDate } from '@/utils/date-utils';
-import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, Beaker, Calendar, Check, ClipboardCheck, Clock, Download, FileText, Info, Link2, XCircle } from 'lucide-react';
-import React from 'react';
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import AppLayout from "@/layouts/app-layout"
+import type { BreadcrumbItem, Testing } from "@/types"
+import { parseAndFormatDate } from "@/utils/date-utils"
+import { Head, Link } from "@inertiajs/react"
+import {
+    ArrowLeft,
+    Beaker,
+    Calendar,
+    Check,
+    ClipboardCheck,
+    Clock,
+    Download,
+    FileText,
+    Info,
+    Link2,
+} from "lucide-react"
+import type React from "react"
 
 // Format date helper
 const formatDate = (dateString: string | null | undefined) => {
-    if (!dateString) return '-';
+    if (!dateString) return "-"
     try {
-        return parseAndFormatDate(new Date(dateString));
+        return parseAndFormatDate(new Date(dateString))
     } catch (error) {
-        return `Format tanggal tidak valid: ${error}`;
+        return `Format tanggal tidak valid: ${error}`
     }
-};
+}
 
-// Status badge component
-const StatusBadge = ({ status }: { status: string }) => {
-    let colorClasses = 'bg-gray-100 text-gray-800';
-    let icon = <Info className="h-4 w-4" />;
+// Get display status and color based on status and test_date (same logic as datatable)
+const getStatusDisplay = (status: string, testDate: string) => {
+    const testDateObj = new Date(testDate)
+    const now = new Date()
 
-    if (status === 'completed') {
-        colorClasses = 'bg-green-100 text-green-800';
-        icon = <Check className="h-4 w-4" />;
-    } else if (status === 'testing') {
-        colorClasses = 'bg-blue-100 text-blue-800';
-        icon = <Beaker className="h-4 w-4" />;
-    } else if (status === 'pending') {
-        colorClasses = 'bg-yellow-100 text-yellow-800';
-        icon = <Clock className="h-4 w-4" />;
-    } else if (status === 'cancelled') {
-        colorClasses = 'bg-red-100 text-red-800';
-        icon = <XCircle className="h-4 w-4" />;
+    if (status === "completed") {
+        return {
+            displayStatus: "Selesai",
+            colorClasses: "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
+            icon: <Check className="h-4 w-4" />,
+        }
+    } else if (status === "testing") {
+        if (now < testDateObj) {
+            return {
+                displayStatus: "Menunggu Pengujian",
+                colorClasses: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
+                icon: <Clock className="h-4 w-4" />,
+            }
+        } else {
+            return {
+                displayStatus: "Memproses Hasil",
+                colorClasses: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
+                icon: <Beaker className="h-4 w-4" />,
+            }
+        }
     }
+
+    // Default fallback
+    return {
+        displayStatus: "Tidak Diketahui",
+        colorClasses: "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400",
+        icon: <Info className="h-4 w-4" />,
+    }
+}
+
+// Status badge component with updated logic
+const StatusBadge = ({ status, testDate }: { status: string; testDate: string }) => {
+    const { displayStatus, colorClasses, icon } = getStatusDisplay(status, testDate)
 
     return (
-        <div className={`small-font-size inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 font-medium ${colorClasses}`}>
+        <div
+            className={`small-font-size inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 font-medium ${colorClasses}`}
+        >
             {icon}
-            {status === 'testing' ? 'Dalam Proses' : status.charAt(0).toUpperCase() + status.slice(1)}
+            {displayStatus}
         </div>
-    );
-};
+    )
+}
 
 // Info item component
-const InfoItem = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | React.ReactNode }) => {
+const InfoItem = ({
+                      icon,
+                      label,
+                      value,
+                  }: { icon: React.ReactNode; label: string; value: string | React.ReactNode }) => {
     return (
         <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-900/20">{icon}</div>
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-900/20">
+                {icon}
+            </div>
             <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
                 <p className="font-medium">{value}</p>
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: Testing[] }) {
+export default function TestingDetail({ testingHistoryDetail }: { testingHistoryDetail: Testing[] }) {
     // Get the first test record
-    const testRecord: Testing = testHistoryDetail[0];
+    const testRecord: Testing = testingHistoryDetail[0]
+
+    console.info("Testing Detail Page - Test Record:", testRecord)
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: 'Pengujian',
-            href: '/history/tests',
+            title: "Pengujian",
+            href: "/history/tests",
         },
         {
             title: `${testRecord.code}`,
             href: `/history/test/${testRecord.code}`,
         },
-    ];
+    ]
 
     // If no data, show a message
     if (!testRecord) {
@@ -81,7 +122,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                     <Card>
                         <CardContent className="p-8 text-center">
                             <p>Data pengujian tidak ditemukan</p>
-                            <Button variant="outline" className="mt-4" asChild>
+                            <Button variant="outline" className="mt-4 bg-transparent" asChild>
                                 <Link href="/history/tests">
                                     <ArrowLeft className="mr-2 h-4 w-4" />
                                     Kembali
@@ -91,26 +132,45 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                     </Card>
                 </div>
             </AppLayout>
-        );
+        )
     }
 
-    // Calculate test progress based on status
-    const getProgressPercentage = (status: string) => {
-        switch (status) {
-            case 'pending':
-                return 0;
-            case 'testing':
-                return 50;
-            case 'completed':
-                return 100;
-            case 'cancelled':
-                return 0;
-            default:
-                return 0;
-        }
-    };
+    // Calculate test progress based on status and test_date
+    const getProgressPercentage = (status: string, testDate: string) => {
+        const testDateObj = new Date(testDate)
+        const now = new Date()
 
-    const progressPercentage = getProgressPercentage(testRecord.status);
+        if (status === "completed") {
+            return 100
+        } else if (status === "testing") {
+            if (now < testDateObj) {
+                return 25 // Menunggu Pengujian
+            } else {
+                return 75 // Memproses Hasil
+            }
+        }
+        return 0 // Default
+    }
+
+    const progressPercentage = getProgressPercentage(testRecord.status, testRecord.test_date)
+    const { displayStatus } = getStatusDisplay(testRecord.status, testRecord.test_date)
+
+    // Get timeline step status
+    const getTimelineStepStatus = (stepIndex: number, status: string, testDate: string) => {
+        const testDateObj = new Date(testDate)
+        const now = new Date()
+
+        if (status === "completed") {
+            return stepIndex <= 3 // All steps completed
+        } else if (status === "testing") {
+            if (now < testDateObj) {
+                return stepIndex <= 1 // Up to "Pengujian Dijadwalkan"
+            } else {
+                return stepIndex <= 2 // Up to "Pengujian dalam Proses"
+            }
+        }
+        return stepIndex <= 0 // Only first step
+    }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -130,7 +190,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                             <p>{testRecord.code}</p>
                                         </CardDescription>
                                     </div>
-                                    <StatusBadge status={testRecord.status} />
+                                    <StatusBadge status={testRecord.status} testDate={testRecord.test_date} />
                                 </div>
                             </CardHeader>
 
@@ -151,7 +211,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                         <InfoItem
                                             icon={<Clock className="h-5 w-5 text-blue-600" />}
                                             label="Tanggal Selesai"
-                                            value={formatDate(testRecord.completed_at) || 'Belum selesai'}
+                                            value={formatDate(testRecord.completed_at) || "Belum selesai"}
                                         />
                                         <InfoItem
                                             icon={<Link2 className="h-5 w-5 text-blue-600" />}
@@ -175,6 +235,85 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                     </div>
                                 )}
 
+                                {/* Timeline pengujian - Improved stepper look */}
+                                <div className="rounded-lg border mb-6 p-4">
+                                    <h3 className="mb-6 text-lg font-medium">Timeline Pengujian</h3>
+                                    <div className="space-y-6">
+                                        {/* Step 1: Pengajuan Diterima */}
+                                        <div className="relative flex items-start">
+                                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500 text-white shadow-lg">
+                                                <Check className="h-5 w-5" />
+                                            </div>
+                                            <div className="ml-4 flex-1">
+                                                <h4 className="font-semibold text-gray-900 dark:text-white">Pengajuan Diterima</h4>
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(testRecord.created_at)}</p>
+                                            </div>
+                                            <div className="absolute left-5 top-10 h-6 w-0.5 bg-gray-300 dark:bg-gray-600"></div>
+                                        </div>
+
+                                        {/* Step 2: Pengujian Dijadwalkan */}
+                                        <div className="relative flex items-start">
+                                            <div
+                                                className={`flex h-10 w-10 items-center justify-center rounded-full shadow-lg ${
+                                                    getTimelineStepStatus(1, testRecord.status, testRecord.test_date)
+                                                        ? "bg-green-500 text-white"
+                                                        : "bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-400"
+                                                }`}
+                                            >
+                                                <Calendar className="h-5 w-5" />
+                                            </div>
+                                            <div className="ml-4 flex-1">
+                                                <h4 className="font-semibold text-gray-900 dark:text-white">Pengujian Dijadwalkan</h4>
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(testRecord.test_date)}</p>
+                                            </div>
+                                            <div className="absolute left-5 top-10 h-6 w-0.5 bg-gray-300 dark:bg-gray-600"></div>
+                                        </div>
+
+                                        {/* Step 3: Pengujian dalam Proses */}
+                                        <div className="relative flex items-start">
+                                            <div
+                                                className={`flex h-10 w-10 items-center justify-center rounded-full shadow-lg ${
+                                                    getTimelineStepStatus(2, testRecord.status, testRecord.test_date)
+                                                        ? "bg-green-500 text-white"
+                                                        : "bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-400"
+                                                }`}
+                                            >
+                                                <Beaker className="h-5 w-5" />
+                                            </div>
+                                            <div className="ml-4 flex-1">
+                                                <h4 className="font-semibold text-gray-900 dark:text-white">Pengujian dalam Proses</h4>
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                    {testRecord.status === "testing" && new Date() >= new Date(testRecord.test_date)
+                                                        ? "Sedang dalam proses"
+                                                        : testRecord.status === "completed"
+                                                            ? "Selesai diproses"
+                                                            : "Menunggu jadwal pengujian"}
+                                                </p>
+                                            </div>
+                                            <div className="absolute left-5 top-10 h-6 w-0.5 bg-gray-300 dark:bg-gray-600"></div>
+                                        </div>
+
+                                        {/* Step 4: Pengujian Selesai */}
+                                        <div className="relative flex items-start">
+                                            <div
+                                                className={`flex h-10 w-10 items-center justify-center rounded-full shadow-lg ${
+                                                    getTimelineStepStatus(3, testRecord.status, testRecord.test_date)
+                                                        ? "bg-green-500 text-white"
+                                                        : "bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-400"
+                                                }`}
+                                            >
+                                                <ClipboardCheck className="h-5 w-5" />
+                                            </div>
+                                            <div className="ml-4 flex-1">
+                                                <h4 className="font-semibold text-gray-900 dark:text-white">Pengujian Selesai</h4>
+                                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                                    {testRecord.completed_at ? formatDate(testRecord.completed_at) : "Belum selesai"}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {testRecord.documents && (
                                     <div className="mb-6 rounded-lg border p-4">
                                         <h3 className="mb-4 text-lg font-medium">Dokumen Hasil Pengujian</h3>
@@ -186,7 +325,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                                         <h4 className="font-medium">Hasil Pengujian</h4>
                                                     </div>
                                                     <Button size="sm" variant="ghost" asChild>
-                                                        <a href={`/storage/${testRecord.documents}`} target="_blank">
+                                                        <a href={`/storage/${testRecord.documents}`} target="_blank" rel="noreferrer">
                                                             <Download className="h-4 w-4" />
                                                         </a>
                                                     </Button>
@@ -196,53 +335,6 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                         </div>
                                     </div>
                                 )}
-
-                                {/* Timeline pengujian */}
-                                <div className="rounded-lg border p-4">
-                                    <h3 className="mb-4 text-lg font-medium">Timeline Pengujian</h3>
-                                    <div className="space-y-4">
-                                        <div className="relative pl-8">
-                                            <div className="absolute top-1.5 left-0 h-4 w-4 rounded-full bg-green-500"></div>
-                                            <div className="absolute top-5 left-2 h-full w-0.5 bg-gray-200 dark:bg-gray-700"></div>
-                                            <h4 className="font-medium">Pengajuan Diterima</h4>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(testRecord.created_at)}</p>
-                                        </div>
-
-                                        <div className="relative pl-8">
-                                            <div
-                                                className={`absolute top-1.5 left-0 h-4 w-4 rounded-full ${testRecord.status === 'pending' || testRecord.status === 'testing' || testRecord.status === 'completed' ? 'bg-green-500' : 'bg-gray-300'}`}
-                                            ></div>
-                                            <div className="absolute top-5 left-2 h-full w-0.5 bg-gray-200 dark:bg-gray-700"></div>
-                                            <h4 className="font-medium">Pengujian Dijadwalkan</h4>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(testRecord.test_date)}</p>
-                                        </div>
-
-                                        <div className="relative pl-8">
-                                            <div
-                                                className={`absolute top-1.5 left-0 h-4 w-4 rounded-full ${testRecord.status === 'testing' || testRecord.status === 'completed' ? 'bg-green-500' : 'bg-gray-300'}`}
-                                            ></div>
-                                            <div className="absolute top-5 left-2 h-full w-0.5 bg-gray-200 dark:bg-gray-700"></div>
-                                            <h4 className="font-medium">Pengujian dalam Proses</h4>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                {testRecord.status === 'testing'
-                                                    ? 'Sedang dalam proses'
-                                                    : testRecord.status === 'completed'
-                                                        ? 'Selesai'
-                                                        : 'Menunggu'}
-                                            </p>
-                                        </div>
-
-                                        <div className="relative pl-8">
-                                            <div
-                                                className={`absolute top-1.5 left-0 h-4 w-4 rounded-full ${testRecord.status === 'completed' ? 'bg-green-500' : 'bg-gray-300'}`}
-                                            ></div>
-                                            <h4 className="font-medium">Pengujian Selesai</h4>
-                                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                {testRecord.completed_at ? formatDate(testRecord.completed_at) : 'Belum selesai'}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
                             </CardContent>
                         </Card>
                     </div>
@@ -261,59 +353,51 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                     </div>
                                     <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                                         <div
-                                            className={`h-full rounded-full ${testRecord.status === 'cancelled' ? 'bg-red-500' : 'bg-blue-600'}`}
+                                            className="h-full rounded-full bg-blue-600 transition-all duration-300 ease-in-out"
                                             style={{ width: `${progressPercentage}%` }}
                                         ></div>
                                     </div>
                                 </div>
 
                                 <div className="space-y-4">
-                                    {testRecord.status === 'completed' && (
+                                    {/* Scenario 1: Completed */}
+                                    {testRecord.status === "completed" && (
                                         <div className="rounded-lg bg-green-50 p-4 dark:bg-green-900/20">
                                             <div className="mb-2 flex items-center gap-2">
                                                 <Check className="h-5 w-5 text-green-600" />
-                                                <h4 className="font-medium text-green-700 dark:text-green-400">Pengujian Selesai</h4>
+                                                <h4 className="font-medium text-green-700 dark:text-green-400">Selesai</h4>
                                             </div>
                                             <p className="text-sm text-green-700 dark:text-green-400">
-                                                Pengujian telah selesai dilakukan pada {formatDate(testRecord.completed_at)}. Hasil pengujian dapat
-                                                diunduh dari bagian dokumen.
+                                                Pengujian telah selesai dilakukan pada {formatDate(testRecord.completed_at)}. Hasil pengujian
+                                                dapat diunduh dari bagian dokumen.
                                             </p>
                                         </div>
                                     )}
 
-                                    {testRecord.status === 'testing' && (
-                                        <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
-                                            <div className="mb-2 flex items-center gap-2">
-                                                <Beaker className="h-5 w-5 text-blue-600" />
-                                                <h4 className="font-medium text-blue-700 dark:text-blue-400">Dalam Proses Pengujian</h4>
-                                            </div>
-                                            <p className="text-sm text-blue-700 dark:text-blue-400">
-                                                Pengujian sedang dalam proses. Kami akan memberi tahu Anda ketika pengujian telah selesai.
-                                            </p>
-                                        </div>
-                                    )}
-
-                                    {testRecord.status === 'pending' && (
+                                    {/* Scenario 2: Testing - Before test date (Menunggu Pengujian) */}
+                                    {testRecord.status === "testing" && new Date() < new Date(testRecord.test_date) && (
                                         <div className="rounded-lg bg-yellow-50 p-4 dark:bg-yellow-900/20">
                                             <div className="mb-2 flex items-center gap-2">
                                                 <Clock className="h-5 w-5 text-yellow-600" />
-                                                <h4 className="font-medium text-yellow-700 dark:text-yellow-400">Menunggu Jadwal</h4>
+                                                <h4 className="font-medium text-yellow-700 dark:text-yellow-400">Menunggu Pengujian</h4>
                                             </div>
                                             <p className="text-sm text-yellow-700 dark:text-yellow-400">
-                                                Pengujian telah dijadwalkan pada {formatDate(testRecord.test_date)}. Silakan mempersiapkan sampel
-                                                untuk pengujian.
+                                                Pengujian telah dijadwalkan pada {formatDate(testRecord.test_date)}. Silakan mempersiapkan
+                                                sampel untuk pengujian dan datang tepat waktu.
                                             </p>
                                         </div>
                                     )}
 
-                                    {testRecord.status === 'cancelled' && (
-                                        <div className="rounded-lg bg-red-50 p-4 dark:bg-red-900/20">
+                                    {/* Scenario 3: Testing - After test date (Memproses Hasil) */}
+                                    {testRecord.status === "testing" && new Date() >= new Date(testRecord.test_date) && (
+                                        <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
                                             <div className="mb-2 flex items-center gap-2">
-                                                <XCircle className="h-5 w-5 text-red-600" />
-                                                <h4 className="font-medium text-red-700 dark:text-red-400">Pengujian Dibatalkan</h4>
+                                                <Beaker className="h-5 w-5 text-blue-600" />
+                                                <h4 className="font-medium text-blue-700 dark:text-blue-400">Memproses Hasil</h4>
                                             </div>
-                                            <p className="text-sm text-red-700 dark:text-red-400">
-                                                Pengujian ini telah dibatalkan. Silakan hubungi admin untuk informasi lebih lanjut.
+                                            <p className="text-sm text-blue-700 dark:text-blue-400">
+                                                Pengujian sedang dalam tahap pemrosesan hasil. Kami akan memberi tahu Anda ketika hasil
+                                                pengujian telah siap.
                                             </p>
                                         </div>
                                     )}
@@ -343,7 +427,6 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                             <li>Hasil pengujian akan tersedia setelah proses selesai</li>
                                         </ul>
                                     </div>
-
                                 </div>
                             </CardContent>
                         </Card>
@@ -380,12 +463,12 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                         <div>
                                             <div className="font-medium text-gray-900 dark:text-white">Jam Operasional</div>
                                             <div className="text-gray-600 dark:text-gray-300">
-                                                Senin - Jumat<br />
+                                                Senin - Jumat
+                                                <br />
                                                 08:00 - 16:00 WIB
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </CardContent>
                         </Card>
@@ -393,5 +476,5 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                 </div>
             </div>
         </AppLayout>
-    );
+    )
 }
