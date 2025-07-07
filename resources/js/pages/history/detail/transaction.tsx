@@ -71,16 +71,15 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
 
     const handleMultiDownload = (files: string[]) => {
         files.forEach((file) => {
-            const link = document.createElement("a");
+            const link = document.createElement('a');
             link.href = `/storage/${file}`;
-            link.download = file.split("/").pop() || "download";
-            link.target = "_blank"; // optional
+            link.download = file.split('/').pop() || 'download';
+            link.target = '_blank'; // optional
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         });
     };
-
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -100,7 +99,7 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                 <Head title="Tidak Terdapat Transaksi" />
                 <div className="container mx-auto py-8">
                     <Card className="bg-white dark:bg-zinc-900">
-                        <CardContent className="p-8 text-center bg-white dark:bg-zinc-900">
+                        <CardContent className="bg-white p-8 text-center dark:bg-zinc-900">
                             <p>Data transaksi tidak ditemukan</p>
                             <Button variant="outline" className="mt-4" asChild>
                                 <Link href="/history/transactions">
@@ -122,7 +121,7 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                     {/* Main content - 2/3 width on large screens */}
                     <div className="lg:col-span-2">
-                        <Card className="gap-0 overflow-hidden p-0 bg-white dark:bg-zinc-900">
+                        <Card className="gap-0 overflow-hidden bg-white p-0 dark:bg-zinc-900">
                             <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800">
                                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
@@ -137,7 +136,7 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                 </div>
                             </CardHeader>
 
-                            <CardContent className="p-4 bg-white dark:bg-zinc-900">
+                            <CardContent className="bg-white p-4 dark:bg-zinc-900">
                                 <div className="mb-6 rounded-lg border p-4">
                                     <h3 className="mb-4 font-medium">Informasi Transaksi</h3>
                                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -164,7 +163,7 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                         <InfoItem
                                             icon={<CreditCard className="h-5 w-5 text-blue-600" />}
                                             label="Metode Pembayaran"
-                                            value={!transaction.payment_method ? "Tidak tersedia" : transaction.payment_method}
+                                            value={!transaction.payment_method ? 'Tidak tersedia' : transaction.payment_method}
                                         />
                                         <InfoItem
                                             icon={<Link2 className="h-5 w-5 text-blue-600" />}
@@ -189,11 +188,12 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                                     <FileText className="h-5 w-5 text-blue-600" />
                                                     <h4 className="font-medium">Invoice Pembayaran</h4>
                                                 </div>
-                                                <Button size="sm"
-                                                        variant="ghost"
-                                                        onClick={() => handleMultiDownload(transaction.payment_invoice_files || [])}
-                                                        >
-                                                        <Download className="h-4 w-4" />
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    onClick={() => handleMultiDownload(transaction.payment_invoice_files || [])}
+                                                >
+                                                    <Download className="h-4 w-4" />
                                                 </Button>
                                             </div>
                                             <small className="text-gray-500">Invoice pembayaran untuk transaksi ini</small>
@@ -210,7 +210,7 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                                         variant="ghost"
                                                         onClick={() => handleMultiDownload(transaction.payment_receipt_images || [])}
                                                     >
-                                                            <Download className="h-4 w-4" />
+                                                        <Download className="h-4 w-4" />
                                                     </Button>
                                                 ) : (
                                                     <span className="text-sm text-gray-400 italic">Belum tersedia</span>
@@ -218,9 +218,8 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                             </div>
                                             <small className="text-gray-500">
                                                 {transaction.payment_receipt_images
-                                                    ? "Bukti pembayaran yang telah diunggah"
-                                                    : "Bukti pembayaran belum diunggah"
-                                                }
+                                                    ? 'Bukti pembayaran yang telah diunggah'
+                                                    : 'Bukti pembayaran belum diunggah'}
                                             </small>
                                         </div>
                                     </div>
@@ -237,11 +236,11 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
 
                     {/* Sidebar - 1/3 width on large screens */}
                     <div className="lg:col-span-1">
-                        <Card className="gap-0 overflow-hidden p-0 bg-white dark:bg-zinc-900">
+                        <Card className="gap-0 overflow-hidden bg-white p-0 dark:bg-zinc-900">
                             <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800">
                                 <CardTitle className="text-lg">Status Pembayaran</CardTitle>
                             </CardHeader>
-                            <CardContent className="p-4 bg-white dark:bg-zinc-900">
+                            <CardContent className="bg-white p-4 dark:bg-zinc-900">
                                 {transaction.status === 'success' && (
                                     <div className="rounded-lg bg-green-50 p-4 dark:bg-green-900/20">
                                         <div className="mb-2 flex items-center gap-2">
@@ -304,11 +303,11 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                             </CardFooter>
                         </Card>
 
-                        <Card className="mt-6 gap-0 overflow-hidden p-0 bg-white dark:bg-zinc-900">
+                        <Card className="mt-6 gap-0 overflow-hidden bg-white p-0 dark:bg-zinc-900">
                             <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800">
                                 <CardTitle className="text-lg">Ringkasan Pembayaran</CardTitle>
                             </CardHeader>
-                            <CardContent className="p-4 bg-white dark:bg-zinc-900">
+                            <CardContent className="bg-white p-4 dark:bg-zinc-900">
                                 <div className="space-y-3">
                                     <div className="flex justify-between">
                                         <span className="text-gray-600 dark:text-gray-400">Total Biaya</span>
@@ -328,7 +327,7 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                         </Card>
 
                         <Card className="mt-6 gap-0 p-0 dark:bg-zinc-900">
-                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800 rounded-t-lg">
+                            <CardHeader className="rounded-t-lg border-b bg-slate-50 p-4 dark:bg-zinc-800">
                                 <CardTitle className="text-lg">Bantuan</CardTitle>
                             </CardHeader>
                             <CardContent className="p-4">
@@ -359,12 +358,12 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                         <div>
                                             <div className="font-medium text-gray-900 dark:text-white">Jam Operasional</div>
                                             <div className="text-gray-600 dark:text-gray-300">
-                                                Senin - Jumat<br />
+                                                Senin - Jumat
+                                                <br />
                                                 08:00 - 16:00 WIB
                                             </div>
                                         </div>
                                     </div>
-
                                 </div>
                             </CardContent>
                         </Card>

@@ -8,7 +8,7 @@ import DropdownSelect from '@/components/ui/DropdownSelect';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import type { BreadcrumbItem, LaboratorySimple, SimpleOption, Testing } from '@/types';
+import type { BreadcrumbItem, SimpleOption, Testing } from '@/types';
 import { Head } from '@inertiajs/react';
 import type { Table as TanStackTable } from '@tanstack/react-table';
 import {
@@ -35,17 +35,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Test({
-    userTestings,
-    tests,
-    packages,
-    laboratories,
-}: {
-    userTestings: Testing[];
-    tests: SimpleOption[];
-    packages: SimpleOption[];
-    laboratories: LaboratorySimple[];
-}) {
+export default function Test({ userTestings }: { userTestings: Testing[] }) {
     // Testing Table State
     const [testingSorting, setTestingSorting] = useState<SortingState>([]);
     const [testingFilters, setTestingFilters] = useState<ColumnFiltersState>([]);

@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, SubmissionSchedule, Testing, Transaction } from '@/types';
+import { type BreadcrumbItem, SubmissionSchedule, Test, Testing, Transaction } from '@/types';
 import { parseAndFormatDate } from '@/utils/date-utils';
 import { Head, Link } from '@inertiajs/react';
 import {
@@ -23,6 +23,84 @@ import {
     Users,
 } from 'lucide-react';
 import React, { useState } from 'react';
+
+// Add these types at the top of the file after imports
+// Update types at the top of the file after imports
+type ResubmissionFormData = {
+    company_name?: string;
+    project_name?: string;
+    project_address?: string;
+    name?: string;
+    program_study?: string;
+    research_title?: string;
+    personnel_count?: number;
+    supervisor?: string;
+    test_submission_date: string;
+    user_note?: string; // Make optional since it's not in SubmissionSchedule
+};
+
+// ✅ Simplified TestData type based on actual SubmissionSchedule data
+type TestData = {
+    test_id: number;
+    slug: string;
+    unit: number;
+    test: {
+        id: number;
+        name: string;
+        slug: string;
+        price: number;
+        description: string;
+        images: string[];
+        minimum_unit: number;
+        daily_slot: number;
+        is_active: boolean;
+        category_id: number;
+        laboratory_id: number;
+        created_at: string;
+        updated_at: string;
+        deleted_at: null;
+        category: {
+            id: number;
+            name: string;
+            description: null;
+            created_at: string;
+            updated_at: string;
+            deleted_at: null;
+        };
+        laboratory: {
+            id: number;
+            code: string;
+            slug: string;
+            name: string;
+            room: string;
+            description: string;
+            images: string[];
+            created_at: string;
+            updated_at: string;
+            deleted_at: null;
+        };
+    };
+};
+
+// ✅ Simplified PackageData type based on actual SubmissionSchedule data
+type PackageData = {
+    package_id: number;
+    slug: string;
+    package: {
+        id: number;
+        name: string;
+        slug: string;
+        price: number;
+        images: string[];
+        description: string;
+        laboratory_id: number;
+        created_at: string;
+        updated_at: string;
+        deleted_at: null;
+        tests: Test[];
+    };
+    quantity: number;
+};
 
 const formatDate = (dateString: string) => {
     if (!dateString) return 'Tanggal tidak valid';
@@ -73,146 +151,165 @@ export default function SubmissionDetail({
     relatedTesting: Testing[];
 }) {
     const testRecord: SubmissionSchedule = submissionHistoryDetail[0];
-    const [processing, setProcessing] = useState(false);
+    const [processing, setProcessing] = useState<boolean>(false);
 
-    console.log('Submission History Detail:', testRecord);
-
-    const uniquePackages = submissionHistoryDetail
-        .filter((record: SubmissionSchedule) => record.package_id)
-        .reduce((acc, current) => {
-            const existingPackage = acc.find((pkg) => pkg.package_id === current.package_id);
+    const uniquePackages: SubmissionSchedule[] = submissionHistoryDetail
+        .filter((record: SubmissionSchedule): boolean => Boolean(record.package_id))
+        .reduce((acc: SubmissionSchedule[], current: SubmissionSchedule): SubmissionSchedule[] => {
+            const existingPackage: SubmissionSchedule | undefined = acc.find(
+                (pkg: SubmissionSchedule): boolean => pkg.package_id === current.package_id,
+            );
             if (!existingPackage) {
                 acc.push(current);
             }
             return acc;
-        }, [] as SubmissionSchedule[]);
+        }, []);
 
-    const uniqueTests = submissionHistoryDetail
-        .filter((record: SubmissionSchedule) => record.test_id)
-        .reduce((acc, current) => {
-            const existingTest = acc.find((test) => test.test_id === current.test_id);
+    const uniqueTests: SubmissionSchedule[] = submissionHistoryDetail
+        .filter((record: SubmissionSchedule): boolean => Boolean(record.test_id))
+        .reduce((acc: SubmissionSchedule[], current: SubmissionSchedule): SubmissionSchedule[] => {
+            const existingTest: SubmissionSchedule | undefined = acc.find((test: SubmissionSchedule): boolean => test.test_id === current.test_id);
             if (!existingTest) {
                 acc.push(current);
             }
             return acc;
-        }, [] as SubmissionSchedule[]);
+        }, []);
 
-    const packageExists = uniquePackages.length > 0;
-    const testExists = uniqueTests.length > 0;
+    // ✅ Type boolean checks properly
+    const packageExists: boolean = uniquePackages.length > 0;
+    const testExists: boolean = uniqueTests.length > 0;
 
-    const cleanSubmissionData = {
-        packages: uniquePackages.map((pkg) => ({
-            package_id: pkg.package_id,
-            package_name: pkg.package_name,
-            package_price: pkg.package_price,
-            package_slug: pkg.package_slug,
-            package_images: pkg.package_images,
-        })),
-        tests: uniqueTests.map((test) => ({
-            test_id: test.test_id,
-            test_name: test.test_name,
-            test_price: test.test_price,
-            test_slug: test.test_slug,
-            test_images: test.test_images,
-            quantity: test.quantity,
-        })),
-    };
+    // Uncomment this if you want to use cleanSubmissionData for any purpose
+    // const cleanSubmissionData = {
+    //     packages: uniquePackages.map((pkg) => ({
+    //         package_id: pkg.package_id,
+    //         package_name: pkg.package_name,
+    //         package_price: pkg.package_price,
+    //         package_slug: pkg.package_slug,
+    //         package_images: pkg.package_images,
+    //     })),
+    //     tests: uniqueTests.map((test) => ({
+    //         test_id: test.test_id,
+    //         test_name: test.test_name,
+    //         test_price: test.test_price,
+    //         test_slug: test.test_slug,
+    //         test_images: test.test_images,
+    //         quantity: test.quantity,
+    //     })),
+    // };
 
-    const handleRepeatSubmission = () => {
+    const handleRepeatSubmission = (): void => {
         setProcessing(true);
 
         try {
-            const submissionType = testRecord.submission_type;
+            const submissionType: string = testRecord.submission_type;
 
+            // ✅ Prepare form data with proper typing - remove user_note since it's not in SubmissionSchedule
             if (submissionType === 'external') {
-                const externalFormData = {
+                const externalFormData: ResubmissionFormData = {
                     company_name: testRecord.company_name || '',
                     project_name: testRecord.project_name || '',
                     project_address: testRecord.project_address || '',
                     test_submission_date: testRecord.test_submission_date ? testRecord.test_submission_date.split('T')[0] : '',
-                    user_note: testRecord.user_note || '',
                 };
                 localStorage.setItem('external_form', JSON.stringify(externalFormData));
             } else if (submissionType === 'internal') {
-                const internalFormData = {
+                const internalFormData: ResubmissionFormData = {
                     name: testRecord.researcher_name || '',
                     program_study: testRecord.program_study || '',
                     research_title: testRecord.research_title || '',
                     personnel_count: testRecord.personnel_count || 1,
                     supervisor: testRecord.supervisor || '',
                     test_submission_date: testRecord.test_submission_date ? testRecord.test_submission_date.split('T')[0] : '',
-                    user_note: testRecord.user_note || '',
                 };
                 localStorage.setItem('internal_form', JSON.stringify(internalFormData));
             }
 
-            const testsData = uniqueTests.map((test) => ({
-                test_id: test.test_id,
-                slug: test.test_slug,
-                unit: test.quantity,
-                test: {
-                    id: test.test_id,
-                    name: test.test_name,
+            // ✅ Prepare tests data with type safety - only use fields that exist in SubmissionSchedule
+            const testsData: TestData[] = uniqueTests.map((test: SubmissionSchedule): TestData => {
+                // Parse images with type safety - only use test_images which exists
+                const testImages: string[] = Array.isArray(test.test_images)
+                    ? test.test_images
+                    : typeof test.test_images === 'string'
+                      ? JSON.parse(test.test_images || '["test_images/default.jpg"]')
+                      : ['test_images/default.jpg'];
+
+                // ✅ Use default laboratory images since lab_images doesn't exist in SubmissionSchedule
+                const labImages: string[] = ['laboratory_images/default.jpg'];
+
+                return {
+                    test_id: test.test_id,
                     slug: test.test_slug,
-                    price: test.test_price,
-                    description: test.test_description || '',
-                    images: Array.isArray(test.test_images) ? test.test_images : JSON.parse(test.test_images || '["test_images/default.jpg"]'),
-                    minimum_unit: 1,
-                    daily_slot: test.test_daily_slot || 10,
-                    is_active: true,
-                    category_id: test.category_id || 1,
-                    laboratory_id: test.lab_id,
-                    created_at: test.created_at,
-                    updated_at: test.updated_at,
-                    deleted_at: null,
-                    category: {
-                        id: test.category_id || 1,
-                        name: test.category_name || 'Kategori',
-                        description: null,
+                    unit: test.quantity,
+                    test: {
+                        id: test.test_id,
+                        name: test.test_name,
+                        slug: test.test_slug,
+                        price: test.test_price,
+                        description: '', // Not available in SubmissionSchedule
+                        images: testImages,
+                        minimum_unit: 1, // Default value
+                        daily_slot: 10, // Default value
+                        is_active: true, // Default value
+                        category_id: 1, // Default value - not available in SubmissionSchedule
+                        laboratory_id: test.lab_id,
                         created_at: test.created_at,
-                        updated_at: test.updated_at,
+                        updated_at: test.created_at, // Use created_at as fallback
                         deleted_at: null,
+                        category: {
+                            id: 1, // Default value
+                            name: 'Kategori', // Default value
+                            description: null,
+                            created_at: test.created_at,
+                            updated_at: test.created_at,
+                            deleted_at: null,
+                        },
+                        laboratory: {
+                            id: test.lab_id,
+                            code: test.lab_code,
+                            slug: test.lab_code?.toLowerCase() || '',
+                            name: test.lab_name,
+                            room: '', // Not available in SubmissionSchedule
+                            description: '', // Not available in SubmissionSchedule
+                            images: labImages,
+                            created_at: test.created_at,
+                            updated_at: test.created_at,
+                            deleted_at: null,
+                        },
                     },
-                    laboratory: {
-                        id: test.lab_id,
-                        code: test.lab_code,
-                        slug: test.lab_slug || test.lab_code?.toLowerCase(),
-                        name: test.lab_name,
-                        room: test.lab_room || '',
-                        description: test.lab_description || '',
-                        images: test.lab_images
-                            ? Array.isArray(test.lab_images)
-                                ? test.lab_images
-                                : JSON.parse(test.lab_images)
-                            : ['laboratory_images/default.jpg'],
-                        created_at: test.created_at,
-                        updated_at: test.updated_at,
-                        deleted_at: null,
-                    },
-                },
-            }));
+                };
+            });
 
-            const packagesData = uniquePackages.map((pkg) => ({
-                package_id: pkg.package_id,
-                slug: pkg.package_slug,
-                package: {
-                    id: pkg.package_id,
-                    name: pkg.package_name,
+            // ✅ Prepare packages data with type safety - only use fields that exist in SubmissionSchedule
+            const packagesData: PackageData[] = uniquePackages.map((pkg: SubmissionSchedule): PackageData => {
+                // Parse images with type safety
+                const packageImages: string[] = Array.isArray(pkg.package_images)
+                    ? pkg.package_images
+                    : typeof pkg.package_images === 'string'
+                      ? JSON.parse(pkg.package_images || '["package_images/default.jpg"]')
+                      : ['package_images/default.jpg'];
+
+                return {
+                    package_id: pkg.package_id,
                     slug: pkg.package_slug,
-                    price: pkg.package_price,
-                    images: Array.isArray(pkg.package_images)
-                        ? pkg.package_images
-                        : JSON.parse(pkg.package_images || '["package_images/default.jpg"]'),
-                    description: pkg.package_description || '',
-                    laboratory_id: pkg.lab_id,
-                    created_at: pkg.created_at,
-                    updated_at: pkg.updated_at,
-                    deleted_at: null,
-                    tests: [],
-                },
-                quantity: 1,
-            }));
+                    package: {
+                        id: pkg.package_id,
+                        name: pkg.package_name,
+                        slug: pkg.package_slug,
+                        price: pkg.package_price,
+                        images: packageImages,
+                        description: '', // Not available in SubmissionSchedule
+                        laboratory_id: pkg.lab_id,
+                        created_at: pkg.created_at,
+                        updated_at: pkg.created_at, // Use created_at as fallback
+                        deleted_at: null,
+                        tests: [], // Empty array for tests in package
+                    },
+                    quantity: 1, // Default quantity for packages
+                };
+            });
 
+            // ✅ Save to localStorage with type checking
             if (testsData.length > 0) {
                 localStorage.setItem('tests', JSON.stringify(testsData));
             }
@@ -221,28 +318,42 @@ export default function SubmissionDetail({
                 localStorage.setItem('packages', JSON.stringify(packagesData));
             }
 
-            const testIds = testsData.map((test) => test.test_id);
-            const packageIds = packagesData.map((pkg) => pkg.package_id);
+            // ✅ Build URL parameters with type safety
+            const testIds: number[] = testsData.map((test: TestData): number => test.test_id);
+            const packageIds: number[] = packagesData.map((pkg: PackageData): number => pkg.package_id);
 
-            const params = new URLSearchParams();
-            testIds.forEach((id) => params.append('testIds[]', id.toString()));
-            packageIds.forEach((id) => params.append('packageIds[]', id.toString()));
+            const params: URLSearchParams = new URLSearchParams();
+            testIds.forEach((id: number): void => {
+                params.append('testIds[]', id.toString());
+            });
+            packageIds.forEach((id: number): void => {
+                params.append('packageIds[]', id.toString());
+            });
 
-            const formUrl = `/orders/form?${params.toString()}`;
+            const formUrl: string = `/orders/form?${params.toString()}`;
 
-            setTimeout(() => {
+            // ✅ Debug logs with proper typing
+            console.log('=== RESUBMISSION DEBUG ===');
+            console.log('Submission Type:', submissionType);
+            console.log('Tests Data Count:', testsData.length);
+            console.log('Packages Data Count:', packagesData.length);
+            console.log('Form URL:', formUrl);
+
+            // ✅ Redirect with delay
+            setTimeout((): void => {
                 window.location.href = formUrl;
             }, 500);
-        } catch (error) {
+        } catch (error: unknown) {
             console.error('Error during resubmission:', error);
-            alert('Terjadi kesalahan saat mengajukan ulang. Silakan coba lagi.');
+
+            // Type-safe error handling
+            const errorMessage: string = error instanceof Error ? error.message : 'Terjadi kesalahan saat mengajukan ulang. Silakan coba lagi.';
+
+            alert(errorMessage);
         } finally {
             setProcessing(false);
         }
     };
-
-    console.log('Submission data for resubmission:', testRecord);
-    console.log('Clean data for resubmission:', cleanSubmissionData);
 
     const transactionStatusMap: Record<string, string> = {
         success: 'Sukses',

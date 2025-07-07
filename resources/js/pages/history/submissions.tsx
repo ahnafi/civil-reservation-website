@@ -1,29 +1,16 @@
-"use client"
+'use client';
 
-import { DatePicker } from "@/components/DatePicker"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import DropdownSelect from "@/components/ui/DropdownSelect"
-import { Input } from "@/components/ui/input"
-import SearchableSelect from "@/components/ui/SearchableSelect"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import AppLayout from "@/layouts/app-layout"
-import {
-    BreadcrumbItem,
-    LaboratorySimple,
-    User,
-    SimpleOption,
-    BaseSubmission,
-    InternalSubmission,
-    ExternalSubmission
-} from '@/types';
-import { Head, usePage } from "@inertiajs/react"
+import { DatePicker } from '@/components/DatePicker';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import DropdownSelect from '@/components/ui/DropdownSelect';
+import { Input } from '@/components/ui/input';
+import SearchableSelect from '@/components/ui/SearchableSelect';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import { BaseSubmission, BreadcrumbItem, ExternalSubmission, InternalSubmission, LaboratorySimple, SimpleOption, User } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
 import {
     type ColumnFiltersState,
     flexRender,
@@ -34,82 +21,77 @@ import {
     type SortingState,
     useReactTable,
     type VisibilityState,
-} from "@tanstack/react-table"
-import { Check, ChevronDown, FlaskConical, HardHat, X } from "lucide-react"
-import type * as React from "react"
-import { useEffect, useState } from "react"
-import { toast, ToastContainer } from "react-toastify"
+} from '@tanstack/react-table';
+import { Check, ChevronDown, FlaskConical, HardHat, X } from 'lucide-react';
+import type * as React from 'react';
+import { useEffect, useState } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
 import {
-    internalSubmissionColumnLabels,
     externalSubmissionColumnLabels,
-    internalSubmissionColumns,
     externalSubmissionColumns,
+    internalSubmissionColumnLabels,
+    internalSubmissionColumns,
     submissionStatusOptions,
-} from "./tableConfig"
+} from './tableConfig';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: "Riwayat Pengajuan",
-        href: "/history/submissions",
+        title: 'Riwayat Pengajuan',
+        href: '/history/submissions',
     },
-]
+];
 
-function isInternalSubmission(
-    submission: BaseSubmission
-): submission is InternalSubmission {
+function isInternalSubmission(submission: BaseSubmission): submission is InternalSubmission {
     return submission.submission_type === 'internal';
 }
 
-function isExternalSubmission(
-    submission: BaseSubmission
-): submission is ExternalSubmission {
+function isExternalSubmission(submission: BaseSubmission): submission is ExternalSubmission {
     return submission.submission_type === 'external';
 }
 
-
 export default function Submissions({
-                                        userSubmissions,
-                                        tests,
-                                        packages,
-                                        laboratories,
-                                    }: {
-    userSubmissions: BaseSubmission[]
-    tests: SimpleOption[]
-    packages: SimpleOption[]
-    laboratories: LaboratorySimple[]
+    userSubmissions,
+    tests,
+    packages,
+    laboratories,
+}: {
+    userSubmissions: BaseSubmission[];
+    tests: SimpleOption[];
+    packages: SimpleOption[];
+    laboratories: LaboratorySimple[];
 }) {
     // User Role
-    const { auth } = usePage<{ auth: { user: User } }>().props
-    const user = auth.user
-    const userRole = user.role
+    const { auth } = usePage<{ auth: { user: User } }>().props;
+    const user = auth.user;
+    const userRole = user.role;
 
     const internalSubmissions = userSubmissions.filter(isInternalSubmission);
     const externalSubmissions = userSubmissions.filter(isExternalSubmission);
 
     // submission types
-    const [submissionType, setSubmissionType] = useState<"internal" | "external">("internal")
+    const [submissionType, setSubmissionType] = useState<'internal' | 'external'>('internal');
 
     // Submission Table State
-    const [submissionSorting, setSubmissionSorting] = useState<SortingState>([])
-    const [submissionFilters, setSubmissionFilters] = useState<ColumnFiltersState>([])
-    const [submissionVisibility, setSubmissionVisibility] = useState<VisibilityState>({})
-    const [submissionSelection, setSubmissionSelection] = useState({})
-    const [submissionRows, setSubmissionRows] = useState<number>(10)
+    const [submissionSorting, setSubmissionSorting] = useState<SortingState>([]);
+    const [submissionFilters, setSubmissionFilters] = useState<ColumnFiltersState>([]);
+    const [submissionVisibility, setSubmissionVisibility] = useState<VisibilityState>({});
+    const [submissionSelection, setSubmissionSelection] = useState({});
+    const [submissionRows, setSubmissionRows] = useState<number>(10);
 
     // Submission Table Filter State
-    const [submissionSelectedLab, setSubmissionSelectedLab] = useState<LaboratorySimple | null>(null)
-    const [submissionSelectedTest, setSubmissionSelectedTest] = useState<SimpleOption | null>(null)
-    const [submissionSelectedStatus, setSubmissionSelectedStatus] = useState<SimpleOption | null>(null)
+    const [submissionSelectedLab, setSubmissionSelectedLab] = useState<LaboratorySimple | null>(null);
+    const [submissionSelectedTest, setSubmissionSelectedTest] = useState<SimpleOption | null>(null);
+    const [submissionSelectedStatus, setSubmissionSelectedStatus] = useState<SimpleOption | null>(null);
 
-    const [submissionInitialDate, setSubmissionInitialDate] = useState<Date | undefined>()
-    const [submissionFinalDate, setSubmissionFinalDate] = useState<Date | undefined>()
-    const [submissionFinalDateKey, setSubmissionFinalDateKey] = useState<number>(Date.now())
+    const [submissionInitialDate, setSubmissionInitialDate] = useState<Date | undefined>();
+    const [submissionFinalDate, setSubmissionFinalDate] = useState<Date | undefined>();
+    const [submissionFinalDateKey, setSubmissionFinalDateKey] = useState<number>(Date.now());
 
     // Alert State
-    const [alertMessage, setAlertMessage] = useState<string | null>(null)
+    const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
     // Merged Test and Package Options
-    const mergedTestPackage: SimpleOption[] = [...packages, ...tests]
+    const mergedTestPackage: SimpleOption[] = [...packages, ...tests];
 
     // Initial Date Select Handlers
     const handleInitialDateSelect = (
@@ -118,18 +100,18 @@ export default function Submissions({
         setFinalDate: (date: Date | undefined) => void,
         finalDate: Date | undefined,
     ) => {
-        const selected = date ?? new Date()
-        setInitialDate(selected)
+        const selected = date ?? new Date();
+        setInitialDate(selected);
 
         if (!finalDate || (date && finalDate.getTime() === selected.getTime())) {
-            setFinalDate(selected)
+            setFinalDate(selected);
         } else if (selected.getTime() > finalDate.getTime()) {
-            setAlertMessage("Tanggal awal tidak boleh lebih besar dari tanggal akhir")
-            setFinalDate(selected)
+            setAlertMessage('Tanggal awal tidak boleh lebih besar dari tanggal akhir');
+            setFinalDate(selected);
         } else {
-            setAlertMessage(null)
+            setAlertMessage(null);
         }
-    }
+    };
 
     // Final Date Select Handlers
     const handleFinalDateSelect = (
@@ -141,28 +123,28 @@ export default function Submissions({
         setFinalDateKey: (key: number) => void,
     ) => {
         if (!initialDate || !date) {
-            setFinalDate(date)
-            return
+            setFinalDate(date);
+            return;
         }
 
         if (!initialDate) {
-            setInitialDate(date)
-            setFinalDate(date)
-            setAlertMessage(null)
-            return
+            setInitialDate(date);
+            setFinalDate(date);
+            setAlertMessage(null);
+            return;
         }
 
         if (date.getTime() === initialDate.getTime()) {
-            setFinalDate(date)
+            setFinalDate(date);
         } else if (date.getTime() < initialDate.getTime()) {
-            setAlertMessage("Tanggal akhir tidak boleh lebih kecil dari tanggal awal")
-            setFinalDate(initialDate)
-            setFinalDateKey(Date.now())
+            setAlertMessage('Tanggal akhir tidak boleh lebih kecil dari tanggal awal');
+            setFinalDate(initialDate);
+            setFinalDateKey(Date.now());
         } else {
-            setFinalDate(date)
-            setAlertMessage(null)
+            setFinalDate(date);
+            setAlertMessage(null);
         }
-    }
+    };
 
     // const submissionTable = useReactTable<SubmissionWithDetails>({
     //     data: submissionType === "internal" ? internalSubmissions : externalSubmissions,
@@ -201,7 +183,7 @@ export default function Submissions({
             columnVisibility: submissionVisibility,
             rowSelection: submissionSelection,
         },
-    })
+    });
 
     const externalSubmissionTable = useReactTable<ExternalSubmission>({
         data: externalSubmissions,
@@ -220,37 +202,33 @@ export default function Submissions({
             columnVisibility: submissionVisibility,
             rowSelection: submissionSelection,
         },
-    })
+    });
 
     // Create a helper to get the current table
-    const currentTable = submissionType === "internal" && userRole === "internal" ? internalSubmissionTable : externalSubmissionTable
+    const currentTable = submissionType === 'internal' && userRole === 'internal' ? internalSubmissionTable : externalSubmissionTable;
 
     // Column Filter Update
-    const updateColumnFilter = (
-        setFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>,
-        columnId: string,
-        value: unknown,
-    ) => {
+    const updateColumnFilter = (setFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>, columnId: string, value: unknown) => {
         setFilters((prevFilters) => {
-            const otherFilters = prevFilters.filter((f) => f.id !== columnId)
-            if (value === undefined || value === null || value === "") {
-                return otherFilters
+            const otherFilters = prevFilters.filter((f) => f.id !== columnId);
+            if (value === undefined || value === null || value === '') {
+                return otherFilters;
             }
-            return [...otherFilters, { id: columnId, value }]
-        })
-    }
+            return [...otherFilters, { id: columnId, value }];
+        });
+    };
 
     // Submission Date Column Filter Effect
     useEffect(() => {
         if (submissionInitialDate) {
-            updateColumnFilter(setSubmissionFilters, "test_submission_date", {
+            updateColumnFilter(setSubmissionFilters, 'test_submission_date', {
                 start: submissionInitialDate,
                 end: submissionFinalDate ?? submissionInitialDate,
-            })
+            });
         } else {
-            updateColumnFilter(setSubmissionFilters, "test_submission_date", undefined)
+            updateColumnFilter(setSubmissionFilters, 'test_submission_date', undefined);
         }
-    }, [submissionInitialDate, submissionFinalDate])
+    }, [submissionInitialDate, submissionFinalDate]);
 
     // Reusable Column Filter Effect
     const useColumnFilterEffect = (
@@ -260,39 +238,39 @@ export default function Submissions({
     ) => {
         useEffect(() => {
             if (selectedOption?.name) {
-                updateColumnFilter(setFilters, columnId, selectedOption.name)
+                updateColumnFilter(setFilters, columnId, selectedOption.name);
             } else {
-                updateColumnFilter(setFilters, columnId, undefined)
+                updateColumnFilter(setFilters, columnId, undefined);
             }
-        }, [selectedOption, columnId, setFilters])
-    }
+        }, [selectedOption, columnId, setFilters]);
+    };
 
     // Submission Lab Column Filter Effect
     useEffect(() => {
         if (submissionSelectedLab?.name) {
-            updateColumnFilter(setSubmissionFilters, "lab_code", submissionSelectedLab.code)
+            updateColumnFilter(setSubmissionFilters, 'lab_code', submissionSelectedLab.code);
         } else {
-            updateColumnFilter(setSubmissionFilters, "lab_code", undefined)
+            updateColumnFilter(setSubmissionFilters, 'lab_code', undefined);
         }
-    }, [submissionSelectedLab])
+    }, [submissionSelectedLab]);
 
     // Submission Test Column Filter Effect
-    useColumnFilterEffect(submissionSelectedTest, setSubmissionFilters, "test_name")
+    useColumnFilterEffect(submissionSelectedTest, setSubmissionFilters, 'test_name');
 
     // Submission Status Column Filter Effect
-    useColumnFilterEffect(submissionSelectedStatus, setSubmissionFilters, "status")
+    useColumnFilterEffect(submissionSelectedStatus, setSubmissionFilters, 'status');
 
     // Remove the generic usePageSizeEffect function and replace with separate effects
 
     // Internal Submission Table Row Pagination Effect
     useEffect(() => {
-        internalSubmissionTable.setPageSize(submissionRows)
-    }, [submissionRows, internalSubmissionTable])
+        internalSubmissionTable.setPageSize(submissionRows);
+    }, [submissionRows, internalSubmissionTable]);
 
     // External Submission Table Row Pagination Effect
     useEffect(() => {
-        externalSubmissionTable.setPageSize(submissionRows)
-    }, [submissionRows, externalSubmissionTable])
+        externalSubmissionTable.setPageSize(submissionRows);
+    }, [submissionRows, externalSubmissionTable]);
 
     // Remove these lines:
     // const usePageSizeEffect = <T,>(table: TanStackTable<T>, rows: number) => {
@@ -307,20 +285,20 @@ export default function Submissions({
     useEffect(() => {
         if (alertMessage) {
             toast.error(alertMessage, {
-                position: "top-center",
+                position: 'top-center',
                 autoClose: 5000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-            })
-            setAlertMessage(null)
+            });
+            setAlertMessage(null);
         }
-    }, [alertMessage])
+    }, [alertMessage]);
 
     // Filter Dialog State
-    const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
+    const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -332,38 +310,32 @@ export default function Submissions({
                         <div className="submission col-span-full space-y-2">
                             <div className="mb-6 border-b border-zinc-200 pb-6 dark:border-zinc-800">
                                 <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">Riwayat Pengajuan</h1>
-                                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                    Kelola dan pantau riwayat pengajuan pengujian Anda
-                                </p>
+                                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Kelola dan pantau riwayat pengajuan pengujian Anda</p>
                             </div>
 
-                            {(userRole === "admin" || userRole === "internal") && (
-                                <div className="submission-type mb-4 flex justify-center items-center">
-                                    <div className="relative bg-muted rounded-lg p-1 flex">
+                            {(userRole === 'admin' || userRole === 'internal') && (
+                                <div className="submission-type mb-4 flex items-center justify-center">
+                                    <div className="bg-muted relative flex rounded-lg p-1">
                                         {/* Sliding background indicator */}
                                         <div
-                                            className={`absolute top-1 bottom-1 bg-background rounded-md shadow-sm transition-all duration-300 ease-in-out ${
-                                                submissionType === "internal" ? "left-1 right-1/2" : "left-1/2 right-1"
+                                            className={`bg-background absolute top-1 bottom-1 rounded-md shadow-sm transition-all duration-300 ease-in-out ${
+                                                submissionType === 'internal' ? 'right-1/2 left-1' : 'right-1 left-1/2'
                                             }`}
                                         />
 
                                         {/* Buttons */}
                                         <button
-                                            onClick={() => setSubmissionType("internal")}
-                                            className={`relative z-10 px-6 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                                                submissionType === "internal"
-                                                    ? "text-foreground"
-                                                    : "text-muted-foreground hover:text-foreground"
+                                            onClick={() => setSubmissionType('internal')}
+                                            className={`relative z-10 rounded-md px-6 py-2 text-sm font-medium transition-colors duration-200 ${
+                                                submissionType === 'internal' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
                                             }`}
                                         >
                                             Pengajuan Internal
                                         </button>
                                         <button
-                                            onClick={() => setSubmissionType("external")}
-                                            className={`relative z-10 px-6 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                                                submissionType === "external"
-                                                    ? "text-foreground"
-                                                    : "text-muted-foreground hover:text-foreground"
+                                            onClick={() => setSubmissionType('external')}
+                                            className={`relative z-10 rounded-md px-6 py-2 text-sm font-medium transition-colors duration-200 ${
+                                                submissionType === 'external' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
                                             }`}
                                         >
                                             Pengajuan Eksternal
@@ -444,9 +416,9 @@ export default function Submissions({
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                setSubmissionInitialDate(undefined)
-                                                setSubmissionFinalDate(undefined)
-                                                setSubmissionFilters((prev) => prev.filter((f) => f.id !== "test_submission_date"))
+                                                setSubmissionInitialDate(undefined);
+                                                setSubmissionFinalDate(undefined);
+                                                setSubmissionFilters((prev) => prev.filter((f) => f.id !== 'test_submission_date'));
                                             }}
                                             className="text-muted-foreground hover:text-foreground mt-1 flex items-center gap-1"
                                         >
@@ -542,9 +514,9 @@ export default function Submissions({
                                                     <button
                                                         type="button"
                                                         onClick={() => {
-                                                            setSubmissionInitialDate(undefined)
-                                                            setSubmissionFinalDate(undefined)
-                                                            setSubmissionFilters((prev) => prev.filter((f) => f.id !== "test_submission_date"))
+                                                            setSubmissionInitialDate(undefined);
+                                                            setSubmissionFinalDate(undefined);
+                                                            setSubmissionFilters((prev) => prev.filter((f) => f.id !== 'test_submission_date'));
                                                         }}
                                                         className="text-muted-foreground hover:text-foreground mt-1 flex items-center gap-1"
                                                     >
@@ -564,8 +536,8 @@ export default function Submissions({
                                         <div className="code-search flex flex-col">
                                             <Input
                                                 placeholder="Cari Kode Pengajuan..."
-                                                value={(currentTable.getColumn("code")?.getFilterValue() as string) ?? ""}
-                                                onChange={(e) => currentTable.getColumn("code")?.setFilterValue(e.target.value)}
+                                                value={(currentTable.getColumn('code')?.getFilterValue() as string) ?? ''}
+                                                onChange={(e) => currentTable.getColumn('code')?.setFilterValue(e.target.value)}
                                                 className="small-font-size w-full rounded-md border border-zinc-300 bg-white py-2 text-zinc-900 placeholder-zinc-500 shadow-sm focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-400 dark:focus:ring-blue-400"
                                             />
                                         </div>
@@ -582,9 +554,9 @@ export default function Submissions({
                                                         .filter((column) => column.getCanHide())
                                                         .map((column) => {
                                                             const columnLabels =
-                                                                submissionType === "internal" && userRole === "internal"
+                                                                submissionType === 'internal' && userRole === 'internal'
                                                                     ? internalSubmissionColumnLabels
-                                                                    : externalSubmissionColumnLabels
+                                                                    : externalSubmissionColumnLabels;
                                                             return (
                                                                 <DropdownMenuCheckboxItem
                                                                     key={column.id}
@@ -594,7 +566,7 @@ export default function Submissions({
                                                                 >
                                                                     {columnLabels[column.id] ?? column.id}
                                                                 </DropdownMenuCheckboxItem>
-                                                            )
+                                                            );
                                                         })}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -635,39 +607,41 @@ export default function Submissions({
                                                                         ? null
                                                                         : flexRender(header.column.columnDef.header, header.getContext())}
                                                                 </TableHead>
-                                                            )
+                                                            );
                                                         })}
                                                     </TableRow>
                                                 ))}
                                             </TableHeader>
                                             <TableBody>
-                                                {submissionType === "internal" && userRole === "internal" ? (
-                                                    internalSubmissionTable.getRowModel().rows.map((row, index) => (
-                                                        <TableRow
-                                                            key={row.id}
-                                                            className={index % 2 === 0 ? "bg-white dark:bg-zinc-900" : "bg-gray-50 dark:bg-zinc-800/30"}
-                                                        >
-                                                            {row.getVisibleCells().map((cell) => (
-                                                                <TableCell key={cell.id}>
-                                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                                </TableCell>
-                                                            ))}
-                                                        </TableRow>
-                                                    ))
-                                                ) : (
-                                                    externalSubmissionTable.getRowModel().rows.map((row, index) => (
-                                                        <TableRow
-                                                            key={row.id}
-                                                            className={index % 2 === 0 ? "bg-white dark:bg-zinc-900" : "bg-gray-50 dark:bg-zinc-800/30"}
-                                                        >
-                                                            {row.getVisibleCells().map((cell) => (
-                                                                <TableCell key={cell.id}>
-                                                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                                                </TableCell>
-                                                            ))}
-                                                        </TableRow>
-                                                    ))
-                                                )}
+                                                {submissionType === 'internal' && userRole === 'internal'
+                                                    ? internalSubmissionTable.getRowModel().rows.map((row, index) => (
+                                                          <TableRow
+                                                              key={row.id}
+                                                              className={
+                                                                  index % 2 === 0 ? 'bg-white dark:bg-zinc-900' : 'bg-gray-50 dark:bg-zinc-800/30'
+                                                              }
+                                                          >
+                                                              {row.getVisibleCells().map((cell) => (
+                                                                  <TableCell key={cell.id}>
+                                                                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                                  </TableCell>
+                                                              ))}
+                                                          </TableRow>
+                                                      ))
+                                                    : externalSubmissionTable.getRowModel().rows.map((row, index) => (
+                                                          <TableRow
+                                                              key={row.id}
+                                                              className={
+                                                                  index % 2 === 0 ? 'bg-white dark:bg-zinc-900' : 'bg-gray-50 dark:bg-zinc-800/30'
+                                                              }
+                                                          >
+                                                              {row.getVisibleCells().map((cell) => (
+                                                                  <TableCell key={cell.id}>
+                                                                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                                                  </TableCell>
+                                                              ))}
+                                                          </TableRow>
+                                                      ))}
                                             </TableBody>
                                         </Table>
                                     </div>
@@ -702,5 +676,5 @@ export default function Submissions({
 
             <ToastContainer />
         </AppLayout>
-    )
+    );
 }

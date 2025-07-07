@@ -193,7 +193,7 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
     const removeFile = () => {
         setData('payment_receipt', null);
         setImagePreview(null);
-        form.setValue('payment_receipt', undefined, { shouldValidate: true });
+        form.resetField('payment_receipt');
 
         const input = document.getElementById('payment-proof') as HTMLInputElement;
         if (input) input.value = '';
@@ -206,13 +206,13 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
         // Submit with Inertia
         post(route('submit-payment'), {
             onSuccess: () => {
-            setIsSuccess(true);
-            reset();
-            setImagePreview(null);
-            form.reset();
+                setIsSuccess(true);
+                reset();
+                setImagePreview(null);
+                form.reset();
             },
             onError: (errors) => {
-            console.error('Payment submission errors:', errors);
+                console.error('Payment submission errors:', errors);
             },
         });
     };
@@ -512,7 +512,10 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
                                                                                     onChange(e.target.files);
                                                                                     handleFileSelect(e.target.files);
                                                                                 }}
-                                                                                {...rest}
+                                                                                name={rest.name}
+                                                                                onBlur={rest.onBlur}
+                                                                                disabled={rest.disabled}
+                                                                                ref={rest.ref}
                                                                             />
                                                                             <Label htmlFor="payment-proof" className="cursor-pointer text-center">
                                                                                 <Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
@@ -530,7 +533,7 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
                                                                             {/* Image Preview */}
                                                                             <div className="relative rounded-lg border-2 border-gray-200 dark:border-gray-600">
                                                                                 <img
-                                                                                    src={imagePreview || "/placeholder.svg"}
+                                                                                    src={imagePreview || '/placeholder.svg'}
                                                                                     alt="Preview bukti pembayaran"
                                                                                     className="h-64 w-full rounded-lg object-cover"
                                                                                 />
@@ -542,9 +545,7 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
                                                                                     <X className="h-4 w-4" />
                                                                                 </button>
                                                                             </div>
-
-                                                                            {/* Upload another file */}
-                                                                            <div className="text-center">
+                                                                            <div>
                                                                                 <Input
                                                                                     type="file"
                                                                                     accept=".jpg,.jpeg,.png"
@@ -554,6 +555,10 @@ export default function Payment({ transactionDetail }: { transactionDetail: Tran
                                                                                         onChange(e.target.files);
                                                                                         handleFileSelect(e.target.files);
                                                                                     }}
+                                                                                    name={rest.name}
+                                                                                    onBlur={rest.onBlur}
+                                                                                    disabled={rest.disabled}
+                                                                                    ref={rest.ref}
                                                                                 />
                                                                                 <Label htmlFor="payment-proof-replace">
                                                                                     <Button type="button" variant="outline" size="sm">

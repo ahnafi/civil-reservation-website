@@ -154,7 +154,7 @@ export default function ReservationForm() {
         user_note: '',
     });
 
-    const { data, setData, post, processing, errors, reset } = useForm<SubmissionData>({
+    const { setData, post, processing, errors, reset } = useForm<SubmissionData>({
         submission_type: submissionType,
         test_submission_date: undefined,
         user_note: '',
@@ -186,7 +186,7 @@ export default function ReservationForm() {
                     parsedForm.test_submission_date = new Date(Number(year), Number(month) - 1, Number(day));
                 }
                 setExternalForm(parsedForm);
-            } catch (error) {
+            } catch {
                 localStorage.removeItem('external_form');
             }
         }
@@ -199,7 +199,7 @@ export default function ReservationForm() {
                     parsedForm.test_submission_date = new Date(Number(year), Number(month) - 1, Number(day));
                 }
                 setInternalForm(parsedForm);
-            } catch (error) {
+            } catch {
                 localStorage.removeItem('internal_form');
             }
         }
@@ -305,14 +305,13 @@ export default function ReservationForm() {
         setShowConfirmDialog(false);
 
         post(route('createSubmission'), {
-            onSuccess: (page) => {
+            onSuccess: () => {
                 reset();
                 localStorage.removeItem('tests');
                 localStorage.removeItem('packages');
                 localStorage.removeItem('external_form');
                 localStorage.removeItem('internal_form');
             },
-            onError: (errors) => {},
         });
     };
 

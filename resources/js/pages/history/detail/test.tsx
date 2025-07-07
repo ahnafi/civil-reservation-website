@@ -2,11 +2,34 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Testing } from '@/types';
+import { type BreadcrumbItem } from '@/types';
 import { parseAndFormatDate } from '@/utils/date-utils';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Beaker, Calendar, Check, ClipboardCheck, Clock, Download, Edit, FileText, Info, Link2, Star, XCircle } from 'lucide-react';
 import React, { useState } from 'react';
+
+type ReviewTesting = {
+    id: number;
+    code: string;
+    status: string;
+    note?: string | null;
+    documents?: string[] | null;
+    test_date: string;
+    completed_at?: string | null;
+    submission_id: number;
+    submission_code: string;
+    created_at: string;
+    updated_at: string;
+    deleted_at?: string | null;
+    reviews?: {
+        id: number;
+        rating: number;
+        content: string;
+        created_at: string;
+        updated_at: string;
+    } | null;
+    links?: unknown;
+};
 
 // Format date helper
 const formatDate = (dateString: string | null | undefined) => {
@@ -66,9 +89,9 @@ const InfoItem = ({ icon, label, value }: { icon: React.ReactNode; label: string
     );
 };
 
-export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: Testing[] }) {
+export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: ReviewTesting[] }) {
     // Get the first test record
-    const testRecord: Testing = testHistoryDetail[0];
+    const testRecord: ReviewTesting = testHistoryDetail[0];
 
     // Review form state
     const [showReviewForm, setShowReviewForm] = useState(false);
@@ -334,7 +357,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: T
                                                                 <Star
                                                                     key={star}
                                                                     className={`h-5 w-5 ${
-                                                                        star <= testRecord.reviews.rating
+                                                                        star <= (testRecord.reviews?.rating || 0)
                                                                             ? 'fill-yellow-400 text-yellow-400'
                                                                             : 'text-gray-300'
                                                                     }`}
