@@ -28,6 +28,7 @@ import {
     Users,
 } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
+import axios from 'axios';
 
 // Types
 type User = {
@@ -104,6 +105,67 @@ export default function ReservationForm() {
     const [submissionType, setSubmissionType] = useState<'external' | 'internal'>(
         user.role === 'admin' ? 'external' : (user.role as 'external' | 'internal'),
     );
+    const [unavailableDates, setUnavailableDates] = useState<string[]>([]);
+    const [loadingAvailability, setLoadingAvailability] = useState(false);
+
+    const checkAvailability = async () => {
+        const tests = JSON.parse(localStorage.getItem('tests') || '[]');
+        const packages = JSON.parse(localStorage.getItem('packages') || '[]');
+
+        if (tests.length === 0 && packages.length === 0) {
+            return;
+        }
+
+        setLoadingAvailability(true);
+
+        try {
+            // Set date range untuk 3 bulan ke depan
+            const today = new Date();
+            const threeMonthsFromNow = new Date();
+            threeMonthsFromNow.setMonth(today.getMonth() + 3);
+
+            const response = await axios.post(route('booking.checkAvailability'), {
+                test_ids: tests.map((test: SimplifiedTest) => test.test_id),
+                package_ids: packages.map((pkg: SimplifiedPackage) => pkg.package_id),
+                start_date: today.toISOString().split('T')[0],
+                end_date: threeMonthsFromNow.toISOString().split('T')[0],
+            });
+
+            if (response.data.success) {
+                const unavailableDateStrings = response.data.unavailable_dates.map(
+                    (item: { date: string; unavailable_tests: string[] }) => item.date,
+                );
+                setUnavailableDates(unavailableDateStrings);
+            }
+        } catch (error) {
+            console.error('Error checking availability:', error);
+        } finally {
+            setLoadingAvailability(false);
+        }
+    };
+
+    // Check availability when component mounts or cart changes
+    useEffect(() => {
+        checkAvailability();
+    }, []); // Run once on mount
+
+    // Function untuk check apakah tanggal disabled
+    const isDateDisabled = (date: Date): boolean => {
+        const today = new Date();
+        const threeMonthsFromNow = new Date();
+        threeMonthsFromNow.setMonth(today.getMonth() + 3);
+
+        // Disable jika tanggal di masa lalu atau lebih dari 3 bulan
+        if (date < today || date > threeMonthsFromNow) {
+            return true;
+        }
+
+        // Disable jika tanggal tidak tersedia
+        const dateString = date.toISOString().split('T')[0];
+        return unavailableDates.includes(dateString);
+    };
+
+    console.log('Unavailable dates:', unavailableDates);
 
     const [externalForm, setExternalForm] = useState<ExternalForm>({
         company_name: '',
@@ -494,6 +556,12 @@ export default function ReservationForm() {
                                                         className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
                                                     >
                                                         Tanggal Pengajuan *
+                                                        {loadingAvailability && (
+                                                            <span className="ml-2 text-xs text-blue-600">
+                                                                <div className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-blue-600 border-t-transparent"></div>
+                                                                Mengecek ketersediaan...
+                                                            </span>
+                                                        )}
                                                     </label>
                                                     <Popover>
                                                         <PopoverTrigger asChild>
@@ -504,7 +572,7 @@ export default function ReservationForm() {
                                                                     'h-12 w-full justify-start pl-4 text-left font-normal',
                                                                     !externalForm.test_submission_date && 'text-muted-foreground',
                                                                 )}
-                                                                disabled={processing}
+                                                                disabled={processing || loadingAvailability}
                                                             >
                                                                 <CalendarIcon className="mr-3 h-4 w-4" />
                                                                 {externalForm.test_submission_date ? (
@@ -519,12 +587,7 @@ export default function ReservationForm() {
                                                                 mode="single"
                                                                 onSelect={(date) => handleExternalFormChange('test_submission_date', date)}
                                                                 selected={externalForm.test_submission_date}
-                                                                disabled={(date) => {
-                                                                    const today = new Date();
-                                                                    const threeMonthsFromNow = new Date();
-                                                                    threeMonthsFromNow.setMonth(today.getMonth() + 3);
-                                                                    return date < today || date > threeMonthsFromNow;
-                                                                }}
+                                                                disabled={isDateDisabled}
                                                             />
                                                         </PopoverContent>
                                                     </Popover>
@@ -705,60 +768,53 @@ export default function ReservationForm() {
                                             </div>
 
                                             {/* Schedule Section for Internal */}
-                                            <div className="space-y-6">
-                                                <div className="flex items-center space-x-2">
-                                                    <Clock className="h-5 w-5 text-green-600" />
-                                                    <h3 className="text-lg font-semibold">Jadwal Penelitian</h3>
-                                                </div>
-                                                <Separator />
-
-                                                <div className="space-y-2">
-                                                    <label
-                                                        htmlFor="test_submission_date_internal"
-                                                        className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
-                                                    >
-                                                        Tanggal Pengajuan *
-                                                    </label>
-                                                    <Popover>
-                                                        <PopoverTrigger asChild>
-                                                            <Button
-                                                                id="test_submission_date_internal"
-                                                                variant={'outline'}
-                                                                className={cn(
-                                                                    'h-12 w-full justify-start pl-4 text-left font-normal',
-                                                                    !internalForm.test_submission_date && 'text-muted-foreground',
-                                                                )}
-                                                                disabled={processing}
-                                                            >
-                                                                <CalendarIcon className="mr-3 h-4 w-4" />
-                                                                {internalForm.test_submission_date ? (
-                                                                    formatDate(internalForm.test_submission_date)
-                                                                ) : (
-                                                                    <span>Pilih Tanggal Pengajuan</span>
-                                                                )}
-                                                            </Button>
-                                                        </PopoverTrigger>
-                                                        <PopoverContent className="w-auto p-0" align="start">
-                                                            <Calendar
-                                                                mode="single"
-                                                                onSelect={(date) => handleInternalFormChange('test_submission_date', date)}
-                                                                selected={internalForm.test_submission_date}
-                                                                disabled={(date) => {
-                                                                    const today = new Date();
-                                                                    const sixMonthsFromNow = new Date();
-                                                                    sixMonthsFromNow.setMonth(today.getMonth() + 6);
-                                                                    return date < today || date > sixMonthsFromNow;
-                                                                }}
-                                                            />
-                                                        </PopoverContent>
-                                                    </Popover>
-                                                    {errors.test_submission_date && (
-                                                        <p className="flex items-center text-sm text-red-500">
-                                                            <span className="mr-1">⚠</span>
-                                                            {errors.test_submission_date}
-                                                        </p>
+                                            <div className="space-y-2">
+                                                <label
+                                                    htmlFor="test_submission_date_internal"
+                                                    className="block text-sm font-semibold text-gray-700 dark:text-gray-300"
+                                                >
+                                                    Tanggal Pengajuan *
+                                                    {loadingAvailability && (
+                                                        <span className="ml-2 text-xs text-blue-600">
+                                                            <div className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-blue-600 border-t-transparent"></div>
+                                                            Mengecek ketersediaan...
+                                                        </span>
                                                     )}
-                                                </div>
+                                                </label>
+                                                <Popover>
+                                                    <PopoverTrigger asChild>
+                                                        <Button
+                                                            id="test_submission_date_internal"
+                                                            variant={'outline'}
+                                                            className={cn(
+                                                                'h-12 w-full justify-start pl-4 text-left font-normal',
+                                                                !internalForm.test_submission_date && 'text-muted-foreground',
+                                                            )}
+                                                            disabled={processing || loadingAvailability}
+                                                        >
+                                                            <CalendarIcon className="mr-3 h-4 w-4" />
+                                                            {internalForm.test_submission_date ? (
+                                                                formatDate(internalForm.test_submission_date)
+                                                            ) : (
+                                                                <span>Pilih Tanggal Pengajuan</span>
+                                                            )}
+                                                        </Button>
+                                                    </PopoverTrigger>
+                                                    <PopoverContent className="w-auto p-0" align="start">
+                                                        <Calendar
+                                                            mode="single"
+                                                            onSelect={(date) => handleInternalFormChange('test_submission_date', date)}
+                                                            selected={internalForm.test_submission_date}
+                                                            disabled={isDateDisabled}
+                                                        />
+                                                    </PopoverContent>
+                                                </Popover>
+                                                {errors.test_submission_date && (
+                                                    <p className="flex items-center text-sm text-red-500">
+                                                        <span className="mr-1">⚠</span>
+                                                        {errors.test_submission_date}
+                                                    </p>
+                                                )}
                                             </div>
 
                                             {/* Additional Notes for Internal */}

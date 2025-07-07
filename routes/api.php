@@ -9,6 +9,7 @@ use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TestController;
 use App\Mail\ContactFormMail;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\BookingController;
 
 // API Routes
 // Team Routes
@@ -37,3 +38,9 @@ Route::get("labs/{laboratory:slug}", [LaboratoryController::class, "apiDetail"])
 
 // Contact Form Route
 Route::post("contact", [ContactController::class, "send"])->name("contact.send");
+
+// Check Availability Route
+
+Route::post('/booking/check-availability', [BookingController::class, 'checkAvailability'])
+    ->name('booking.checkAvailability')
+    ->middleware(['auth']);
