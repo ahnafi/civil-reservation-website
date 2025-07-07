@@ -10,7 +10,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { DatePicker } from '@/components/DatePicker';
 import SearchableSelect from '@/components/ui/SearchableSelect';
-import { type BreadcrumbItem, SimpleOption, testForSchedule, scheduleForSchedule } from '@/types';
+import { type BreadcrumbItem, SimpleOption, testForSchedule, scheduleForSchedule, LaboratorySimple } from '@/types';
 import { Head } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
@@ -21,7 +21,10 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Schedule({ tests }: { tests: SimpleOption[] }) {
+export default function Schedule({ tests, laboratories }: {
+    tests: SimpleOption[],
+    laboratories: LaboratorySimple[]
+}) {
     const [selectedTest, setSelectedTest] = useState<SimpleOption | null>(null);
     const [testData, setTestData] = useState<testForSchedule | null>(null);
     const [schedules, setSchedules] = useState<scheduleForSchedule[] | null>(null);
@@ -324,48 +327,60 @@ export default function Schedule({ tests }: { tests: SimpleOption[] }) {
                             </div>
 
                             <div className="p-6">
-                                <div className="schedule-list space-y-4">
+                                <div className="space-y-6">
                                     {schedules
-                                        .filter((schedule) => isWithinDateRange(new Date(schedule.date), initialDate, finalDate))
+                                        .filter(schedule =>
+                                            isWithinDateRange(new Date(schedule.date), initialDate, finalDate)
+                                        )
                                         .map((schedule: scheduleForSchedule) => (
-                                            <div key={schedule.id} className="schedule-item bg-gray-50 dark:bg-zinc-800 rounded-lg border border-gray-200 dark:border-zinc-700 overflow-hidden">
-                                                {/* Schedule Date Header */}
-                                                <div className="bg-gray-100 dark:bg-zinc-700 px-4 py-3 border-b border-gray-200 dark:border-zinc-600">
-                                                    <div className="text-md font-semibold text-gray-800 dark:text-zinc-200">
+                                            <div
+                                                key={schedule.id}
+                                                className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-gray-200 dark:border-zinc-700 transition hover:shadow-md"
+                                            >
+                                                {/* Header */}
+                                                <div className="bg-gray-100 dark:bg-zinc-800 px-6 py-4 rounded-t-2xl border-b border-gray-200 dark:border-zinc-700">
+                                                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
                                                         {new Date(schedule.date).toLocaleDateString('id-ID', {
                                                             year: 'numeric',
                                                             month: 'long',
                                                             day: 'numeric',
-                                                            weekday: 'long'
+                                                            weekday: 'long',
                                                         })}
-                                                    </div>
+                                                    </h3>
                                                 </div>
 
-                                                {/* Schedule Details */}
-                                                <div className="p-4">
+                                                {/* Body */}
+                                                <div className="px-6 py-5">
                                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                                        <div className="flex flex-col items-center p-3 bg-white dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-600">
-                                                            <span className="text-sm text-gray-500 dark:text-zinc-400 mb-1">Slot Tersedia</span>
-                                                            <span className="text-xl font-bold text-green-600 dark:text-green-400">{schedule.available_slots}</span>
+                                                        {/* Available Slot */}
+                                                        <div className="flex flex-col items-center bg-gray-50 dark:bg-zinc-800 p-4 rounded-xl border border-gray-200 dark:border-zinc-700">
+                                                            <span className="text-sm text-gray-500 dark:text-zinc-400">Slot Tersedia</span>
+                                                            <span className="text-2xl font-bold text-green-600 dark:text-green-400">{schedule.available_slots}</span>
                                                         </div>
-                                                        <div className="flex flex-col items-center p-3 bg-white dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-600">
-                                                            <span className="text-sm text-gray-500 dark:text-zinc-400 mb-1">Slot Terambil</span>
-                                                            <span className="text-xl font-bold text-blue-600 dark:text-blue-400">{schedule.approved_count}</span>
+
+                                                        {/* Approved Count */}
+                                                        <div className="flex flex-col items-center bg-gray-50 dark:bg-zinc-800 p-4 rounded-xl border border-gray-200 dark:border-zinc-700">
+                                                            <span className="text-sm text-gray-500 dark:text-zinc-400">Slot Terambil</span>
+                                                            <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">{schedule.approved_count}</span>
                                                         </div>
-                                                        <div className="flex flex-col items-center p-3 bg-white dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-600">
-                                                            <span className="text-sm text-gray-500 dark:text-zinc-400 mb-1">Pengajuan Pending</span>
-                                                            <span className="text-xl font-bold text-amber-600 dark:text-amber-400">{schedule.pending_count}</span>
+
+                                                        {/* Pending Count */}
+                                                        <div className="flex flex-col items-center bg-gray-50 dark:bg-zinc-800 p-4 rounded-xl border border-gray-200 dark:border-zinc-700">
+                                                            <span className="text-sm text-gray-500 dark:text-zinc-400">Pengajuan Pending</span>
+                                                            <span className="text-2xl font-bold text-amber-600 dark:text-amber-400">{schedule.pending_count}</span>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         ))}
 
-                                    {/* Empty Schedule State */}
-                                    {schedules.filter(s => isWithinDateRange(new Date(s.date), initialDate, finalDate)).length === 0 && (
-                                        <div className="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-zinc-400">
-                                            <Calendar size={36} className="text-gray-300 dark:text-zinc-600 mb-2" />
-                                            <p>Tidak ada jadwal dalam rentang tanggal yang dipilih</p>
+                                    {/* Empty state */}
+                                    {schedules.filter(s =>
+                                        isWithinDateRange(new Date(s.date), initialDate, finalDate)
+                                    ).length === 0 && (
+                                        <div className="flex flex-col items-center justify-center py-10 text-gray-500 dark:text-zinc-400">
+                                            <Calendar size={40} className="mb-3 text-gray-300 dark:text-zinc-600" />
+                                            <p className="text-base">Tidak ada jadwal dalam rentang tanggal yang dipilih</p>
                                         </div>
                                     )}
                                 </div>
