@@ -12,14 +12,18 @@ export default function AuthCardLayout({
     title?: string;
     description?: string;
 }>) {
+    //dark:bg-zinc-900
+
+    //dark:bg-black
+
     return (
-        <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
+        <div className="bg-muted flex min-h-svh dark:bg-black flex-col items-center justify-center gap-6 p-6 md:p-10">
             <div className="flex w-full max-w-md flex-col gap-6">
                 <Link href={route('home')} className="flex items-center gap-2 self-center font-medium">
                     <LaboratoryLogo/>
                 </Link>
                 <div className="flex flex-col gap-6">
-                    <Card className="rounded-xl">
+                    <Card className="rounded-x dark:bg-zinc-900">
                         <CardHeader className="px-4 md:px-8 pt-4 text-center">
                             <CardTitle className="text-xl">{title}</CardTitle>
                             <CardDescription>{description}</CardDescription>
