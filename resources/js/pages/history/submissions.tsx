@@ -2,6 +2,7 @@
 
 import { DatePicker } from "@/components/DatePicker"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import {
     DropdownMenu,
@@ -14,15 +15,15 @@ import { Input } from "@/components/ui/input"
 import SearchableSelect from "@/components/ui/SearchableSelect"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import AppLayout from "@/layouts/app-layout"
-import {
+import type {
     BreadcrumbItem,
     LaboratorySimple,
     User,
     SimpleOption,
     BaseSubmission,
     InternalSubmission,
-    ExternalSubmission
-} from '@/types';
+    ExternalSubmission,
+} from "@/types"
 import { Head, usePage } from "@inertiajs/react"
 import {
     type ColumnFiltersState,
@@ -35,7 +36,7 @@ import {
     useReactTable,
     type VisibilityState,
 } from "@tanstack/react-table"
-import { Check, ChevronDown, FlaskConical, HardHat, X } from "lucide-react"
+import { Check, CheckCircle, ChevronDown, Clock, FlaskConical, HardHat, X, XCircle } from "lucide-react"
 import type * as React from "react"
 import { useEffect, useState } from "react"
 import { toast, ToastContainer } from "react-toastify"
@@ -54,18 +55,19 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ]
 
-function isInternalSubmission(
-    submission: BaseSubmission
-): submission is InternalSubmission {
-    return submission.submission_type === 'internal';
+const submissionStatusMap: Record<string, string> = {
+    submitted: "Diajukan",
+    approved: "Disetujui",
+    rejected: "Ditolak",
 }
 
-function isExternalSubmission(
-    submission: BaseSubmission
-): submission is ExternalSubmission {
-    return submission.submission_type === 'external';
+function isInternalSubmission(submission: BaseSubmission): submission is InternalSubmission {
+    return submission.submission_type === "internal"
 }
 
+function isExternalSubmission(submission: BaseSubmission): submission is ExternalSubmission {
+    return submission.submission_type === "external"
+}
 
 export default function Submissions({
                                         userSubmissions,
@@ -83,8 +85,27 @@ export default function Submissions({
     const user = auth.user
     const userRole = user.role
 
-    const internalSubmissions = userSubmissions.filter(isInternalSubmission);
-    const externalSubmissions = userSubmissions.filter(isExternalSubmission);
+    const internalSubmissions = userSubmissions.filter(isInternalSubmission)
+    const externalSubmissions = userSubmissions.filter(isExternalSubmission)
+
+    // Calculate status counts
+    const getStatusCounts = () => {
+        const counts = {
+            submitted: 0,
+            approved: 0,
+            rejected: 0,
+        }
+
+        userSubmissions.forEach((submission) => {
+            if (submission.status in counts) {
+                counts[submission.status as keyof typeof counts]++
+            }
+        })
+
+        return counts
+    }
+
+    const statusCounts = getStatusCounts()
 
     // submission types
     const [submissionType, setSubmissionType] = useState<"internal" | "external">("internal")
@@ -164,25 +185,6 @@ export default function Submissions({
         }
     }
 
-    // const submissionTable = useReactTable<SubmissionWithDetails>({
-    //     data: submissionType === "internal" ? internalSubmissions : externalSubmissions,
-    //     columns: submissionType === "internal" ? internalSubmissionColumns : externalSubmissionColumns,
-    //     onSortingChange: setSubmissionSorting,
-    //     onColumnFiltersChange: setSubmissionFilters,
-    //     getCoreRowModel: getCoreRowModel(),
-    //     getPaginationRowModel: getPaginationRowModel(),
-    //     getSortedRowModel: getSortedRowModel(),
-    //     getFilteredRowModel: getFilteredRowModel(),
-    //     onColumnVisibilityChange: setSubmissionVisibility,
-    //     onRowSelectionChange: setSubmissionSelection,
-    //     state: {
-    //         sorting: submissionSorting,
-    //         columnFilters: submissionFilters,
-    //         columnVisibility: submissionVisibility,
-    //         rowSelection: submissionSelection,
-    //     },
-    // })
-
     // Replace the single submissionTable with separate instances
     const internalSubmissionTable = useReactTable<InternalSubmission>({
         data: internalSubmissions,
@@ -223,7 +225,8 @@ export default function Submissions({
     })
 
     // Create a helper to get the current table
-    const currentTable = submissionType === "internal" && userRole === "internal" ? internalSubmissionTable : externalSubmissionTable
+    const currentTable =
+        submissionType === "internal" && userRole === "internal" ? internalSubmissionTable : externalSubmissionTable
 
     // Column Filter Update
     const updateColumnFilter = (
@@ -282,8 +285,6 @@ export default function Submissions({
     // Submission Status Column Filter Effect
     useColumnFilterEffect(submissionSelectedStatus, setSubmissionFilters, "status")
 
-    // Remove the generic usePageSizeEffect function and replace with separate effects
-
     // Internal Submission Table Row Pagination Effect
     useEffect(() => {
         internalSubmissionTable.setPageSize(submissionRows)
@@ -293,15 +294,6 @@ export default function Submissions({
     useEffect(() => {
         externalSubmissionTable.setPageSize(submissionRows)
     }, [submissionRows, externalSubmissionTable])
-
-    // Remove these lines:
-    // const usePageSizeEffect = <T,>(table: TanStackTable<T>, rows: number) => {
-    //   useEffect(() => {
-    //     table.setPageSize(rows)
-    //   }, [rows, table])
-    // }
-
-    // usePageSizeEffect(currentTable, submissionRows)
 
     // Alert Message
     useEffect(() => {
@@ -335,6 +327,53 @@ export default function Submissions({
                                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
                                     Kelola dan pantau riwayat pengajuan pengujian Anda
                                 </p>
+                            </div>
+
+                            {/* Status Count Card Summary */}
+                            <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+                                {/* Submitted Count Card */}
+                                <Card className="border-l-4 border-l-yellow-500 bg-white dark:bg-zinc-900">
+                                    <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                                        <CardTitle className="text-base font-medium text-gray-600 dark:text-gray-400">
+                                            {submissionStatusMap.submitted}
+                                        </CardTitle>
+                                        <Clock className="h-4 w-4 text-yellow-500" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                                            {statusCounts.submitted}
+                                        </div>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">Pengajuan yang sedang diproses</p>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Approved Count Card */}
+                                <Card className="border-l-4 border-l-green-500 bg-white dark:bg-zinc-900">
+                                    <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                                        <CardTitle className="text-base font-medium text-gray-600 dark:text-gray-400">
+                                            {submissionStatusMap.approved}
+                                        </CardTitle>
+                                        <CheckCircle className="h-4 w-4 text-green-500" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">{statusCounts.approved}</div>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">Pengajuan yang telah disetujui</p>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Rejected Count Card */}
+                                <Card className="border-l-4 border-l-red-500 bg-white dark:bg-zinc-900">
+                                    <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                                        <CardTitle className="text-base font-medium text-gray-600 dark:text-gray-400">
+                                            {submissionStatusMap.rejected}
+                                        </CardTitle>
+                                        <XCircle className="h-4 w-4 text-red-500" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-2xl font-bold text-red-600 dark:text-red-400">{statusCounts.rejected}</div>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">Pengajuan yang ditolak</p>
+                                    </CardContent>
+                                </Card>
                             </div>
 
                             {(userRole === "admin" || userRole === "internal") && (
@@ -641,11 +680,13 @@ export default function Submissions({
                                                 ))}
                                             </TableHeader>
                                             <TableBody>
-                                                {submissionType === "internal" && userRole === "internal" ? (
-                                                    internalSubmissionTable.getRowModel().rows.map((row, index) => (
+                                                {submissionType === "internal" && userRole === "internal"
+                                                    ? internalSubmissionTable.getRowModel().rows.map((row, index) => (
                                                         <TableRow
                                                             key={row.id}
-                                                            className={index % 2 === 0 ? "bg-white dark:bg-zinc-900" : "bg-gray-50 dark:bg-zinc-800/30"}
+                                                            className={
+                                                                index % 2 === 0 ? "bg-white dark:bg-zinc-900" : "bg-gray-50 dark:bg-zinc-800/30"
+                                                            }
                                                         >
                                                             {row.getVisibleCells().map((cell) => (
                                                                 <TableCell key={cell.id}>
@@ -654,11 +695,12 @@ export default function Submissions({
                                                             ))}
                                                         </TableRow>
                                                     ))
-                                                ) : (
-                                                    externalSubmissionTable.getRowModel().rows.map((row, index) => (
+                                                    : externalSubmissionTable.getRowModel().rows.map((row, index) => (
                                                         <TableRow
                                                             key={row.id}
-                                                            className={index % 2 === 0 ? "bg-white dark:bg-zinc-900" : "bg-gray-50 dark:bg-zinc-800/30"}
+                                                            className={
+                                                                index % 2 === 0 ? "bg-white dark:bg-zinc-900" : "bg-gray-50 dark:bg-zinc-800/30"
+                                                            }
                                                         >
                                                             {row.getVisibleCells().map((cell) => (
                                                                 <TableCell key={cell.id}>
@@ -666,8 +708,7 @@ export default function Submissions({
                                                                 </TableCell>
                                                             ))}
                                                         </TableRow>
-                                                    ))
-                                                )}
+                                                    ))}
                                             </TableBody>
                                         </Table>
                                     </div>
