@@ -5,7 +5,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { parseAndFormatDate } from '@/utils/date-utils';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, Beaker, Calendar, Check, ClipboardCheck, Clock, Download, Edit, FileText, Info, Link2, Star, XCircle } from 'lucide-react';
+import { ArrowLeft, Beaker, Calendar, Check, ClipboardCheck, Clock, Download, Edit, FileText, Info, Link2, Star } from 'lucide-react';
 import React, { useState } from 'react';
 
 type ReviewTesting = {
@@ -33,108 +33,100 @@ type ReviewTesting = {
 
 // Format date helper
 const formatDate = (dateString: string | null | undefined) => {
-    if (!dateString) return "-"
+    if (!dateString) return '-';
     try {
-        return parseAndFormatDate(new Date(dateString))
+        return parseAndFormatDate(new Date(dateString));
     } catch (error) {
-        return `Format tanggal tidak valid: ${error}`
+        return `Format tanggal tidak valid: ${error}`;
     }
-}
+};
 
 // Get display status and color based on status and test_date (same logic as datatable)
 const getStatusDisplay = (status: string, testDate: string) => {
-    const testDateObj = new Date(testDate)
-    const now = new Date()
+    const testDateObj = new Date(testDate);
+    const now = new Date();
 
-    if (status === "completed") {
+    if (status === 'completed') {
         return {
-            displayStatus: "Selesai",
-            colorClasses: "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
+            displayStatus: 'Selesai',
+            colorClasses: 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400',
             icon: <Check className="h-4 w-4" />,
-        }
-    } else if (status === "testing") {
+        };
+    } else if (status === 'testing') {
         if (now < testDateObj) {
             return {
-                displayStatus: "Menunggu Pengujian",
-                colorClasses: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
+                displayStatus: 'Menunggu Pengujian',
+                colorClasses: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400',
                 icon: <Clock className="h-4 w-4" />,
-            }
+            };
         } else {
             return {
-                displayStatus: "Memproses Hasil",
-                colorClasses: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
+                displayStatus: 'Memproses Hasil',
+                colorClasses: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
                 icon: <Beaker className="h-4 w-4" />,
-            }
+            };
         }
     }
 
     // Default fallback
     return {
-        displayStatus: "Tidak Diketahui",
-        colorClasses: "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400",
+        displayStatus: 'Tidak Diketahui',
+        colorClasses: 'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400',
         icon: <Info className="h-4 w-4" />,
-    }
-}
+    };
+};
 
 // Status badge component with updated logic
 const StatusBadge = ({ status, testDate }: { status: string; testDate: string }) => {
-    const { displayStatus, colorClasses, icon } = getStatusDisplay(status, testDate)
+    const { displayStatus, colorClasses, icon } = getStatusDisplay(status, testDate);
 
     return (
-        <div
-            className={`small-font-size inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 font-medium ${colorClasses}`}
-        >
+        <div className={`small-font-size inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 font-medium ${colorClasses}`}>
             {icon}
             {displayStatus}
         </div>
-    )
-}
+    );
+};
 
 // Info item component
-const InfoItem = ({
-                      icon,
-                      label,
-                      value,
-                  }: { icon: React.ReactNode; label: string; value: string | React.ReactNode }) => {
+const InfoItem = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string | React.ReactNode }) => {
     return (
         <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-900/20">
-                {icon}
-            </div>
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-900/20">{icon}</div>
             <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
                 <p className="font-medium">{value}</p>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: ReviewTesting[] }) {
     // Get the first test record
     const testRecord: ReviewTesting = testHistoryDetail[0];
 
     // Review form state
-    const [showReviewForm, setShowReviewForm] = useState(false)
-    const [editMode, setEditMode] = useState(false)
-    const [reviewSuccess, setReviewSuccess] = useState(false)
+    const [showReviewForm, setShowReviewForm] = useState(false);
+    const [editMode, setEditMode] = useState(false);
+    const [reviewSuccess, setReviewSuccess] = useState(false);
 
     // Inertia form for review submission
     const { data, setData, post, put, processing, errors, reset } = useForm({
         rating: testRecord?.reviews?.rating || 0,
-        content: testRecord?.reviews?.content || "",
+        content: testRecord?.reviews?.content || '',
         testing_id: testRecord?.id || 0,
-    })
+    });
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: "Pengujian",
-            href: "/history/testings",
+            title: 'Pengujian',
+            href: '/history/testings',
         },
         {
-            title: `${testRecord?.code || "Unknown"}`,
-            href: `/history/testings/${testRecord?.code || "unknown"}`,
+            title: `${testRecord?.code || 'Unknown'}`,
+            href: `/history/testings/${testRecord?.code || 'unknown'}`,
         },
-    ]
+    ];
 
     // Update form data when editing existing review
     const initializeEditForm = () => {
@@ -143,91 +135,91 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                 rating: testRecord.reviews.rating,
                 content: testRecord.reviews.content,
                 testing_id: testRecord.id,
-            })
+            });
         }
-        setEditMode(true)
-        setShowReviewForm(true)
-    }
+        setEditMode(true);
+        setShowReviewForm(true);
+    };
 
     // Handle review submission (create or update)
     const handleReviewSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
+        e.preventDefault();
 
         if (data.rating === 0) {
-            alert("Silakan berikan rating untuk pengujian ini")
-            return
+            alert('Silakan berikan rating untuk pengujian ini');
+            return;
         }
 
-        if (data.content.trim() === "") {
-            alert("Silakan berikan komentar tentang pengujian ini")
-            return
+        if (data.content.trim() === '') {
+            alert('Silakan berikan komentar tentang pengujian ini');
+            return;
         }
 
         if (editMode && testRecord.reviews) {
             // Update existing review
             put(`/reviews/${testRecord.reviews.id}`, {
                 onSuccess: () => {
-                    setReviewSuccess(true)
-                    setShowReviewForm(false)
-                    setEditMode(false)
+                    setReviewSuccess(true);
+                    setShowReviewForm(false);
+                    setEditMode(false);
                     setTimeout(() => {
-                        window.location.reload()
-                    }, 1500)
+                        window.location.reload();
+                    }, 1500);
                 },
                 onError: (errors) => {
-                    console.error("Review update errors:", errors)
+                    console.error('Review update errors:', errors);
                     if (errors.message) {
-                        alert(errors.message)
+                        alert(errors.message);
                     } else {
-                        alert("Terjadi kesalahan saat memperbarui review")
+                        alert('Terjadi kesalahan saat memperbarui review');
                     }
                 },
-            })
+            });
         } else {
             // Create new review
-            post("/reviews", {
+            post('/reviews', {
                 onSuccess: () => {
-                    setReviewSuccess(true)
-                    setShowReviewForm(false)
-                    reset()
+                    setReviewSuccess(true);
+                    setShowReviewForm(false);
+                    reset();
                     setTimeout(() => {
-                        window.location.reload()
-                    }, 1500)
+                        window.location.reload();
+                    }, 1500);
                 },
                 onError: (errors) => {
-                    console.error("Review submission errors:", errors)
+                    console.error('Review submission errors:', errors);
                     if (errors.message) {
-                        alert(errors.message)
+                        alert(errors.message);
                     } else {
-                        alert("Terjadi kesalahan saat mengirim review")
+                        alert('Terjadi kesalahan saat mengirim review');
                     }
                 },
-            })
+            });
         }
-    }
+    };
 
     // Handle star rating
     const handleStarClick = (rating: number) => {
-        setData("rating", rating)
-    }
+        setData('rating', rating);
+    };
 
     // Reset form and states
     const resetForm = () => {
-        setShowReviewForm(false)
-        setEditMode(false)
+        setShowReviewForm(false);
+        setEditMode(false);
         if (testRecord.reviews) {
             setData({
                 rating: testRecord.reviews.rating,
                 content: testRecord.reviews.content,
                 testing_id: testRecord.id,
-            })
+            });
         } else {
-            setData({ rating: 0, content: "", testing_id: testRecord.id })
+            setData({ rating: 0, content: '', testing_id: testRecord.id });
         }
-    }
+    };
 
     // Check if testing is completed
-    const isTestingCompleted = testRecord?.status === "completed" && testRecord?.completed_at
+    const isTestingCompleted = testRecord?.status === 'completed' && testRecord?.completed_at;
 
     // If no data, show a message
     if (!testRecord) {
@@ -248,45 +240,44 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                     </Card>
                 </div>
             </AppLayout>
-        )
+        );
     }
 
     // Calculate test progress based on status and test_date
     const getProgressPercentage = (status: string, testDate: string) => {
-        const testDateObj = new Date(testDate)
-        const now = new Date()
+        const testDateObj = new Date(testDate);
+        const now = new Date();
 
-        if (status === "completed") {
-            return 100
-        } else if (status === "testing") {
+        if (status === 'completed') {
+            return 100;
+        } else if (status === 'testing') {
             if (now < testDateObj) {
-                return 25 // Menunggu Pengujian
+                return 25; // Menunggu Pengujian
             } else {
-                return 75 // Memproses Hasil
+                return 75; // Memproses Hasil
             }
         }
-        return 0 // Default
-    }
+        return 0; // Default
+    };
 
-    const progressPercentage = getProgressPercentage(testRecord.status, testRecord.test_date)
-    const { displayStatus } = getStatusDisplay(testRecord.status, testRecord.test_date)
+    const progressPercentage = getProgressPercentage(testRecord.status, testRecord.test_date);
 
     // Get timeline step status
     const getTimelineStepStatus = (stepIndex: number, status: string, testDate: string) => {
-        const testDateObj = new Date(testDate)
-        const now = new Date()
+        const testDateObj = new Date(testDate);
+        const now = new Date();
 
-        if (status === "completed") {
-            return stepIndex <= 3 // All steps completed
-        } else if (status === "testing") {
+        if (status === 'completed') {
+            return stepIndex <= 3; // All steps completed
+        } else if (status === 'testing') {
             if (now < testDateObj) {
-                return stepIndex <= 1 // Up to "Pengujian Dijadwalkan"
+                return stepIndex <= 1; // Up to "Pengujian Dijadwalkan"
             } else {
-                return stepIndex <= 2 // Up to "Pengujian dalam Proses"
+                return stepIndex <= 2; // Up to "Pengujian dalam Proses"
             }
         }
-        return stepIndex <= 0 // Only first step
-    }
+        return stepIndex <= 0; // Only first step
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -310,7 +301,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                                 </div>
                             </CardHeader>
 
-                            <CardContent className="p-4 bg-white dark:bg-zinc-900">
+                            <CardContent className="bg-white p-4 dark:bg-zinc-900">
                                 <div className="mb-6 rounded-lg border p-4">
                                     <h3 className="mb-4 text-lg font-medium">Informasi Pengujian</h3>
                                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -327,7 +318,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                                         <InfoItem
                                             icon={<Clock className="h-5 w-5 text-blue-600" />}
                                             label="Tanggal Selesai"
-                                            value={formatDate(testRecord.completed_at) || "Belum selesai"}
+                                            value={formatDate(testRecord.completed_at) || 'Belum selesai'}
                                         />
                                         <InfoItem
                                             icon={<Link2 className="h-5 w-5 text-blue-600" />}
@@ -352,7 +343,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                                 )}
 
                                 {/* Timeline pengujian - Improved stepper look */}
-                                <div className="rounded-lg border mb-6 p-4">
+                                <div className="mb-6 rounded-lg border p-4">
                                     <h3 className="mb-6 text-lg font-medium">Timeline Pengujian</h3>
                                     <div className="space-y-6">
                                         {/* Step 1: Pengajuan Diterima */}
@@ -364,7 +355,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                                                 <h4 className="font-semibold text-gray-900 dark:text-white">Pengajuan Diterima</h4>
                                                 <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(testRecord.created_at)}</p>
                                             </div>
-                                            <div className="absolute left-5 top-10 h-6 w-0.5 bg-gray-300 dark:bg-gray-600"></div>
+                                            <div className="absolute top-10 left-5 h-6 w-0.5 bg-gray-300 dark:bg-gray-600"></div>
                                         </div>
 
                                         {/* Step 2: Pengujian Dijadwalkan */}
@@ -372,8 +363,8 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                                             <div
                                                 className={`flex h-10 w-10 items-center justify-center rounded-full shadow-lg ${
                                                     getTimelineStepStatus(1, testRecord.status, testRecord.test_date)
-                                                        ? "bg-green-500 text-white"
-                                                        : "bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-400"
+                                                        ? 'bg-green-500 text-white'
+                                                        : 'bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-400'
                                                 }`}
                                             >
                                                 <Calendar className="h-5 w-5" />
@@ -382,7 +373,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                                                 <h4 className="font-semibold text-gray-900 dark:text-white">Pengujian Dijadwalkan</h4>
                                                 <p className="text-sm text-gray-500 dark:text-gray-400">{formatDate(testRecord.test_date)}</p>
                                             </div>
-                                            <div className="absolute left-5 top-10 h-6 w-0.5 bg-gray-300 dark:bg-gray-600"></div>
+                                            <div className="absolute top-10 left-5 h-6 w-0.5 bg-gray-300 dark:bg-gray-600"></div>
                                         </div>
 
                                         {/* Step 3: Pengujian dalam Proses */}
@@ -390,8 +381,8 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                                             <div
                                                 className={`flex h-10 w-10 items-center justify-center rounded-full shadow-lg ${
                                                     getTimelineStepStatus(2, testRecord.status, testRecord.test_date)
-                                                        ? "bg-green-500 text-white"
-                                                        : "bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-400"
+                                                        ? 'bg-green-500 text-white'
+                                                        : 'bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-400'
                                                 }`}
                                             >
                                                 <Beaker className="h-5 w-5" />
@@ -399,14 +390,14 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                                             <div className="ml-4 flex-1">
                                                 <h4 className="font-semibold text-gray-900 dark:text-white">Pengujian dalam Proses</h4>
                                                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                    {testRecord.status === "testing" && new Date() >= new Date(testRecord.test_date)
-                                                        ? "Sedang dalam proses"
-                                                        : testRecord.status === "completed"
-                                                            ? "Selesai diproses"
-                                                            : "Menunggu jadwal pengujian"}
+                                                    {testRecord.status === 'testing' && new Date() >= new Date(testRecord.test_date)
+                                                        ? 'Sedang dalam proses'
+                                                        : testRecord.status === 'completed'
+                                                          ? 'Selesai diproses'
+                                                          : 'Menunggu jadwal pengujian'}
                                                 </p>
                                             </div>
-                                            <div className="absolute left-5 top-10 h-6 w-0.5 bg-gray-300 dark:bg-gray-600"></div>
+                                            <div className="absolute top-10 left-5 h-6 w-0.5 bg-gray-300 dark:bg-gray-600"></div>
                                         </div>
 
                                         {/* Step 4: Pengujian Selesai */}
@@ -414,8 +405,8 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                                             <div
                                                 className={`flex h-10 w-10 items-center justify-center rounded-full shadow-lg ${
                                                     getTimelineStepStatus(3, testRecord.status, testRecord.test_date)
-                                                        ? "bg-green-500 text-white"
-                                                        : "bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-400"
+                                                        ? 'bg-green-500 text-white'
+                                                        : 'bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-400'
                                                 }`}
                                             >
                                                 <ClipboardCheck className="h-5 w-5" />
@@ -423,7 +414,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                                             <div className="ml-4 flex-1">
                                                 <h4 className="font-semibold text-gray-900 dark:text-white">Pengujian Selesai</h4>
                                                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                    {testRecord.completed_at ? formatDate(testRecord.completed_at) : "Belum selesai"}
+                                                    {testRecord.completed_at ? formatDate(testRecord.completed_at) : 'Belum selesai'}
                                                 </p>
                                             </div>
                                         </div>
@@ -503,14 +494,12 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                                                 </div>
                                                 <p className="mb-3 text-gray-700 dark:text-gray-300">{testRecord.reviews.content}</p>
                                                 <div className="flex items-center justify-between">
-                                                    <p className="text-xs text-gray-500">
-                                                        Dikirim pada {formatDate(testRecord.reviews.created_at)}
-                                                    </p>
+                                                    <p className="text-xs text-gray-500">Dikirim pada {formatDate(testRecord.reviews.created_at)}</p>
                                                     <Button
                                                         variant="outline"
                                                         size="sm"
                                                         onClick={initializeEditForm}
-                                                        className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 bg-transparent"
+                                                        className="inline-flex items-center gap-2 bg-transparent text-blue-600 hover:text-blue-700"
                                                     >
                                                         <Edit className="h-4 w-4" />
                                                         Edit Review
@@ -536,7 +525,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                                                     <form onSubmit={handleReviewSubmit} className="space-y-4">
                                                         <div className="mb-3 flex items-center justify-between">
                                                             <h4 className="text-md font-medium">
-                                                                {editMode ? "Edit Review Anda" : "Berikan Review"}
+                                                                {editMode ? 'Edit Review Anda' : 'Berikan Review'}
                                                             </h4>
                                                             {editMode && (
                                                                 <div className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
@@ -560,8 +549,8 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                                                                         <Star
                                                                             className={`h-8 w-8 ${
                                                                                 star <= data.rating
-                                                                                    ? "fill-yellow-400 text-yellow-400"
-                                                                                    : "text-gray-300 hover:text-yellow-200"
+                                                                                    ? 'fill-yellow-400 text-yellow-400'
+                                                                                    : 'text-gray-300 hover:text-yellow-200'
                                                                             }`}
                                                                         />
                                                                     </button>
@@ -577,7 +566,7 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                                                             </label>
                                                             <Textarea
                                                                 value={data.content}
-                                                                onChange={(e) => setData("content", e.target.value)}
+                                                                onChange={(e) => setData('content', e.target.value)}
                                                                 placeholder="Bagikan pengalaman Anda tentang layanan pengujian ini..."
                                                                 className="min-h-[100px]"
                                                                 maxLength={1000}
@@ -591,12 +580,12 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                                                                 {processing ? (
                                                                     <>
                                                                         <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                                                                        {editMode ? "Memperbarui..." : "Mengirim..."}
+                                                                        {editMode ? 'Memperbarui...' : 'Mengirim...'}
                                                                     </>
                                                                 ) : editMode ? (
-                                                                    "Perbarui Review"
+                                                                    'Perbarui Review'
                                                                 ) : (
-                                                                    "Kirim Review"
+                                                                    'Kirim Review'
                                                                 )}
                                                             </Button>
                                                             <Button type="button" variant="outline" onClick={resetForm} disabled={processing}>
@@ -617,8 +606,8 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                                                     <Check className="h-5 w-5 text-green-600" />
                                                     <p className="text-green-700 dark:text-green-400">
                                                         {editMode
-                                                            ? "Review berhasil diperbarui. Terima kasih atas feedback Anda!"
-                                                            : "Review berhasil dikirim. Terima kasih atas feedback Anda!"}
+                                                            ? 'Review berhasil diperbarui. Terima kasih atas feedback Anda!'
+                                                            : 'Review berhasil dikirim. Terima kasih atas feedback Anda!'}
                                                     </p>
                                                 </div>
                                             </div>
@@ -647,11 +636,11 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
 
                     {/* Sidebar - 1/3 width on large screens */}
                     <div className="lg:col-span-1">
-                        <Card className="gap-0 overflow-hidden p-0 bg-white dark:bg-zinc-900">
+                        <Card className="gap-0 overflow-hidden bg-white p-0 dark:bg-zinc-900">
                             <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800">
                                 <CardTitle className="text-lg">Status Pengujian</CardTitle>
                             </CardHeader>
-                            <CardContent className="p-4 bg-white dark:bg-zinc-900">
+                            <CardContent className="bg-white p-4 dark:bg-zinc-900">
                                 <div className="mb-4 space-y-2">
                                     <div className="flex justify-between">
                                         <span className="text-sm font-medium">Progres</span>
@@ -667,43 +656,43 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
 
                                 <div className="space-y-4">
                                     {/* Scenario 1: Completed */}
-                                    {testRecord.status === "completed" && (
+                                    {testRecord.status === 'completed' && (
                                         <div className="rounded-lg bg-green-50 p-4 dark:bg-green-900/20">
                                             <div className="mb-2 flex items-center gap-2">
                                                 <Check className="h-5 w-5 text-green-600" />
                                                 <h4 className="font-medium text-green-700 dark:text-green-400">Selesai</h4>
                                             </div>
                                             <p className="text-sm text-green-700 dark:text-green-400">
-                                                Pengujian telah selesai dilakukan pada {formatDate(testRecord.completed_at)}. Hasil pengujian
-                                                dapat diunduh dari bagian dokumen.
+                                                Pengujian telah selesai dilakukan pada {formatDate(testRecord.completed_at)}. Hasil pengujian dapat
+                                                diunduh dari bagian dokumen.
                                             </p>
                                         </div>
                                     )}
 
                                     {/* Scenario 2: Testing - Before test date (Menunggu Pengujian) */}
-                                    {testRecord.status === "testing" && new Date() < new Date(testRecord.test_date) && (
+                                    {testRecord.status === 'testing' && new Date() < new Date(testRecord.test_date) && (
                                         <div className="rounded-lg bg-yellow-50 p-4 dark:bg-yellow-900/20">
                                             <div className="mb-2 flex items-center gap-2">
                                                 <Clock className="h-5 w-5 text-yellow-600" />
                                                 <h4 className="font-medium text-yellow-700 dark:text-yellow-400">Menunggu Pengujian</h4>
                                             </div>
                                             <p className="text-sm text-yellow-700 dark:text-yellow-400">
-                                                Pengujian telah dijadwalkan pada {formatDate(testRecord.test_date)}. Silakan mempersiapkan
-                                                sampel untuk pengujian dan datang tepat waktu.
+                                                Pengujian telah dijadwalkan pada {formatDate(testRecord.test_date)}. Silakan mempersiapkan sampel
+                                                untuk pengujian dan datang tepat waktu.
                                             </p>
                                         </div>
                                     )}
 
                                     {/* Scenario 3: Testing - After test date (Memproses Hasil) */}
-                                    {testRecord.status === "testing" && new Date() >= new Date(testRecord.test_date) && (
+                                    {testRecord.status === 'testing' && new Date() >= new Date(testRecord.test_date) && (
                                         <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20">
                                             <div className="mb-2 flex items-center gap-2">
                                                 <Beaker className="h-5 w-5 text-blue-600" />
                                                 <h4 className="font-medium text-blue-700 dark:text-blue-400">Memproses Hasil</h4>
                                             </div>
                                             <p className="text-sm text-blue-700 dark:text-blue-400">
-                                                Pengujian sedang dalam tahap pemrosesan hasil. Kami akan memberi tahu Anda ketika hasil
-                                                pengujian telah siap.
+                                                Pengujian sedang dalam tahap pemrosesan hasil. Kami akan memberi tahu Anda ketika hasil pengujian
+                                                telah siap.
                                             </p>
                                         </div>
                                     )}
@@ -784,5 +773,5 @@ export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: R
                 </div>
             </div>
         </AppLayout>
-    )
+    );
 }

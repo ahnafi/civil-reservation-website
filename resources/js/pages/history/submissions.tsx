@@ -65,27 +65,8 @@ export default function Submissions({
     const user = auth.user;
     const userRole = user.role;
 
-    const internalSubmissions = userSubmissions.filter(isInternalSubmission)
-    const externalSubmissions = userSubmissions.filter(isExternalSubmission)
-
-    // Calculate status counts
-    const getStatusCounts = () => {
-        const counts = {
-            submitted: 0,
-            approved: 0,
-            rejected: 0,
-        }
-
-        userSubmissions.forEach((submission) => {
-            if (submission.status in counts) {
-                counts[submission.status as keyof typeof counts]++
-            }
-        })
-
-        return counts
-    }
-
-    const statusCounts = getStatusCounts()
+    const internalSubmissions = userSubmissions.filter(isInternalSubmission);
+    const externalSubmissions = userSubmissions.filter(isExternalSubmission);
 
     // submission types
     const [submissionType, setSubmissionType] = useState<'internal' | 'external'>('internal');

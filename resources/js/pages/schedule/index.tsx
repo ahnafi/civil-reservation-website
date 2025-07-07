@@ -19,10 +19,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Schedule({ tests, laboratories }: {
-    tests: SimpleOption[],
-    laboratories: LaboratorySimple[]
-}) {
+export default function Schedule({ tests }: { tests: SimpleOption[] }) {
     const [selectedTest, setSelectedTest] = useState<SimpleOption | null>(null);
     const [testData, setTestData] = useState<testForSchedule | null>(null);
     const [schedules, setSchedules] = useState<scheduleForSchedule[] | null>(null);
@@ -179,7 +176,7 @@ export default function Schedule({ tests, laboratories }: {
 
                         {/* Date Range Picker */}
                         <div className="date-range-picker">
-                            <label className="mb-2 block flex items-center font-medium text-gray-700 dark:text-zinc-300">
+                            <label className="mb-2 flex items-center font-medium text-gray-700 dark:text-zinc-300">
                                 <Calendar className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
                                 Rentang Tanggal
                             </label>
@@ -321,9 +318,7 @@ export default function Schedule({ tests, laboratories }: {
                             <div className="p-6">
                                 <div className="space-y-6">
                                     {schedules
-                                        .filter(schedule =>
-                                            isWithinDateRange(new Date(schedule.date), initialDate, finalDate)
-                                        )
+                                        .filter((schedule) => isWithinDateRange(new Date(schedule.date), initialDate, finalDate))
                                         .map((schedule: scheduleForSchedule) => (
                                             <div
                                                 key={schedule.id}
@@ -337,9 +332,8 @@ export default function Schedule({ tests, laboratories }: {
                                                             month: 'long',
                                                             day: 'numeric',
                                                             weekday: 'long',
-                                                            weekday: 'long',
                                                         })}
-                                                    </h3>
+                                                    </div>
                                                 </div>
 
                                                 {/* Schedule Details */}
