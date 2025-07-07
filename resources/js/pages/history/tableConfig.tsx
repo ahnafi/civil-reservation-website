@@ -11,6 +11,7 @@ import type {
 import { formatDate, parseISODate } from "@/utils/date-utils"
 import { Link } from "@inertiajs/react"
 import type { ColumnDef } from "@tanstack/react-table"
+import { ExternalLink } from "lucide-react"
 import { ArrowUpDown, Download } from "lucide-react"
 
 // Submission Column Labels
@@ -44,12 +45,24 @@ export const submissionStatusOptions: SimpleOption[] = [
     { id: 3, name: "Submitted" },
 ]
 
+const submissionStatusMap: Record<string, string> = {
+    submitted: "Diajukan",
+    approved: "Disetujui",
+    rejected: "Ditolak",
+};
+
 // Transaction Status Options
 export const transactionStatusOptions: SimpleOption[] = [
     { id: 1, name: "Pending" },
     { id: 2, name: "Success" },
     { id: 3, name: "Failed" },
 ]
+
+const transactionStatusMap: Record<string, string> = {
+    pending: "Menunggu",
+    success: "Berhasil",
+    failed: "Gagal",
+};
 
 // Testing Status Options
 export const testingStatusOptions: SimpleOption[] = [
@@ -179,7 +192,9 @@ export const externalSubmissionColumns: ColumnDef<ExternalSubmission>[] = [
           <span
               className={`text-white items-center rounded-lg px-3 py-1.5 text-center text-sm font-medium capitalize shadow-sm ${statusColor}`}
           >
-            {row.getValue("status")}
+            {
+                submissionStatusMap[row.getValue("status") as string]
+            }
           </span>
                 </div>
             )
@@ -192,9 +207,10 @@ export const externalSubmissionColumns: ColumnDef<ExternalSubmission>[] = [
             <div className="flex justify-center">
                 <Link
                     href={`/history/submission/${row.original.code}`}
-                    className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-colors shadow-sm"
+                    className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-colors shadow-sm"
                 >
-                    Lihat Detail
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Lihat Detail</span>
                 </Link>
             </div>
         ),
@@ -304,7 +320,9 @@ export const internalSubmissionColumns: ColumnDef<InternalSubmission>[] = [
           <span
               className={`text-white items-center rounded-lg px-3 py-1.5 text-center text-sm font-medium capitalize shadow-sm ${statusColor}`}
           >
-            {row.getValue("status")}
+            {
+               submissionStatusMap[row.getValue("status") as string]
+            }
           </span>
                 </div>
             )
@@ -317,9 +335,10 @@ export const internalSubmissionColumns: ColumnDef<InternalSubmission>[] = [
             <div className="flex justify-center">
                 <Link
                     href={`/history/submission/${row.original.code}`}
-                    className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-colors shadow-sm"
+                    className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-colors shadow-sm"
                 >
-                    Lihat Detail
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Lihat Detail</span>
                 </Link>
             </div>
         ),
@@ -432,7 +451,9 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
                     <div
                         className={`text-white items-center rounded-lg px-3 py-1.5 text-center text-sm font-medium capitalize shadow-sm ${statusColor}`}
                     >
-                        {status}
+                        {
+                            transactionStatusMap[status]
+                        }
                     </div>
                 </div>
             )
@@ -445,9 +466,10 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
             <div className="flex justify-center">
                 <Link
                     href={`/history/transaction/${row.original.code}`}
-                    className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-colors shadow-sm"
+                    className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-colors shadow-sm"
                 >
-                    Lihat Detail
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Lihat Detail</span>
                 </Link>
             </div>
         ),
@@ -475,7 +497,7 @@ export const testingColumns: ColumnDef<Testing>[] = [
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 className="flex w-[5rem] justify-center text-center"
             >
-                Tanggal
+                Tanggal Pengujian
                 <ArrowUpDown />
             </Button>
         ),
@@ -503,23 +525,36 @@ export const testingColumns: ColumnDef<Testing>[] = [
         accessorKey: "status",
         header: () => <div className="text-center">Status Pengujian</div>,
         cell: ({ row }) => {
-            const status = row.getValue("status") as string
-            const statusColor =
-                status === "testing"
-                    ? "bg-yellow-600 dark:bg-yellow-700"
-                    : status === "completed"
-                        ? "bg-green-600 dark:bg-green-700"
-                        : "bg-red-600 dark:bg-red-700"
+            const rawStatus = row.getValue("status") as string;
+            const rawTestDate = row.getValue("test_date") as string;
+            const testDate = new Date(rawTestDate);
+            const now = new Date();
+
+            let displayStatus = "";
+            let statusColor = "";
+
+            if (rawStatus === "completed") {
+                displayStatus = "Selesai";
+                statusColor = "bg-green-600 dark:bg-green-700";
+            } else if (rawStatus === "testing") {
+                if (now < testDate) {
+                    displayStatus = "Menunggu Pengujian";
+                    statusColor = "bg-yellow-600 dark:bg-yellow-700";
+                } else {
+                    displayStatus = "Memproses Hasil";
+                    statusColor = "bg-blue-600 dark:bg-blue-700";
+                }
+            }
 
             return (
                 <div className="flex w-full justify-center">
                     <div
                         className={`text-white items-center rounded-lg px-3 py-1.5 text-center text-sm font-medium capitalize shadow-sm ${statusColor}`}
                     >
-                        {row.getValue("status")}
+                        {displayStatus}
                     </div>
                 </div>
-            )
+            );
         },
     },
     {
@@ -528,12 +563,14 @@ export const testingColumns: ColumnDef<Testing>[] = [
         cell: ({ row }) => (
             <div className="flex justify-center">
                 <Link
-                    href={`/history/test/${row.original.code}`}
-                    className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-colors shadow-sm"
+                    href={`/history/testings/${row.original.code}`}
+                    className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white cursor-pointer rounded-lg px-3 py-1.5 text-sm font-medium transition-colors shadow-sm"
                 >
-                    Lihat Detail
+                    <ExternalLink className="w-4 h-4" />
+                    <span>Lihat Detail</span>
                 </Link>
             </div>
         ),
-    },
+    }
+
 ]
