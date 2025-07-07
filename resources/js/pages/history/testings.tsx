@@ -2,6 +2,7 @@
 
 import { DatePicker } from "@/components/DatePicker"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import {
     DropdownMenu,
@@ -27,7 +28,7 @@ import {
     useReactTable,
     type VisibilityState,
 } from "@tanstack/react-table"
-import { Check, ChevronDown, X } from "lucide-react"
+import { Beaker, Check, CheckCircle, ChevronDown, Clock, X } from "lucide-react"
 import type * as React from "react"
 import { useEffect, useState } from "react"
 import { toast, ToastContainer } from "react-toastify"
@@ -40,17 +41,46 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ]
 
-export default function Test({
-                                  userTestings,
-                                  tests,
-                                  packages,
-                                  laboratories,
-                             }: {
+export default function Testings({
+                                     userTestings,
+                                     tests,
+                                     packages,
+                                     laboratories,
+                                 }: {
     userTestings: Testing[]
     tests: SimpleOption[]
     packages: SimpleOption[]
     laboratories: LaboratorySimple[]
 }) {
+    // Calculate status counts using complex logic (same as datatable)
+    const getStatusCounts = () => {
+        const counts = {
+            completed: 0, // Selesai
+            waiting: 0, // Menunggu Pengujian (testing + before test date)
+            processing: 0, // Memproses Hasil (testing + after test date)
+        }
+
+        const now = new Date()
+
+        userTestings.forEach((testing) => {
+            const testDate = new Date(testing.test_date)
+
+            if (testing.status === "completed") {
+                counts.completed++
+            } else if (testing.status === "testing") {
+                if (now < testDate) {
+                    counts.waiting++ // Menunggu Pengujian
+                } else {
+                    counts.processing++ // Memproses Hasil
+                }
+            }
+        })
+
+        return counts
+    }
+
+    const statusCounts = getStatusCounts()
+
     // Testing Table State
     const [testingSorting, setTestingSorting] = useState<SortingState>([])
     const [testingFilters, setTestingFilters] = useState<ColumnFiltersState>([])
@@ -229,6 +259,54 @@ export default function Test({
                                     Kelola dan pantau daftar pengujian yang sedang berlangsung
                                 </p>
                             </div>
+
+                            {/* Status Count Card Summary */}
+                            <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+                                {/* Menunggu Pengujian Count Card */}
+                                <Card className="border-l-4 border-l-yellow-500 bg-white dark:bg-zinc-900">
+                                    <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                                        <CardTitle className="text-base font-medium text-gray-600 dark:text-gray-400">
+                                            Menunggu Pengujian
+                                        </CardTitle>
+                                        <Clock className="h-4 w-4 text-yellow-500" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                                            {statusCounts.waiting}
+                                        </div>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">Pengujian yang belum dimulai</p>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Memproses Hasil Count Card */}
+                                <Card className="border-l-4 border-l-blue-500 bg-white dark:bg-zinc-900">
+                                    <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                                        <CardTitle className="text-base font-medium text-gray-600 dark:text-gray-400">
+                                            Memproses Hasil
+                                        </CardTitle>
+                                        <Beaker className="h-4 w-4 text-blue-500" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{statusCounts.processing}</div>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">Pengujian sedang diproses</p>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Selesai Count Card */}
+                                <Card className="border-l-4 border-l-green-500 bg-white dark:bg-zinc-900">
+                                    <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                                        <CardTitle className="text-base font-medium text-gray-600 dark:text-gray-400">Selesai</CardTitle>
+                                        <CheckCircle className="h-4 w-4 text-green-500" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                                            {statusCounts.completed}
+                                        </div>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">Pengujian yang telah selesai</p>
+                                    </CardContent>
+                                </Card>
+                            </div>
+
                             <div className="testing-table-filters small-font-size mb-4 hidden justify-end gap-4 lg:mb-6 lg:flex lg:flex-wrap bg-gray-50 dark:bg-zinc-900/50 p-4 rounded-lg border border-gray-200 dark:border-zinc-800">
                                 <div className="status-type">
                                     <DropdownSelect
