@@ -1,31 +1,19 @@
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
-import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, Testing } from '@/types';
-import { parseAndFormatDate } from '@/utils/date-utils';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, Beaker, Calendar, Check, ClipboardCheck, Clock, Download, Edit, FileText, Info, Link2, Star, XCircle } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState } from "react"
+import { Head, Link, useForm } from "@inertiajs/react"
+import {
+    ArrowLeft, Beaker, Calendar, Check, ClipboardCheck,
+    Clock, Download, Edit, FileText, Info, Link2, Star, XCircle
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+    Card, CardContent, CardDescription,
+    CardFooter, CardHeader, CardTitle
+} from "@/components/ui/card"
+import { Textarea } from "@/components/ui/textarea"
 import AppLayout from "@/layouts/app-layout"
 import type { BreadcrumbItem, Testing } from "@/types"
 import { parseAndFormatDate } from "@/utils/date-utils"
-import { Head, Link } from "@inertiajs/react"
-import {
-    ArrowLeft,
-    Beaker,
-    Calendar,
-    Check,
-    ClipboardCheck,
-    Clock,
-    Download,
-    FileText,
-    Info,
-    Link2,
-} from "lucide-react"
-import type React from "react"
+
 
 // Format date helper
 const formatDate = (dateString: string | null | undefined) => {
