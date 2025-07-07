@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Exception;
 use App\Exceptions\SlotUnavailableException;
-
+use App\Utils\BookingUtils;
 
 class BookingController extends Controller
 {
@@ -56,15 +56,11 @@ class BookingController extends Controller
 
             return redirect()->route('orders-cart-checkout')
                 ->with('Success', 'Pengajuan Berhasil Dibuat!');
-        }
-
-        catch (SlotUnavailableException $e) {
+        } catch (SlotUnavailableException $e) {
             return redirect()->back()
                 ->withInput()
                 ->with('Error', 'Slot penuh untuk pengujian: ' . implode(', ', $e->getUnavailableTests()));
-        }
-
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             Log::error('Submission failed:', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
@@ -119,6 +115,71 @@ class BookingController extends Controller
             return redirect()->back()
                 ->withInput()
                 ->with('error', 'Terjadi kesalahan saat mengupload bukti pembayaran. Silakan coba lagi.');
+        }
+    }
+
+    public function checkAvailability(Request $request)
+    {
+        $validated = $request->validate([
+            'test_ids' => 'required|array',
+            'test_ids.*' => 'integer|exists:tests,id',
+            'package_ids' => 'nullable|array',
+            'package_ids.*' => 'integer|exists:packages,id',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date'
+        ]);
+
+        try {
+            $testIds = collect($validated['test_ids']);
+            $packageIds = collect($validated['package_ids'] ?? []);
+
+            // Ambil test IDs dari packages
+            if ($packageIds->isNotEmpty()) {
+                $packageTestIds = Package::whereIn('id', $packageIds)
+                    ->with('tests')
+                    ->get()
+                    ->flatMap(fn($p) => $p->tests->pluck('id'));
+
+                $testIds = $testIds->merge($packageTestIds);
+            }
+
+            $allTestIds = $testIds->unique()->values()->toArray();
+
+            // Generate tanggal dari start_date ke end_date
+            $startDate = new \DateTime($validated['start_date']);
+            $endDate = new \DateTime($validated['end_date']);
+            $unavailableDates = [];
+
+            while ($startDate <= $endDate) {
+                $dateString = $startDate->format('Y-m-d');
+
+                // Cek apakah ada test yang tidak tersedia di tanggal ini
+                $unavailableTestNames = BookingUtils::getUnavailableTestNames($allTestIds, $dateString);
+
+                if (!empty($unavailableTestNames)) {
+                    $unavailableDates[] = [
+                        'date' => $dateString,
+                        'unavailable_tests' => $unavailableTestNames
+                    ];
+                }
+
+                $startDate->modify('+1 day');
+            }
+
+            return response()->json([
+                'success' => true,
+                'unavailable_dates' => $unavailableDates
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Availability check failed:', [
+                'error' => $e->getMessage(),
+                'input' => $validated
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal memeriksa ketersediaan'
+            ], 500);
         }
     }
 }

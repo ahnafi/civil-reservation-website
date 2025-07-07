@@ -22,7 +22,7 @@ import {
     MapPin,
     Hammer
 } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
 
 // Helper function to format date
 const formatDate = (dateString: string) => {
@@ -73,8 +73,176 @@ export default function SubmissionDetail({ submissionHistoryDetail, relatedTrans
 }) {
     // Get the first submission record
     const testRecord: SubmissionSchedule = submissionHistoryDetail[0];
-    const packageExists = submissionHistoryDetail.some((record: SubmissionSchedule) => record.package_id);
-    const testExists = submissionHistoryDetail.some((record: SubmissionSchedule) => record.test_id);
+    const [processing, setProcessing] = useState(false);
+
+    console.log('Submission History Detail:', testRecord);
+
+    const uniquePackages = submissionHistoryDetail
+        .filter((record: SubmissionSchedule) => record.package_id)
+        .reduce((acc, current) => {
+            const existingPackage = acc.find((pkg) => pkg.package_id === current.package_id);
+            if (!existingPackage) {
+                acc.push(current);
+            }
+            return acc;
+        }, [] as SubmissionSchedule[]);
+
+    const uniqueTests = submissionHistoryDetail
+        .filter((record: SubmissionSchedule) => record.test_id)
+        .reduce((acc, current) => {
+            const existingTest = acc.find((test) => test.test_id === current.test_id);
+            if (!existingTest) {
+                acc.push(current);
+            }
+            return acc;
+        }, [] as SubmissionSchedule[]);
+
+    const packageExists = uniquePackages.length > 0;
+    const testExists = uniqueTests.length > 0;
+
+    const cleanSubmissionData = {
+        packages: uniquePackages.map((pkg) => ({
+            package_id: pkg.package_id,
+            package_name: pkg.package_name,
+            package_price: pkg.package_price,
+            package_slug: pkg.package_slug,
+            package_images: pkg.package_images,
+        })),
+        tests: uniqueTests.map((test) => ({
+            test_id: test.test_id,
+            test_name: test.test_name,
+            test_price: test.test_price,
+            test_slug: test.test_slug,
+            test_images: test.test_images,
+            quantity: test.quantity,
+        })),
+    };
+
+    const handleRepeatSubmission = () => {
+        setProcessing(true);
+
+        try {
+            const submissionType = testRecord.submission_type;
+
+            if (submissionType === 'external') {
+                const externalFormData = {
+                    company_name: testRecord.company_name || '',
+                    project_name: testRecord.project_name || '',
+                    project_address: testRecord.project_address || '',
+                    test_submission_date: testRecord.test_submission_date ? testRecord.test_submission_date.split('T')[0] : '',
+                    user_note: testRecord.user_note || '',
+                };
+                localStorage.setItem('external_form', JSON.stringify(externalFormData));
+            } else if (submissionType === 'internal') {
+                const internalFormData = {
+                    name: testRecord.researcher_name || '',
+                    program_study: testRecord.program_study || '',
+                    research_title: testRecord.research_title || '',
+                    personnel_count: testRecord.personnel_count || 1,
+                    supervisor: testRecord.supervisor || '',
+                    test_submission_date: testRecord.test_submission_date ? testRecord.test_submission_date.split('T')[0] : '',
+                    user_note: testRecord.user_note || '',
+                };
+                localStorage.setItem('internal_form', JSON.stringify(internalFormData));
+            }
+
+            const testsData = uniqueTests.map((test) => ({
+                test_id: test.test_id,
+                slug: test.test_slug,
+                unit: test.quantity,
+                test: {
+                    id: test.test_id,
+                    name: test.test_name,
+                    slug: test.test_slug,
+                    price: test.test_price,
+                    description: test.test_description || '',
+                    images: Array.isArray(test.test_images) ? test.test_images : JSON.parse(test.test_images || '["test_images/default.jpg"]'),
+                    minimum_unit: 1,
+                    daily_slot: test.test_daily_slot || 10,
+                    is_active: true,
+                    category_id: test.category_id || 1,
+                    laboratory_id: test.lab_id,
+                    created_at: test.created_at,
+                    updated_at: test.updated_at,
+                    deleted_at: null,
+                    category: {
+                        id: test.category_id || 1,
+                        name: test.category_name || 'Kategori',
+                        description: null,
+                        created_at: test.created_at,
+                        updated_at: test.updated_at,
+                        deleted_at: null,
+                    },
+                    laboratory: {
+                        id: test.lab_id,
+                        code: test.lab_code,
+                        slug: test.lab_slug || test.lab_code?.toLowerCase(),
+                        name: test.lab_name,
+                        room: test.lab_room || '',
+                        description: test.lab_description || '',
+                        images: test.lab_images
+                            ? Array.isArray(test.lab_images)
+                                ? test.lab_images
+                                : JSON.parse(test.lab_images)
+                            : ['laboratory_images/default.jpg'],
+                        created_at: test.created_at,
+                        updated_at: test.updated_at,
+                        deleted_at: null,
+                    },
+                },
+            }));
+
+            const packagesData = uniquePackages.map((pkg) => ({
+                package_id: pkg.package_id,
+                slug: pkg.package_slug,
+                package: {
+                    id: pkg.package_id,
+                    name: pkg.package_name,
+                    slug: pkg.package_slug,
+                    price: pkg.package_price,
+                    images: Array.isArray(pkg.package_images)
+                        ? pkg.package_images
+                        : JSON.parse(pkg.package_images || '["package_images/default.jpg"]'),
+                    description: pkg.package_description || '',
+                    laboratory_id: pkg.lab_id,
+                    created_at: pkg.created_at,
+                    updated_at: pkg.updated_at,
+                    deleted_at: null,
+                    tests: [],
+                },
+                quantity: 1,
+            }));
+
+            if (testsData.length > 0) {
+                localStorage.setItem('tests', JSON.stringify(testsData));
+            }
+
+            if (packagesData.length > 0) {
+                localStorage.setItem('packages', JSON.stringify(packagesData));
+            }
+
+            const testIds = testsData.map((test) => test.test_id);
+            const packageIds = packagesData.map((pkg) => pkg.package_id);
+
+            const params = new URLSearchParams();
+            testIds.forEach((id) => params.append('testIds[]', id.toString()));
+            packageIds.forEach((id) => params.append('packageIds[]', id.toString()));
+
+            const formUrl = `/orders/form?${params.toString()}`;
+
+            setTimeout(() => {
+                window.location.href = formUrl;
+            }, 500);
+        } catch (error) {
+            console.error('Error during resubmission:', error);
+            alert('Terjadi kesalahan saat mengajukan ulang. Silakan coba lagi.');
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    console.log('Submission data for resubmission:', testRecord);
+    console.log('Clean data for resubmission:', cleanSubmissionData);
 
     const transactionStatusMap: Record<string, string> = {
         success: 'Sukses',
@@ -124,14 +292,19 @@ export default function SubmissionDetail({ submissionHistoryDetail, relatedTrans
             <div className="container mx-auto px-4 py-6">
                 <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                     {/* Main content - 2/3 width on large screens */}
-                    <div className="lg:col-span-2 gap-6">
+                    <div className="gap-6 lg:col-span-2">
                         <Card className="overflow-hidden p-0 dark:bg-zinc-900">
                             <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800">
                                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                     <div>
                                         <CardTitle>
                                             <h2>
-                                                Detail Pengujian {testRecord.submission_type === 'internal' ? 'Internal' : testRecord.submission_type === 'external' ? 'Eksternal' : ''}
+                                                Detail Pengujian{' '}
+                                                {testRecord.submission_type === 'internal'
+                                                    ? 'Internal'
+                                                    : testRecord.submission_type === 'external'
+                                                      ? 'Eksternal'
+                                                      : ''}
                                             </h2>
                                         </CardTitle>
                                         <CardDescription>
@@ -521,6 +694,23 @@ export default function SubmissionDetail({ submissionHistoryDetail, relatedTrans
                                         <p className="text-sm text-red-700 dark:text-red-400">
                                             Pengajuan ini ditolak. Silakan cek email anda untuk informasi lebih lanjut mengenai alasan penolakan.
                                         </p>
+                                        <Button
+                                            onClick={handleRepeatSubmission}
+                                            className="inline-flex items-center gap-2 rounded-md bg-red-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-50"
+                                            disabled={processing}
+                                        >
+                                            {processing ? (
+                                                <>
+                                                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                                                    Memproses...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <FileText className="h-4 w-4" />
+                                                    Ajukan Ulang
+                                                </>
+                                            )}
+                                        </Button>
                                     </div>
                                 )}
                             </CardContent>
@@ -532,7 +722,7 @@ export default function SubmissionDetail({ submissionHistoryDetail, relatedTrans
                         </Card>
 
                         <Card className="mt-6 gap-0 p-0 dark:bg-zinc-900">
-                            <CardHeader className="border-b bg-slate-50 p-4 dark:bg-zinc-800 rounded-t-lg">
+                            <CardHeader className="rounded-t-lg border-b bg-slate-50 p-4 dark:bg-zinc-800">
                                 <CardTitle className="text-lg">Bantuan</CardTitle>
                             </CardHeader>
                             <CardContent className="p-4">
@@ -563,7 +753,8 @@ export default function SubmissionDetail({ submissionHistoryDetail, relatedTrans
                                         <div>
                                             <div className="font-medium text-gray-900 dark:text-white">Jam Operasional</div>
                                             <div className="text-gray-600 dark:text-gray-300">
-                                                Senin - Jumat<br />
+                                                Senin - Jumat
+                                                <br />
                                                 08:00 - 16:00 WIB
                                             </div>
                                         </div>

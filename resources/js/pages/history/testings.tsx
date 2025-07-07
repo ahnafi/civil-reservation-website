@@ -37,7 +37,7 @@ import { testingColumnLabels, testingColumns, testingStatusOptions } from "./tab
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: "Riwayat Pengujian",
-        href: "/history/tests",
+        href: "/history/testings",
     },
 ]
 
@@ -206,44 +206,44 @@ export default function Testings({
     ) => {
         useEffect(() => {
             if (selectedOption?.name) {
-                updateColumnFilter(setFilters, columnId, selectedOption.name)
+                updateColumnFilter(setFilters, columnId, selectedOption.name);
             } else {
-                updateColumnFilter(setFilters, columnId, undefined)
+                updateColumnFilter(setFilters, columnId, undefined);
             }
-        }, [selectedOption, columnId, setFilters])
-    }
+        }, [selectedOption, columnId, setFilters]);
+    };
 
     // Testing Status Column Filter Effect
-    useColumnFilterEffect(testingSelectedStatus, setTestingFilters, "status")
+    useColumnFilterEffect(testingSelectedStatus, setTestingFilters, 'status');
 
     // Row Pagination Effect
     const usePageSizeEffect = <T,>(table: TanStackTable<T>, rows: number) => {
         useEffect(() => {
-            table.setPageSize(rows)
-        }, [rows, table])
-    }
+            table.setPageSize(rows);
+        }, [rows, table]);
+    };
 
     // Testing Table Row Pagination Effect
-    usePageSizeEffect(testingTable, testingRows)
+    usePageSizeEffect(testingTable, testingRows);
 
     // Alert Message
     useEffect(() => {
         if (alertMessage) {
             toast.error(alertMessage, {
-                position: "top-center",
+                position: 'top-center',
                 autoClose: 5000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-            })
-            setAlertMessage(null)
+            });
+            setAlertMessage(null);
         }
-    }, [alertMessage])
+    }, [alertMessage]);
 
     // Filter Dialog State
-    const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
+    const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -353,8 +353,8 @@ export default function Testings({
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                setTestingInitialDate(undefined)
-                                                setTestingFinalDate(undefined)
+                                                setTestingInitialDate(undefined);
+                                                setTestingFinalDate(undefined);
                                             }}
                                             className="text-muted-foreground hover:text-foreground mt-1 flex items-center gap-1"
                                         >
@@ -430,8 +430,8 @@ export default function Testings({
                                                     <button
                                                         type="button"
                                                         onClick={() => {
-                                                            setTestingInitialDate(undefined)
-                                                            setTestingFinalDate(undefined)
+                                                            setTestingInitialDate(undefined);
+                                                            setTestingFinalDate(undefined);
                                                         }}
                                                         className="text-muted-foreground hover:text-foreground mt-1 flex items-center gap-1"
                                                     >
