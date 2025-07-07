@@ -120,12 +120,13 @@ class HistoryController extends Controller
 
     public function testHistoryDetail($code): Response
     {
-        $testHistoryDetail = Testing::query()
+        $testHistoryDetail = Testing::with(['reviews'])
             ->join('submissions', 'testings.submission_id', '=', 'submissions.id')
             ->where('submissions.user_id', auth()->id())
-            ->orderBy('testings.created_at', 'desc')
+            ->where('testings.code', $code)
             ->select('testings.*', 'submissions.code as submission_code')
             ->get();
+
 
         return Inertia::render('history/detail/test', [
             'testHistoryDetail' => $testHistoryDetail,

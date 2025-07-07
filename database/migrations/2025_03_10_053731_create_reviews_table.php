@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('rating');
             $table->text('content');
             $table->foreignId('testing_id')->constrained()->cascadeOnDelete();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

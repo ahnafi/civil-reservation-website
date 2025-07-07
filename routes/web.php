@@ -61,6 +61,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('tutorial/index');
     })->name('tutorial');
 
+    // Post Review
+    Route::post('/reviews', [\App\Http\Controllers\ReviewController::class, 'store'])->name('reviews.store');
+
+    // Update Review
+    Route::put('/reviews/{review}', [\App\Http\Controllers\ReviewController::class, 'update'])->name('reviews.update');
+
     // Post Page
     Route::post('payment', [BookingController::class, 'submitPayment'])->name('submit-payment');
     Route::post('schedule/submit', [ScheduleController::class, 'getSchedule'])->name('schedule.submit');
