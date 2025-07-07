@@ -461,7 +461,7 @@ export default function SubmissionDetail({ submissionHistoryDetail, relatedTrans
                                                 </div>
                                                 <div className="mt-2 text-right">
                                                     <Link
-                                                        href={`/history/test/${testing.code}`}
+                                                        href={`/history/testing/${testing.code}`}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
                                                         className="text-sm text-blue-600 hover:underline inline-flex items-center gap-1"
@@ -507,7 +507,7 @@ export default function SubmissionDetail({ submissionHistoryDetail, relatedTrans
                                             <h4 className="font-medium text-yellow-700 dark:text-yellow-400">Menunggu Persetujuan</h4>
                                         </div>
                                         <p className="text-sm text-yellow-700 dark:text-yellow-400">
-                                            Pengajuan ini sedang dalam proses review dengan waktu pemrosesan maksimal 2 x 24 jam. Kami akan memberi tahu Anda setelah pengajuan disetujui atau ditolak.
+                                            Pengajuan ini sedang dalam proses review dengan waktu pemrosesan maksimal 1 x 24 jam pada hari kerja. Kami akan memberi tahu Anda setelah pengajuan disetujui atau ditolak.
                                         </p>
                                     </div>
                                 )}

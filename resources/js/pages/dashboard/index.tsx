@@ -484,7 +484,7 @@ export default function MainDashboard({
                         </div>
                         <div className="mt-4 text-center">
                             <a
-                                href="/history/tests" // placeholder link
+                                href="/history/testings" // placeholder link
                                 className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-orange-700"
                             >
                                 <HardHat className="size-4" />
