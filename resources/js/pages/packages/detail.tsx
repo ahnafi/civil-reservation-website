@@ -219,10 +219,10 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                                         <Button
                                             onClick={() => handleAddTestToCart(data)}
                                             disabled={isAdding}
-                                            className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold h-12 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                                            className="w-full cursor-pointer bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold h-12 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2 text-xl"
                                             size="lg"
                                         >
-                                            <ShoppingCart className="h-5 w-5" />
+                                            <ShoppingCart className="h-7 w-7" />
                                             {isAdding ? "Menambahkan..." : "Pesan Paket Ini"}
                                         </Button>
                                     </CardFooter>
