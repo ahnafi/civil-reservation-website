@@ -5,11 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import AppLayout from "@/layouts/app-layout"
-import type { BreadcrumbItem, PaginatedTests, Test, TestCart } from "@/types"
+import type { BreadcrumbItem, PaginatedTests, Test, TestCart, LaboratorySimple } from "@/types"
 import { Head, Link } from "@inertiajs/react"
 import { ChevronLeft, ChevronRight, ShoppingCart, Building2, Package, Wrench, Search } from "lucide-react"
 import { useEffect, useState, useMemo } from "react"
 import { toast, ToastContainer } from "react-toastify"
+import DropdownSelect from "@/components/ui/DropdownSelect"
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -18,10 +19,17 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ]
 
-export default function Tests({ tests }: { tests: PaginatedTests }) {
+export default function Tests({
+                                  tests,
+                                  laboratories,
+                              }: {
+    tests: PaginatedTests
+    laboratories: LaboratorySimple[]
+}) {
     const [testCart, setTestCart] = useState<TestCart[]>([])
     const [isAdding, setIsAdding] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
+    const [selectedLaboratory, setSelectedLaboratory] = useState<LaboratorySimple | null>(null)
 
     useEffect(() => {
         const savedTest = localStorage.getItem("tests")
@@ -31,20 +39,28 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
         }
     }, [])
 
-    // Filter tests based on search query
+    // Filter tests based on search query and selected laboratory
     const filteredTests = useMemo(() => {
-        if (!searchQuery.trim()) {
-            return tests.data
+        let filtered = tests.data
+
+        // Filter by search query
+        if (searchQuery.trim()) {
+            filtered = filtered.filter(
+                (test) =>
+                    test.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    test.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    test.category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    test.laboratory.code.toLowerCase().includes(searchQuery.toLowerCase()),
+            )
         }
 
-        return tests.data.filter(
-            (test) =>
-                test.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                test.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                test.category.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                test.laboratory.code.toLowerCase().includes(searchQuery.toLowerCase()),
-        )
-    }, [tests.data, searchQuery])
+        // Filter by selected laboratory
+        if (selectedLaboratory) {
+            filtered = filtered.filter((test) => test.laboratory.id === selectedLaboratory.id)
+        }
+
+        return filtered
+    }, [tests.data, searchQuery, selectedLaboratory])
 
     const handleAddTestToCart = (test: Test) => {
         setIsAdding(true)
@@ -172,25 +188,60 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                             Temukan berbagai layanan pengujian berkualitas tinggi untuk kebutuhan analisis Anda.
                         </p>
 
-                        {/* Search Bar */}
-                        <div className="max-w-md mx-auto relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 h-4 w-4" />
-                            <Input
-                                type="text"
-                                placeholder="Cari pengujian, kategori, atau laboratorium..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 pr-4 py-2 w-full border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400"
-                            />
+                        {/* Search and Filter Section */}
+                        <div className="max-w-4xl mx-auto">
+                            <div className="flex flex-col md:flex-row gap-4 items-end justify-center">
+                                {/* Search Bar */}
+                                <div className="flex-1 max-w-md relative">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 h-4 w-4" />
+                                    <Input
+                                        type="text"
+                                        placeholder="Cari pengujian, kategori, atau laboratorium..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="pl-10 pr-4 py-2 w-full border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white placeholder-zinc-500 dark:placeholder-zinc-400"
+                                    />
+                                </div>
+
+                                {/* Laboratory Filter */}
+                                <div className="w-full md:w-auto">
+                                    <div className="flex flex-col align-bottom justify-end">
+                                        {" "}
+                                        {/* Reserve space for clear button */}
+                                        <DropdownSelect
+                                            label=""
+                                            options={laboratories}
+                                            selectedOption={selectedLaboratory}
+                                            setSelectedOption={setSelectedLaboratory}
+                                            placeholder="Semua Lab"
+                                            icon={<Building2 className="w-4 h-4" />}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     {/* Search Results Info */}
-                    {searchQuery && (
+                    {(searchQuery || selectedLaboratory) && (
                         <div className="mb-6 text-center">
                             <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                                Menampilkan {filteredTests.length} hasil untuk "{searchQuery}"
+                                Menampilkan {filteredTests.length} hasil
+                                {searchQuery && ` untuk "${searchQuery}"`}
+                                {selectedLaboratory && ` di ${selectedLaboratory.name}`}
                             </p>
+                            {(searchQuery || selectedLaboratory) && (
+                                <div className="mt-2 flex justify-center gap-2 flex-wrap">
+                                    {searchQuery && (
+                                        <button
+                                            onClick={() => setSearchQuery("")}
+                                            className="text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+                                        >
+                                            Hapus pencarian ✕
+                                        </button>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     )}
 
@@ -202,7 +253,7 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                                     {/* Test Image */}
                                     <div className="relative overflow-hidden">
                                         <img
-                                            src={"/storage/" + data.images}
+                                            src={"/storage/" + (data.images && data.images.length > 0 ? data.images[0] : "placeholder.jpg")}
                                             alt={data.name}
                                             className="h-48 w-full object-cover group-hover:scale-105 transition-transform duration-300"
                                         />
@@ -262,10 +313,10 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                                                 }}
                                                 disabled={isAdding}
                                                 size="sm"
-                                                className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1"
+                                                className="bg-blue-600 cursor-pointer hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium px-3 py-2 rounded-lg transition-colors duration-200 flex items-center gap-1"
                                             >
                                                 <ShoppingCart className="h-4 w-4" />
-                                                <span className="text-xs">Tambah ke keranjang</span>
+                                                <span className="text-sm">Tambah ke keranjang</span>
                                             </Button>
                                         </div>
                                     </CardContent>
@@ -275,24 +326,24 @@ export default function Tests({ tests }: { tests: PaginatedTests }) {
                     </div>
 
                     {/* No Results Message */}
-                    {searchQuery && filteredTests.length === 0 && (
+                    {(searchQuery || selectedLaboratory) && filteredTests.length === 0 && (
                         <div className="text-center py-12">
                             <div className="text-zinc-400 dark:text-zinc-500 mb-4">
                                 <Search className="h-16 w-16 mx-auto mb-4" />
                                 <h3 className="text-xl font-semibold mb-2">Tidak ada hasil ditemukan</h3>
-                                <p>Coba gunakan kata kunci yang berbeda atau periksa ejaan Anda.</p>
+                                <p>Coba gunakan kata kunci yang berbeda atau ubah filter laboratorium.</p>
                             </div>
                         </div>
                     )}
 
-                    {/* Pagination - Only show when not searching */}
-                    {!searchQuery && renderPaginationLinks()}
+                    {/* Pagination - Only show when not searching or filtering */}
+                    {!searchQuery && !selectedLaboratory && renderPaginationLinks()}
 
                     {/* Results Info */}
                     <div className="mt-6 text-center">
             <span className="text-sm text-zinc-500 dark:text-zinc-400">
-              {searchQuery
-                  ? `Menampilkan ${filteredTests.length} hasil pencarian`
+              {searchQuery || selectedLaboratory
+                  ? `Menampilkan ${filteredTests.length} hasil yang difilter`
                   : `Menampilkan ${tests.from} hingga ${tests.to} dari ${tests.total} pengujian`}
             </span>
                     </div>
