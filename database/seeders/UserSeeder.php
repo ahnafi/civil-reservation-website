@@ -70,7 +70,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Bintang Putra Akbar',
-                'email' => 'internal@demo.com',
+                'email' => 'bintang.akbar@mhs.unsoed.ac.id',
                 'email_verified_at' => now(),
                 'password' => Hash::make('qwerty123'),
                 'phone' => '081326804033',
