@@ -208,7 +208,7 @@ const InfoItem = ({ icon, label, value }: { icon: React.ReactNode; label: string
     );
 };
 
-export default function TestingDetail({ testingHistoryDetail }: { testingHistoryDetail: ReviewTesting[] }) {
+export default function Testing({ testingHistoryDetail }: { testingHistoryDetail: ReviewTesting[] }) {
     // Get the first test record
     const testRecord: ReviewTesting = testingHistoryDetail[0];
 
@@ -753,7 +753,7 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                         {/* Show existing review or form */}
                                         {testRecord.reviews && !showReviewForm ? (
                                             /* Display existing review with edit option */
-                                            <div className="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+                                            <div className="rounded-lg bg-gray-50 p-4 dark:bg-zinc-800">
                                                 <div className="mb-3 flex items-center justify-between">
                                                     <div className="flex items-center gap-2">
                                                         <div className="flex">
@@ -774,7 +774,7 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                                         Review Anda
                                                     </div>
                                                 </div>
-                                                <p className="mb-3 text-gray-700 dark:text-gray-300">{testRecord.reviews.content}</p>
+                                                <p className="mb-3 text-gray-700 dark:text-zinc-300">{testRecord.reviews.content}</p>
                                                 <div className="flex items-center justify-between">
                                                     <p className="text-xs text-gray-500">Dikirim pada {formatDate(testRecord.reviews.created_at)}</p>
                                                     <Button
