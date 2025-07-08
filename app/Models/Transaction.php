@@ -17,6 +17,7 @@ class Transaction extends Model
     protected $fillable = [
         "code",
         "payment_invoice_files",
+        "payment_type",
         "payment_receipt_images",
         "amount",
         "payment_method",
