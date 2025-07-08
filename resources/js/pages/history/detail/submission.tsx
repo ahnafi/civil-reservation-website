@@ -370,7 +370,7 @@ export default function SubmissionDetail({
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: 'Pengajuan',
+            title: 'Riwayat Pengajuan',
             href: '/history/submissions',
         },
         {

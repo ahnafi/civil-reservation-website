@@ -119,7 +119,7 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: 'Pengujian',
+            title: 'Riwayat Pengujian',
             href: '/history/testings',
         },
         {

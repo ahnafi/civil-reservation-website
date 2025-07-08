@@ -83,7 +83,7 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: 'Daftar Transaksi',
+            title: 'Riwayat Transaksi',
             href: '/history/transactions',
         },
         {
