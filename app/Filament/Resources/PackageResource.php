@@ -37,6 +37,7 @@ class PackageResource extends Resource
             ->schema([
                 Forms\Components\FileUpload::make('images')
                     ->label("Foto Paket Pengujian")
+                    ->helperText('Maksimal ukuran file: 2MB per gambar')
                     ->directory("package_images")
                     ->reorderable()
                     ->image()
@@ -45,6 +46,7 @@ class PackageResource extends Resource
                     ->imagePreviewHeight('150')
                     ->visibility('public')
                     ->multiple()
+                    ->maxSize(2048)
                     ->columnSpanFull()
                     ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                         $extension = $file->getClientOriginalExtension();

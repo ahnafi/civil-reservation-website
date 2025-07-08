@@ -40,6 +40,7 @@ class TestResource extends Resource
                     Forms\Components\Section::make([
                         Forms\Components\FileUpload::make('images')
                             ->label('Foto pengujian')
+                            ->helperText('Maksimal ukuran file: 2MB per gambar')
                             ->reorderable()
                             ->image()
                             ->imageEditor()
@@ -49,6 +50,7 @@ class TestResource extends Resource
                             ->multiple()
                             ->columnSpanFull()
                             ->directory('test_image')
+                            ->maxSize(2048)
                             ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
                                 $extension = $file->getClientOriginalExtension();
 
@@ -84,6 +86,7 @@ class TestResource extends Resource
                     Forms\Components\Section::make([
                         Forms\Components\Toggle::make('is_active')
                             ->label('Status')
+                            ->helperText('Aktifkan untuk membuat pengujian ini tersedia untuk reservasi')
                             ->required(),
                         Forms\Components\TextInput::make('minimum_unit')
                             ->label('Minimum unit pengujian')

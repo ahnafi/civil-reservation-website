@@ -140,6 +140,8 @@ class TransactionResource extends Resource
                         'application/msword',
                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                     ])
+                    ->maxSize(2048)
+                    ->helperText('Upload file invoice pembayaran. Format yang didukung: PDF, DOC, DOCX. Maksimal ukuran file 2MB.')
                     ->visibility('public')
                     ->directory('payment_invoice_files')
                     ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
@@ -159,6 +161,8 @@ class TransactionResource extends Resource
                     ->imageEditor()
                     ->previewable(true)
                     ->imagePreviewHeight('150')
+                    ->maxSize(2048)
+                    ->helperText('Upload bukti pembayaran berupa gambar. Format yang didukung: JPG, PNG, GIF. Maksimal ukuran file 2MB.')
                     ->visibility('public')
                     ->directory('payment_receipt_images')
                     ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
