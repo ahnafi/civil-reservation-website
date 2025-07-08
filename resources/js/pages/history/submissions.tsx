@@ -4,7 +4,9 @@ import { DatePicker } from '@/components/DatePicker';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { CheckCircle, Clock, XCircle } from 'lucide-react';
 import DropdownSelect from '@/components/ui/DropdownSelect';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import SearchableSelect from '@/components/ui/SearchableSelect';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -49,6 +51,12 @@ function isExternalSubmission(submission: BaseSubmission): submission is Externa
     return submission.submission_type === 'external';
 }
 
+const submissionStatusMap: Record<string, string> = {
+    submitted: "Diajukan",
+    approved: "Disetujui",
+    rejected: "Ditolak",
+}
+
 export default function Submissions({
     userSubmissions,
     tests,
@@ -65,8 +73,27 @@ export default function Submissions({
     const user = auth.user;
     const userRole = user.role;
 
-    const internalSubmissions = userSubmissions.filter(isInternalSubmission);
-    const externalSubmissions = userSubmissions.filter(isExternalSubmission);
+    const internalSubmissions = userSubmissions.filter(isInternalSubmission)
+    const externalSubmissions = userSubmissions.filter(isExternalSubmission)
+
+    // Calculate status counts
+    const getStatusCounts = () => {
+        const counts = {
+            submitted: 0,
+            approved: 0,
+            rejected: 0,
+        }
+
+        userSubmissions.forEach((submission) => {
+            if (submission.status in counts) {
+                counts[submission.status as keyof typeof counts]++
+            }
+        })
+
+        return counts
+    }
+
+    const statusCounts = getStatusCounts()
 
     // submission types
     const [submissionType, setSubmissionType] = useState<'internal' | 'external'>('internal');
@@ -311,6 +338,53 @@ export default function Submissions({
                             <div className="mb-6 border-b border-zinc-200 pb-6 dark:border-zinc-800">
                                 <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">Riwayat Pengajuan</h1>
                                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Kelola dan pantau riwayat pengajuan pengujian Anda</p>
+                            </div>
+
+                            {/* Status Count Card Summary */}
+                            <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+                                {/* Submitted Count Card */}
+                                <Card className="border-l-4 border-l-yellow-500 bg-white dark:bg-zinc-900">
+                                    <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                                        <CardTitle className="text-base font-medium text-gray-600 dark:text-gray-400">
+                                            {submissionStatusMap.submitted}
+                                        </CardTitle>
+                                        <Clock className="h-4 w-4 text-yellow-500" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
+                                            {statusCounts.submitted}
+                                        </div>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">Pengajuan yang sedang diproses</p>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Approved Count Card */}
+                                <Card className="border-l-4 border-l-green-500 bg-white dark:bg-zinc-900">
+                                    <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                                        <CardTitle className="text-base font-medium text-gray-600 dark:text-gray-400">
+                                            {submissionStatusMap.approved}
+                                        </CardTitle>
+                                        <CheckCircle className="h-4 w-4 text-green-500" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">{statusCounts.approved}</div>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">Pengajuan yang telah disetujui</p>
+                                    </CardContent>
+                                </Card>
+
+                                {/* Rejected Count Card */}
+                                <Card className="border-l-4 border-l-red-500 bg-white dark:bg-zinc-900">
+                                    <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                                        <CardTitle className="text-base font-medium text-gray-600 dark:text-gray-400">
+                                            {submissionStatusMap.rejected}
+                                        </CardTitle>
+                                        <XCircle className="h-4 w-4 text-red-500" />
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-2xl font-bold text-red-600 dark:text-red-400">{statusCounts.rejected}</div>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">Pengajuan yang ditolak</p>
+                                    </CardContent>
+                                </Card>
                             </div>
 
                             {(userRole === 'admin' || userRole === 'internal') && (
