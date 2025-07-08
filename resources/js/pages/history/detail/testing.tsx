@@ -2,12 +2,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem } from '@/types';
+import { Test, type BreadcrumbItem } from '@/types';
 import { parseAndFormatDate } from '@/utils/date-utils';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowLeft, Beaker, Calendar, Check, ClipboardCheck, Clock, Download, Edit, FileText, Info, Link2, Star } from 'lucide-react';
+import { ArrowLeft, Beaker, Calendar, Check, ClipboardCheck, Clock, Download, Edit, FileText, Info, Link2, RefreshCw, Star } from 'lucide-react';
 import React, { useState } from 'react';
 
+// ✅ Define types for testing detail and resubmission
 type ReviewTesting = {
     id: number;
     code: string;
@@ -29,6 +30,112 @@ type ReviewTesting = {
         updated_at: string;
     } | null;
     links?: unknown;
+    // ✅ Additional fields for resubmission
+    submission_type?: 'internal' | 'external';
+    // External fields
+    company_name?: string;
+    project_name?: string;
+    project_address?: string;
+    // Internal fields
+    researcher_name?: string;
+    program_study?: string;
+    research_title?: string;
+    personnel_count?: number;
+    supervisor?: string;
+    // Test details
+    test_submission_date?: string;
+    test_id?: number;
+    test_name?: string;
+    test_slug?: string;
+    test_price?: number;
+    test_images?: string[];
+    quantity?: number;
+    // Package details
+    package_id?: number;
+    package_name?: string;
+    package_slug?: string;
+    package_price?: number;
+    package_images?: string[];
+    // Lab details
+    lab_id?: number;
+    lab_code?: string;
+    lab_name?: string;
+};
+
+// ✅ Resubmission form data type
+type ResubmissionFormData = {
+    company_name?: string;
+    project_name?: string;
+    project_address?: string;
+    name?: string;
+    program_study?: string;
+    research_title?: string;
+    personnel_count?: number;
+    supervisor?: string;
+    test_submission_date: string;
+};
+
+// ✅ Test data type for resubmission
+type TestData = {
+    test_id: number;
+    slug: string;
+    unit: number;
+    test: {
+        id: number;
+        name: string;
+        slug: string;
+        price: number;
+        description: string;
+        images: string[];
+        minimum_unit: number;
+        daily_slot: number;
+        is_active: boolean;
+        category_id: number;
+        laboratory_id: number;
+        created_at: string;
+        updated_at: string;
+        deleted_at: null;
+        category: {
+            id: number;
+            name: string;
+            description: null;
+            created_at: string;
+            updated_at: string;
+            deleted_at: null;
+        };
+        laboratory: {
+            id: number;
+            code: string;
+            slug: string;
+            name: string;
+            room: string;
+            description: string;
+            images: string[];
+            created_at: string;
+            updated_at: string;
+            deleted_at: null;
+        };
+    };
+};
+
+// ✅ Package data type for resubmission
+type PackageData = {
+    package_id: number;
+    slug: string;
+    package: {
+        id: number;
+        name: string;
+        slug: string;
+        price: number;
+        images: string[];
+        description: string;
+        laboratory_id: number;
+        created_at: string;
+        updated_at: string;
+        deleted_at: null;
+        tests: Test[];
+    };
+    quantity: number;
 };
 
 // Format date helper
@@ -109,9 +216,18 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
     const [showReviewForm, setShowReviewForm] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [reviewSuccess, setReviewSuccess] = useState(false);
+    const [processing, setProcessing] = useState<boolean>(false);
 
     // Inertia form for review submission
-    const { data, setData, post, put, processing, errors, reset } = useForm({
+    const {
+        data,
+        setData,
+        post,
+        put,
+        processing: reviewProcessing,
+        errors,
+        reset,
+    } = useForm({
         rating: testRecord?.reviews?.rating || 0,
         content: testRecord?.reviews?.content || '',
         testing_id: testRecord?.id || 0,
@@ -128,6 +244,167 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
         },
     ];
 
+    // ✅ Handle repeat submission for testing
+    const handleRepeatSubmission = (): void => {
+        setProcessing(true);
+
+        try {
+            const submissionType: string = testRecord.submission_type || 'external';
+
+            // ✅ Prepare form data with proper typing
+            if (submissionType === 'external') {
+                const externalFormData: ResubmissionFormData = {
+                    company_name: testRecord.company_name || '',
+                    project_name: testRecord.project_name || '',
+                    project_address: testRecord.project_address || '',
+                    test_submission_date: testRecord.test_submission_date
+                        ? testRecord.test_submission_date.split('T')[0]
+                        : new Date().toISOString().split('T')[0],
+                };
+                localStorage.setItem('external_form', JSON.stringify(externalFormData));
+            } else if (submissionType === 'internal') {
+                const internalFormData: ResubmissionFormData = {
+                    name: testRecord.researcher_name || '',
+                    program_study: testRecord.program_study || '',
+                    research_title: testRecord.research_title || '',
+                    personnel_count: testRecord.personnel_count || 1,
+                    supervisor: testRecord.supervisor || '',
+                    test_submission_date: testRecord.test_submission_date
+                        ? testRecord.test_submission_date.split('T')[0]
+                        : new Date().toISOString().split('T')[0],
+                };
+                localStorage.setItem('internal_form', JSON.stringify(internalFormData));
+            }
+
+            // ✅ Prepare tests data if available
+            const testsData: TestData[] = [];
+            if (testRecord.test_id && testRecord.test_name) {
+                const testImages: string[] = Array.isArray(testRecord.test_images)
+                    ? testRecord.test_images
+                    : typeof testRecord.test_images === 'string'
+                      ? JSON.parse(testRecord.test_images || '["test_images/default.jpg"]')
+                      : ['test_images/default.jpg'];
+
+                testsData.push({
+                    test_id: testRecord.test_id,
+                    slug: testRecord.test_slug || '',
+                    unit: testRecord.quantity || 1,
+                    test: {
+                        id: testRecord.test_id,
+                        name: testRecord.test_name,
+                        slug: testRecord.test_slug || '',
+                        price: testRecord.test_price || 0,
+                        description: '',
+                        images: testImages,
+                        minimum_unit: 1,
+                        daily_slot: 10,
+                        is_active: true,
+                        category_id: 1,
+                        laboratory_id: testRecord.lab_id || 1,
+                        created_at: testRecord.created_at,
+                        updated_at: testRecord.updated_at,
+                        deleted_at: null,
+                        category: {
+                            id: 1,
+                            name: 'Kategori',
+                            description: null,
+                            created_at: testRecord.created_at,
+                            updated_at: testRecord.updated_at,
+                            deleted_at: null,
+                        },
+                        laboratory: {
+                            id: testRecord.lab_id || 1,
+                            code: testRecord.lab_code || '',
+                            slug: testRecord.lab_code?.toLowerCase() || '',
+                            name: testRecord.lab_name || '',
+                            room: '',
+                            description: '',
+                            images: ['laboratory_images/default.jpg'],
+                            created_at: testRecord.created_at,
+                            updated_at: testRecord.updated_at,
+                            deleted_at: null,
+                        },
+                    },
+                });
+            }
+
+            // ✅ Prepare packages data if available
+            const packagesData: PackageData[] = [];
+            if (testRecord.package_id && testRecord.package_name) {
+                const packageImages: string[] = Array.isArray(testRecord.package_images)
+                    ? testRecord.package_images
+                    : typeof testRecord.package_images === 'string'
+                      ? JSON.parse(testRecord.package_images || '["package_images/default.jpg"]')
+                      : ['package_images/default.jpg'];
+
+                packagesData.push({
+                    package_id: testRecord.package_id,
+                    slug: testRecord.package_slug || '',
+                    package: {
+                        id: testRecord.package_id,
+                        name: testRecord.package_name,
+                        slug: testRecord.package_slug || '',
+                        price: testRecord.package_price || 0,
+                        images: packageImages,
+                        description: '',
+                        laboratory_id: testRecord.lab_id || 1,
+                        created_at: testRecord.created_at,
+                        updated_at: testRecord.updated_at,
+                        deleted_at: null,
+                        tests: [],
+                    },
+                    quantity: 1,
+                });
+            }
+
+            // ✅ Save to localStorage with type checking
+            if (testsData.length > 0) {
+                localStorage.setItem('tests', JSON.stringify(testsData));
+            }
+
+            if (packagesData.length > 0) {
+                localStorage.setItem('packages', JSON.stringify(packagesData));
+            }
+
+            // ✅ Build URL parameters with type safety
+            const testIds: number[] = testsData.map((test: TestData): number => test.test_id);
+            const packageIds: number[] = packagesData.map((pkg: PackageData): number => pkg.package_id);
+
+            const params: URLSearchParams = new URLSearchParams();
+            testIds.forEach((id: number): void => {
+                params.append('testIds[]', id.toString());
+            });
+            packageIds.forEach((id: number): void => {
+                params.append('packageIds[]', id.toString());
+            });
+
+            const formUrl: string = `/orders/form?${params.toString()}`;
+
+            // ✅ Debug logs with proper typing
+            console.log('=== TESTING RESUBMISSION DEBUG ===');
+            console.log('Submission Type:', submissionType);
+            console.log('Tests Data Count:', testsData.length);
+            console.log('Packages Data Count:', packagesData.length);
+            console.log('Form URL:', formUrl);
+            console.log('Test Data', testsData);
+            console.log('Package Data', packagesData);
+
+            // ✅ Redirect with delay
+            setTimeout((): void => {
+                window.location.href = formUrl;
+            }, 500);
+        } catch (error: unknown) {
+            console.error('Error during testing resubmission:', error);
+
+            // Type-safe error handling
+            const errorMessage: string = error instanceof Error ? error.message : 'Terjadi kesalahan saat mengajukan ulang. Silakan coba lagi.';
+
+            alert(errorMessage);
+        } finally {
+            setProcessing(false);
+        }
+    };
+
     // Update form data when editing existing review
     const initializeEditForm = () => {
         if (testRecord.reviews) {
@@ -140,6 +417,8 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
         setEditMode(true);
         setShowReviewForm(true);
     };
+
+    console.log(testRecord);
 
     // Handle review submission (create or update)
     const handleReviewSubmit = (e: React.FormEvent) => {
@@ -220,6 +499,9 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
 
     // Check if testing is completed
     const isTestingCompleted = testRecord?.status === 'completed' && testRecord?.completed_at;
+
+    // ✅ Check if resubmission is available
+    const canResubmit = testRecord?.status === 'completed' && testRecord?.completed_at;
 
     // If no data, show a message
     if (!testRecord) {
@@ -325,7 +607,7 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                             label="ID Pengajuan"
                                             value={
                                                 <Link
-                                                    href={`/history/submissions/${testRecord.submission_code}`}
+                                                    href={`/history/submission/${testRecord.submission_code}`}
                                                     className="text-blue-600 hover:underline"
                                                 >
                                                     Lihat Pengajuan #{testRecord.submission_code}
@@ -576,8 +858,8 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                                         </div>
 
                                                         <div className="flex gap-3">
-                                                            <Button type="submit" disabled={processing || data.rating === 0} className="flex-1">
-                                                                {processing ? (
+                                                            <Button type="submit" disabled={reviewProcessing || data.rating === 0} className="flex-1">
+                                                                {reviewProcessing ? (
                                                                     <>
                                                                         <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                                                                         {editMode ? 'Memperbarui...' : 'Mengirim...'}
@@ -588,7 +870,7 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                                                     'Kirim Review'
                                                                 )}
                                                             </Button>
-                                                            <Button type="button" variant="outline" onClick={resetForm} disabled={processing}>
+                                                            <Button type="button" variant="outline" onClick={resetForm} disabled={reviewProcessing}>
                                                                 Batal
                                                             </Button>
                                                         </div>
@@ -666,6 +948,32 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                                 Pengujian telah selesai dilakukan pada {formatDate(testRecord.completed_at)}. Hasil pengujian dapat
                                                 diunduh dari bagian dokumen.
                                             </p>
+
+                                            {/* ✅ Resubmission Button for Completed Testing */}
+                                            {canResubmit && (
+                                                <div className="mt-3">
+                                                    <Button
+                                                        onClick={handleRepeatSubmission}
+                                                        className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-green-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 disabled:opacity-50"
+                                                        disabled={processing}
+                                                    >
+                                                        {processing ? (
+                                                            <>
+                                                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                                                                Memproses...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <RefreshCw className="h-4 w-4" />
+                                                                Ajukan Pengujian Ulang
+                                                            </>
+                                                        )}
+                                                    </Button>
+                                                    <p className="mt-2 text-xs text-green-600 dark:text-green-400">
+                                                        Anda dapat mengajukan pengujian serupa dengan data yang sama
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
 
@@ -721,6 +1029,7 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
                                             <li>Pastikan sampel pengujian telah disiapkan dengan baik</li>
                                             <li>Datang tepat waktu sesuai jadwal yang ditentukan</li>
                                             <li>Hasil pengujian akan tersedia setelah proses selesai</li>
+                                            {canResubmit && <li>Anda dapat mengajukan pengujian ulang setelah selesai</li>}
                                         </ul>
                                     </div>
                                 </div>
