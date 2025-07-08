@@ -120,7 +120,25 @@ class HistoryController extends Controller
 
     public function testingHistoryDetail($code): Response
     {
+        // if(auth()->user()->roles('external')->exists()) {
+        //     $externalSubmission = Submission::query()
+        //         ->where('user_id', auth()->id())
+        //         ->where('code', $code)
+        //         ->first();
+        // } else if (auth()->user()->roles('internal')->exists()) {
+        //     $externalSubmission = Submission::query()
+        //         ->where('user_id', auth()->id())
+        //         ->where('code', $code)
+        //         ->first();
+        // } else if (auth()->user()->roles('admin')->exists()) {
+        //     $externalSubmission = Submission::query()
+        //         ->where('code', $code)
+        //         ->first();
+        // } else {
+        //     abort(403, 'Unauthorized action.');
+        // }
         $testingHistoryDetail = Testing::query()
+            ->with('reviews')
             ->join('submissions', 'testings.submission_id', '=', 'submissions.id')
             ->where('submissions.user_id', auth()->id())
             ->where('testings.code', $code)
