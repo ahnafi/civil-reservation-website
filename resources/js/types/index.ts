@@ -232,6 +232,7 @@ export interface SubmissionSchedule {
     supervisor: string;
 
     created_at: string;
+    updated_at: string;
 }
 
 // Schedule Type

@@ -334,13 +334,6 @@ export default function SubmissionDetail({
 
             const formUrl: string = `/orders/form?${params.toString()}`;
 
-            // ✅ Debug logs with proper typing
-            console.log('=== RESUBMISSION DEBUG ===');
-            console.log('Submission Type:', submissionType);
-            console.log('Tests Data Count:', testsData.length);
-            console.log('Packages Data Count:', packagesData.length);
-            console.log('Form URL:', formUrl);
-
             // ✅ Redirect with delay
             setTimeout((): void => {
                 window.location.href = formUrl;

@@ -120,33 +120,22 @@ class HistoryController extends Controller
 
     public function testingHistoryDetail($code): Response
     {
-        // if(auth()->user()->roles('external')->exists()) {
-        //     $externalSubmission = Submission::query()
-        //         ->where('user_id', auth()->id())
-        //         ->where('code', $code)
-        //         ->first();
-        // } else if (auth()->user()->roles('internal')->exists()) {
-        //     $externalSubmission = Submission::query()
-        //         ->where('user_id', auth()->id())
-        //         ->where('code', $code)
-        //         ->first();
-        // } else if (auth()->user()->roles('admin')->exists()) {
-        //     $externalSubmission = Submission::query()
-        //         ->where('code', $code)
-        //         ->first();
-        // } else {
-        //     abort(403, 'Unauthorized action.');
-        // }
         $testingHistoryDetail = Testing::query()
-            ->with('reviews')
+            ->with('reviews', 'submission')
             ->join('submissions', 'testings.submission_id', '=', 'submissions.id')
             ->where('submissions.user_id', auth()->id())
             ->where('testings.code', $code)
             ->select('testings.*', 'submissions.code as submission_code')
             ->get();
+        $submissionHistoryDetail = Submission::withUserScheduleJoin()
+            ->with(['submissionInternalDetail', 'submissionExternalDetail'])
+            ->where('submissions.user_id', auth()->id())
+            ->where('submissions.id', $testingHistoryDetail->first()?->submission_id)
+            ->get();
 
         return Inertia::render('history/detail/testing', [
             'testingHistoryDetail' => $testingHistoryDetail,
+            'submissionHistoryDetail' => $submissionHistoryDetail,
         ]);
     }
 }

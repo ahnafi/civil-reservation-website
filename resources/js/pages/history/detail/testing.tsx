@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { Test, type BreadcrumbItem } from '@/types';
+import { SubmissionSchedule, Test, type BreadcrumbItem } from '@/types';
 import { parseAndFormatDate } from '@/utils/date-utils';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowLeft, Beaker, Calendar, Check, ClipboardCheck, Clock, Download, Edit, FileText, Info, Link2, RefreshCw, Star } from 'lucide-react';
@@ -208,9 +208,16 @@ const InfoItem = ({ icon, label, value }: { icon: React.ReactNode; label: string
     );
 };
 
-export default function TestingDetail({ testingHistoryDetail }: { testingHistoryDetail: ReviewTesting[] }) {
+export default function TestingDetail({
+    testingHistoryDetail,
+    submissionHistoryDetail,
+}: {
+    testingHistoryDetail: ReviewTesting[];
+    submissionHistoryDetail: SubmissionSchedule[];
+}) {
     // Get the first test record
     const testRecord: ReviewTesting = testingHistoryDetail[0];
+    const submissionRecord: SubmissionSchedule = submissionHistoryDetail[0] || null;
 
     // Review form state
     const [showReviewForm, setShowReviewForm] = useState(false);
@@ -249,28 +256,28 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
         setProcessing(true);
 
         try {
-            const submissionType: string = testRecord.submission_type || 'external';
+            const submissionType: string = submissionRecord.submission_type || 'external';
 
             // ✅ Prepare form data with proper typing
             if (submissionType === 'external') {
                 const externalFormData: ResubmissionFormData = {
-                    company_name: testRecord.company_name || '',
-                    project_name: testRecord.project_name || '',
-                    project_address: testRecord.project_address || '',
-                    test_submission_date: testRecord.test_submission_date
-                        ? testRecord.test_submission_date.split('T')[0]
+                    company_name: submissionRecord.company_name || '',
+                    project_name: submissionRecord.project_name || '',
+                    project_address: submissionRecord.project_address || '',
+                    test_submission_date: submissionRecord.test_submission_date
+                        ? submissionRecord.test_submission_date.split('T')[0]
                         : new Date().toISOString().split('T')[0],
                 };
                 localStorage.setItem('external_form', JSON.stringify(externalFormData));
             } else if (submissionType === 'internal') {
                 const internalFormData: ResubmissionFormData = {
-                    name: testRecord.researcher_name || '',
-                    program_study: testRecord.program_study || '',
-                    research_title: testRecord.research_title || '',
-                    personnel_count: testRecord.personnel_count || 1,
-                    supervisor: testRecord.supervisor || '',
-                    test_submission_date: testRecord.test_submission_date
-                        ? testRecord.test_submission_date.split('T')[0]
+                    name: submissionRecord.researcher_name || '',
+                    program_study: submissionRecord.program_study || '',
+                    research_title: submissionRecord.research_title || '',
+                    personnel_count: submissionRecord.personnel_count || 1,
+                    supervisor: submissionRecord.supervisor || '',
+                    test_submission_date: submissionRecord.test_submission_date
+                        ? submissionRecord.test_submission_date.split('T')[0]
                         : new Date().toISOString().split('T')[0],
                 };
                 localStorage.setItem('internal_form', JSON.stringify(internalFormData));
@@ -278,50 +285,50 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
 
             // ✅ Prepare tests data if available
             const testsData: TestData[] = [];
-            if (testRecord.test_id && testRecord.test_name) {
-                const testImages: string[] = Array.isArray(testRecord.test_images)
-                    ? testRecord.test_images
-                    : typeof testRecord.test_images === 'string'
-                      ? JSON.parse(testRecord.test_images || '["test_images/default.jpg"]')
+            if (submissionRecord.test_id && submissionRecord.test_name) {
+                const testImages: string[] = Array.isArray(submissionRecord.test_images)
+                    ? submissionRecord.test_images
+                    : typeof submissionRecord.test_images === 'string'
+                      ? JSON.parse(submissionRecord.test_images || '["test_images/default.jpg"]')
                       : ['test_images/default.jpg'];
 
                 testsData.push({
-                    test_id: testRecord.test_id,
-                    slug: testRecord.test_slug || '',
-                    unit: testRecord.quantity || 1,
+                    test_id: submissionRecord.test_id,
+                    slug: submissionRecord.test_slug || '',
+                    unit: submissionRecord.quantity || 1,
                     test: {
-                        id: testRecord.test_id,
-                        name: testRecord.test_name,
-                        slug: testRecord.test_slug || '',
-                        price: testRecord.test_price || 0,
+                        id: submissionRecord.test_id,
+                        name: submissionRecord.test_name,
+                        slug: submissionRecord.test_slug || '',
+                        price: submissionRecord.test_price || 0,
                         description: '',
                         images: testImages,
                         minimum_unit: 1,
                         daily_slot: 10,
                         is_active: true,
                         category_id: 1,
-                        laboratory_id: testRecord.lab_id || 1,
-                        created_at: testRecord.created_at,
-                        updated_at: testRecord.updated_at,
+                        laboratory_id: submissionRecord.lab_id || 1,
+                        created_at: submissionRecord.created_at,
+                        updated_at: submissionRecord.updated_at,
                         deleted_at: null,
                         category: {
                             id: 1,
                             name: 'Kategori',
                             description: null,
-                            created_at: testRecord.created_at,
-                            updated_at: testRecord.updated_at,
+                            created_at: submissionRecord.created_at,
+                            updated_at: submissionRecord.updated_at,
                             deleted_at: null,
                         },
                         laboratory: {
-                            id: testRecord.lab_id || 1,
-                            code: testRecord.lab_code || '',
-                            slug: testRecord.lab_code?.toLowerCase() || '',
-                            name: testRecord.lab_name || '',
+                            id: submissionRecord.lab_id || 1,
+                            code: submissionRecord.lab_code || '',
+                            slug: submissionRecord.lab_code?.toLowerCase() || '',
+                            name: submissionRecord.lab_name || '',
                             room: '',
                             description: '',
                             images: ['laboratory_images/default.jpg'],
-                            created_at: testRecord.created_at,
-                            updated_at: testRecord.updated_at,
+                            created_at: submissionRecord.created_at,
+                            updated_at: submissionRecord.updated_at,
                             deleted_at: null,
                         },
                     },
@@ -330,26 +337,26 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
 
             // ✅ Prepare packages data if available
             const packagesData: PackageData[] = [];
-            if (testRecord.package_id && testRecord.package_name) {
-                const packageImages: string[] = Array.isArray(testRecord.package_images)
-                    ? testRecord.package_images
-                    : typeof testRecord.package_images === 'string'
-                      ? JSON.parse(testRecord.package_images || '["package_images/default.jpg"]')
+            if (submissionRecord.package_id && submissionRecord.package_name) {
+                const packageImages: string[] = Array.isArray(submissionRecord.package_images)
+                    ? submissionRecord.package_images
+                    : typeof submissionRecord.package_images === 'string'
+                      ? JSON.parse(submissionRecord.package_images || '["package_images/default.jpg"]')
                       : ['package_images/default.jpg'];
 
                 packagesData.push({
-                    package_id: testRecord.package_id,
-                    slug: testRecord.package_slug || '',
+                    package_id: submissionRecord.package_id,
+                    slug: submissionRecord.package_slug || '',
                     package: {
-                        id: testRecord.package_id,
-                        name: testRecord.package_name,
-                        slug: testRecord.package_slug || '',
-                        price: testRecord.package_price || 0,
+                        id: submissionRecord.package_id,
+                        name: submissionRecord.package_name,
+                        slug: submissionRecord.package_slug || '',
+                        price: submissionRecord.package_price || 0,
                         images: packageImages,
                         description: '',
-                        laboratory_id: testRecord.lab_id || 1,
-                        created_at: testRecord.created_at,
-                        updated_at: testRecord.updated_at,
+                        laboratory_id: submissionRecord.lab_id || 1,
+                        created_at: submissionRecord.created_at,
+                        updated_at: submissionRecord.updated_at,
                         deleted_at: null,
                         tests: [],
                     },
@@ -418,7 +425,8 @@ export default function TestingDetail({ testingHistoryDetail }: { testingHistory
         setShowReviewForm(true);
     };
 
-    console.log(testRecord);
+    // console.log(testRecord);
+    console.log('Cek: ', submissionHistoryDetail);
 
     // Handle review submission (create or update)
     const handleReviewSubmit = (e: React.FormEvent) => {
