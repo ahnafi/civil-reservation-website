@@ -8,6 +8,7 @@ use Filament\Forms;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
+use Filament\Forms\Get;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -42,18 +43,54 @@ class TransactionsRelationManager extends RelationManager
                     ->default(fn() => $this->getOwnerRecord()->total_cost ?? 0)
                     ->prefix("Rp"),
 
+                ToggleButtons::make('payment_type')
+                    ->label("Tipe Pembayaran")
+                    ->inline()
+                    ->required()
+                    ->default('main')
+                    ->options([
+                        "main" => "Utama",
+                        "additional" => "Tambahan"
+                    ])
+                    ->colors([
+                        'main' => 'success',
+                        'additional' => 'info',
+                    ])
+                    ->icons([
+                        'main' => 'heroicon-o-banknotes',
+                        'additional' => 'heroicon-o-plus-circle',
+                    ])
+                    ->live()
+                    ->afterStateUpdated(function ($state, Set $set) {
+                        if ($state === "additional") {
+                            $set('payment_method', 'BANK BNI SIPIL');
+                        } else {
+                            $set('payment_method', null);
+                        }
+                    }),
+
                 ToggleButtons::make('payment_method')
                     ->hiddenOn("create")
                     ->label("Metode Pembayaran")
                     ->inline()
-                    ->options([
-                        "BANK JATENG" => "BANK JATENG",
-                        "BANK MANDIRI" => "BANK MANDIRI",
-                        "BANK BNI" => "BANK BNI",
-                        "BANK BRI" => "BANK BRI",
-                        "BANK BSI" => "BANK BSI",
-                        "BANK BTN" => "BANK BTN"
-                    ])
+                    ->options(function (Forms\Get $get) {
+                        $paymentType = $get('payment_type');
+                        
+                        if ($paymentType === 'additional') {
+                            return [
+                                "BANK BNI SIPIL" => "BANK BNI SIPIL"
+                            ];
+                        }
+                        
+                        return [
+                            "BANK JATENG" => "BANK JATENG",
+                            "BANK MANDIRI" => "BANK MANDIRI",
+                            "BANK BNI" => "BANK BNI",
+                            "BANK BRI" => "BANK BRI",
+                            "BANK BSI" => "BANK BSI",
+                            "BANK BTN" => "BANK BTN"
+                        ];
+                    })
                     ->colors([
                         'BANK JATENG' => 'success',
                         'BANK MANDIRI' => 'success',
@@ -61,7 +98,9 @@ class TransactionsRelationManager extends RelationManager
                         'BANK BRI' => 'success',
                         'BANK BSI' => 'success',
                         'BANK BTN' => 'success',
-                    ]),
+                        'BANK BNI SIPIL' => 'info',
+                    ])
+                    ->live(),
 
                 ToggleButtons::make('status')
                     ->default("pending")
@@ -105,9 +144,15 @@ class TransactionsRelationManager extends RelationManager
                         'application/pdf',
                         'application/msword',
                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'image/jpeg',
+                        'image/png',
+                        'image/gif',
+                        'image/webp',
                     ])
+                    ->previewable()
+                    ->openable()
                     ->maxSize(2048)
-                    ->helperText('Upload file invoice pembayaran. Format yang didukung: PDF, DOC, DOCX. Maksimal ukuran file 2MB.')
+                    ->helperText('Upload file invoice pembayaran. Format yang didukung: PDF, DOC, DOCX, JPG, PNG, GIF, WEBP. Maksimal ukuran file 2MB.')
                     ->visibility('public')
                     ->directory('payment_invoice_files')
                     ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
@@ -124,6 +169,7 @@ class TransactionsRelationManager extends RelationManager
                     ->columnSpanFull()
                     ->label('Bukti Pembayaran')
                     ->image()
+                    ->openable()
                     ->imageEditor()
                     ->previewable(true)
                     ->imagePreviewHeight('150')
@@ -159,6 +205,27 @@ class TransactionsRelationManager extends RelationManager
                     ->numeric()
                     ->money('IDR')
                     ->sortable(),
+                
+                Tables\Columns\TextColumn::make('payment_type')
+                    ->label('Tipe Pembayaran')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'main' => 'success',
+                        'additional' => 'info',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'main' => 'Utama',
+                        'additional' => 'Tambahan',
+                        default => ucfirst($state),
+                    }),
+                Tables\Columns\TextColumn::make('payment_method')
+                    ->label('Metode Pembayaran')
+                    ->badge()
+                    ->color(fn(?string $state): string => match ($state) {
+                        'BANK BNI SIPIL' => 'info',
+                        default => 'success',
+                    }),
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Status')
                     ->colors([
@@ -172,8 +239,6 @@ class TransactionsRelationManager extends RelationManager
                         'failed' => 'Ditolak',
                         default => $state,
                     }),
-                Tables\Columns\TextColumn::make('payment_method')
-                    ->label('Metode Pembayaran'),
                 Tables\Columns\TextColumn::make('payment_date')
                     ->label('Tanggal Pembayaran')
                     ->dateTime()
@@ -192,6 +257,23 @@ class TransactionsRelationManager extends RelationManager
                         'pending' => 'Diajukan',
                         'success' => 'Diterima',
                         'failed' => 'Ditolak',
+                    ]),
+                Tables\Filters\SelectFilter::make('payment_type')
+                    ->label('Tipe Pembayaran')
+                    ->options([
+                        'main' => 'Utama',
+                        'additional' => 'Tambahan',
+                    ]),
+                Tables\Filters\SelectFilter::make('payment_method')
+                    ->label('Metode Pembayaran')
+                    ->options([
+                        'BANK JATENG' => 'BANK JATENG',
+                        'BANK MANDIRI' => 'BANK MANDIRI',
+                        'BANK BNI' => 'BANK BNI',
+                        'BANK BRI' => 'BANK BRI',
+                        'BANK BSI' => 'BANK BSI',
+                        'BANK BTN' => 'BANK BTN',
+                        'BANK BNI SIPIL' => 'BANK BNI SIPIL',
                     ]),
                 Tables\Filters\Filter::make('created_at')
                     ->form([

@@ -14,6 +14,7 @@ use Filament\Forms;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Forms\Form;
 use Filament\Forms\Set;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -42,8 +43,7 @@ class TransactionResource extends Resource
             ->schema([
 
                 Forms\Components\Select::make('submission_id')
-                    ->relationship("submission", "code")
-                    ->relationship("submission", "code", fn($query) => $query->orderBy('created_at', 'desc'))
+                    ->relationship("submission", "code", fn($query) => $query->where("submission_type","external")->orderBy('created_at', 'desc'))
                     ->searchable()
                     ->columnSpanFull()
                     ->live()
@@ -53,7 +53,7 @@ class TransactionResource extends Resource
                         $submission = Submission::find($state);
                         if ($submission) {
                             $set("submission_id", $submission->id);
-                            $set("amount", $submission->total_cost);
+                            $set("amount", $submission->submissionExternalDetail->total_cost);
 
                             $submissionId = $submission?->id ?? '000';
                             $userId = $submission?->user_id ?? '000';
@@ -79,19 +79,56 @@ class TransactionResource extends Resource
                     ->default(0)
                     ->prefix("Rp"),
 
+                ToggleButtons::make('payment_type')
+                    ->label("Tipe Pembayaran")
+                    ->inline()
+                    ->columnSpanFull()
+                    ->required()
+                    ->default('main')
+                    ->options([
+                        "main" => "Utama",
+                        "additional" => "Tambahan"
+                    ])
+                    ->colors([
+                        'main' => 'success',
+                        'additional' => 'info',
+                    ])
+                    ->icons([
+                        'main' => 'heroicon-o-banknotes',
+                        'additional' => 'heroicon-o-plus-circle',
+                    ])
+                    ->live()
+                    ->afterStateUpdated(function ($state, Set $set) {
+                        if ($state === "additional") {
+                            $set('payment_method', 'BANK BNI SIPIL');
+                        } else {
+                            $set('payment_method', null);
+                        }
+                    }),
+
                 ToggleButtons::make('payment_method')
                     ->hiddenOn("create")
                     ->label("Metode Pembayaran")
                     ->inline()
                     ->columnSpanFull()
-                    ->options([
-                        "BANK JATENG" => "BANK JATENG",
-                        "BANK MANDIRI" => "BANK MANDIRI",
-                        "BANK BNI" => "BANK BNI",
-                        "BANK BRI" => "BANK BRI",
-                        "BANK BSI" => "BANK BSI",
-                        "BANK BTN" => "BANK BTN"
-                    ])
+                    ->options(function (Forms\Get $get) {
+                        $paymentType = $get('payment_type');
+                        
+                        if ($paymentType === 'additional') {
+                            return [
+                                "BANK BNI SIPIL" => "BANK BNI SIPIL"
+                            ];
+                        }
+                        
+                        return [
+                            "BANK JATENG" => "BANK JATENG",
+                            "BANK MANDIRI" => "BANK MANDIRI",
+                            "BANK BNI" => "BANK BNI",
+                            "BANK BRI" => "BANK BRI",
+                            "BANK BSI" => "BANK BSI",
+                            "BANK BTN" => "BANK BTN"
+                        ];
+                    })
                     ->colors([
                         'BANK JATENG' => 'success',
                         'BANK MANDIRI' => 'success',
@@ -99,7 +136,9 @@ class TransactionResource extends Resource
                         'BANK BRI' => 'success',
                         'BANK BSI' => 'success',
                         'BANK BTN' => 'success',
-                    ]),
+                        'BANK BNI SIPIL' => 'info',
+                    ])
+                    ->live(),
 
                 ToggleButtons::make('status')
                     ->default("pending")
@@ -139,9 +178,15 @@ class TransactionResource extends Resource
                         'application/pdf',
                         'application/msword',
                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                        'image/jpeg',
+                        'image/png',
+                        'image/gif',
+                        'image/webp',
                     ])
+                    ->previewable()
+                    ->openable()
                     ->maxSize(2048)
-                    ->helperText('Upload file invoice pembayaran. Format yang didukung: PDF, DOC, DOCX. Maksimal ukuran file 2MB.')
+                    ->helperText('Upload file invoice pembayaran. Format yang didukung: PDF, DOC, DOCX, JPG, PNG, GIF, WEBP. Maksimal ukuran file 2MB.')
                     ->visibility('public')
                     ->directory('payment_invoice_files')
                     ->getUploadedFileNameForStorageUsing(function (TemporaryUploadedFile $file, $get): string {
@@ -159,6 +204,7 @@ class TransactionResource extends Resource
                     ->label('Bukti Pembayaran')
                     ->image()
                     ->imageEditor()
+                    ->openable()
                     ->previewable(true)
                     ->imagePreviewHeight('150')
                     ->maxSize(2048)
@@ -209,6 +255,28 @@ class TransactionResource extends Resource
                     ->numeric()
                     ->prefix("Rp "),
 
+                Tables\Columns\TextColumn::make('payment_type')
+                    ->label('Tipe Pembayaran')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        'main' => 'success',
+                        'additional' => 'info',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'main' => 'Utama',
+                        'additional' => 'Tambahan',
+                        default => ucfirst($state),
+                    }),
+
+                Tables\Columns\TextColumn::make('payment_method')
+                    ->label('Metode Pembayaran')
+                    ->badge()
+                    ->color(fn(?string $state): string => match ($state) {
+                        'BANK BNI SIPIL' => 'info',
+                        default => 'success',
+                    }),
+
                 Tables\Columns\TextColumn::make('payment_deadline')
                     ->label('Batas Pembayaran')
                     ->date()
@@ -253,6 +321,23 @@ class TransactionResource extends Resource
                         "pending" => "Diajukan",
                         "success" => "Dibayar",
                         "failed" => "Gagal"
+                    ]),
+                Tables\Filters\SelectFilter::make("payment_type")
+                    ->label("Filter berdasarkan tipe pembayaran")
+                    ->options([
+                        "main" => "Utama",
+                        "additional" => "Tambahan"
+                    ]),
+                Tables\Filters\SelectFilter::make("payment_method")
+                    ->label("Filter berdasarkan metode pembayaran")
+                    ->options([
+                        "BANK JATENG" => "BANK JATENG",
+                        "BANK MANDIRI" => "BANK MANDIRI",
+                        "BANK BNI" => "BANK BNI",
+                        "BANK BRI" => "BANK BRI",
+                        "BANK BSI" => "BANK BSI",
+                        "BANK BTN" => "BANK BTN",
+                        "BANK BNI SIPIL" => "BANK BNI SIPIL"
                     ]),
                 Tables\Filters\Filter::make('created_at')
                     ->form([
