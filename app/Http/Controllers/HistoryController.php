@@ -34,43 +34,32 @@ class HistoryController extends Controller
 
     public function testingHistory(): Response
     {
-        $userTestings = Testing::query()
-            ->join('submissions', 'testings.submission_id', '=', 'submissions.id')
-            ->where('submissions.user_id', auth()->id())
-            ->orderBy('testings.created_at', 'desc')
-            ->select('testings.*')
+        $userTestings = Testing::whereHas('submission', function ($query) {
+            $query->where('user_id', auth()->id());
+        })
+            ->with('submission')
+            ->latest()
             ->get();
-
-        $tests = Test::select(['id', 'name'])->get();
-        $packages = Package::select(['id', 'name'])->get();
-        $laboratories = Laboratory::select(['id', 'code', 'name'])->get();
 
         return Inertia::render('history/testings', [
             'userTestings' => $userTestings,
-            'tests' => $tests,
-            'packages' => $packages,
-            'laboratories' => $laboratories,
+            'tests' => Test::select('id', 'name')->get(),
+            'packages' => Package::select('id', 'name')->get(),
+            'laboratories' => Laboratory::select('id', 'code', 'name')->get(),
         ]);
     }
 
+
     public function transactionsHistory(): Response
     {
-        $userTransactions = Transaction::query()
-            ->join('submissions', 'transactions.submission_id', '=', 'submissions.id')
-            ->where('submissions.user_id', auth()->id())
-            ->orderBy('transactions.created_at', 'desc')
-            ->select('transactions.*')
+        $userTransactions = Transaction::whereHas('submission', function ($query) {
+            $query->where('user_id', auth()->id());
+        })
+            ->orderByDesc('created_at')
             ->get();
-
-        $tests = Test::select(['id', 'name'])->get();
-        $packages = Package::select(['id', 'name'])->get();
-        $laboratories = Laboratory::select(['id', 'code', 'name'])->get();
 
         return Inertia::render('history/transactions', [
             'userTransactions' => $userTransactions,
-            'tests' => $tests,
-            'packages' => $packages,
-            'laboratories' => $laboratories,
         ]);
     }
 
@@ -106,12 +95,13 @@ class HistoryController extends Controller
 
     public function transactionHistoryDetail($code): Response
     {
-        $transactionHistoryDetail = Transaction::query()
-            ->join('submissions', 'transactions.submission_id', '=', 'submissions.id')
-            ->where('submissions.user_id', auth()->id())
-            ->where('transactions.code', $code)
-            ->select('transactions.*', 'submissions.code as submission_code')
-            ->get();
+        $transactionHistoryDetail = Transaction::where('code', $code)
+            ->whereHas('submission', function ($query) {
+                $query->where('user_id', auth()->id());
+            })
+            ->with('submission')
+            ->firstOrFail();
+
 
         return Inertia::render('history/detail/transaction', [
             'transactionHistoryDetail' => $transactionHistoryDetail,
