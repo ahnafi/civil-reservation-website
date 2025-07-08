@@ -19,11 +19,12 @@ class SubmissionSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1: Admin
-        // 2: External User
-        // 3: Internal User
-        // 4: External User
-        // 5: Internal User
+        // 1: SuperAdmin
+        // 2: Admin
+        // 3: External User
+        // 4: Internal User
+        // 5: External User
+        // 6: Internal User
 
         $now = Carbon::now();
 
@@ -383,7 +384,7 @@ class SubmissionSeeder extends Seeder
 
         $submissions = [
             [ // 1 submitted
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 1,
                 'status' => 'submitted',
@@ -391,7 +392,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(7, 14)),
             ],
             [ // 2 approved
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 2,
                 'status' => 'approved',
@@ -399,7 +400,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 3 rejected
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 3,
                 'status' => 'rejected',
@@ -407,7 +408,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 4 submitted
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 4,
                 'status' => 'submitted',
@@ -415,7 +416,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(7, 14)),
             ],
             [ // 5 approved
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 5,
                 'status' => 'approved',
@@ -423,7 +424,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 6 rejected
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 6,
                 'status' => 'rejected',
@@ -431,7 +432,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 7 submitted
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 7,
                 'status' => 'submitted',
@@ -439,7 +440,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(7, 14)),
             ],
             [ // 8 approved
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 8,
                 'status' => 'approved',
@@ -447,7 +448,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 9 rejected
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 9,
                 'status' => 'rejected',
@@ -455,7 +456,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 10 submitted
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 10,
                 'status' => 'submitted',
@@ -463,7 +464,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(7, 14)),
             ],
             [ // 11 approved
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 11,
                 'status' => 'approved',
@@ -471,7 +472,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 12 rejected
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 12,
                 'status' => 'rejected',
@@ -479,7 +480,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 13 submitted
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 13,
                 'status' => 'submitted',
@@ -487,7 +488,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(7, 14)),
             ],
             [ // 14 approved
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 14,
                 'status' => 'approved',
@@ -495,7 +496,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 15 rejected
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 15,
                 'status' => 'rejected',
@@ -503,7 +504,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 16 submitted
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 16,
                 'status' => 'submitted',
@@ -511,7 +512,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(7, 14)),
             ],
             [ // 17 approved
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 17,
                 'status' => 'approved',
@@ -519,7 +520,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 18 rejected
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 18,
                 'status' => 'rejected',
@@ -527,7 +528,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 19 submitted
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 19,
                 'status' => 'submitted',
@@ -535,7 +536,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(7, 14)),
             ],
             [ // 20 approved
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 20,
                 'status' => 'approved',
@@ -543,7 +544,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 21 approved
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 21,
                 'status' => 'approved',
@@ -551,7 +552,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 22 approved
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 22,
                 'status' => 'approved',
@@ -559,7 +560,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 23 approved
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 23,
                 'status' => 'approved',
@@ -567,7 +568,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 24 approved
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 24,
                 'status' => 'approved',
@@ -575,7 +576,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 25 approved
-                'user_id' => 4,
+                'user_id' => 5,
                 'submission_type' => 'external',
                 'submission_external_detail_id' => 25,
                 'status' => 'approved',
@@ -583,7 +584,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 26 approved
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 1,
                 'status' => 'approved',
@@ -591,7 +592,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->subDays(rand(30, 60)),
             ],
             [ // 27 approved
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 2,
                 'status' => 'approved',
@@ -599,7 +600,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(10, 30)),
             ],
             [ // 28 rejected
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 3,
                 'status' => 'rejected',
@@ -607,7 +608,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->subDays(rand(20, 60)),
             ],
             [ // 29 submitted
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 4,
                 'status' => 'submitted',
@@ -615,7 +616,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(7, 14)),
             ],
             [ // 30 submitted
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 5,
                 'status' => 'submitted',
@@ -623,7 +624,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(7, 21)),
             ],
             [ // 31 rejected
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 6,
                 'status' => 'rejected',
@@ -631,7 +632,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 32 approved
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 7,
                 'status' => 'approved',
@@ -639,7 +640,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-40, 30)),
             ],
             [ // 33 rejected
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 8,
                 'status' => 'rejected',
@@ -647,7 +648,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-30, 20)),
             ],
             [ // 34 submitted
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 9,
                 'status' => 'submitted',
@@ -655,7 +656,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(10, 20)),
             ],
             [ // 35 approved
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 10,
                 'status' => 'approved',
@@ -663,7 +664,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-50, 30)),
             ],
             [ // 36 submitted
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 11,
                 'status' => 'submitted',
@@ -671,7 +672,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(7, 14)),
             ],
             [ // 37 approved
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 12,
                 'status' => 'approved',
@@ -679,7 +680,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-30, 20)),
             ],
             [ // 38 rejected
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 13,
                 'status' => 'rejected',
@@ -687,7 +688,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-50, 10)),
             ],
             [ // 39 submitted
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 14,
                 'status' => 'submitted',
@@ -695,7 +696,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(10, 20)),
             ],
             [ // 40 approved
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 15,
                 'status' => 'approved',
@@ -703,7 +704,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-30, 20)),
             ],
             [ // 41 rejected
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 16,
                 'status' => 'rejected',
@@ -711,7 +712,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-60, 30)),
             ],
             [ // 42 approved
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 17,
                 'status' => 'approved',
@@ -719,7 +720,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-45, 25)),
             ],
             [ // 43 rejected
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 18,
                 'status' => 'rejected',
@@ -727,7 +728,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(-50, 10)),
             ],
             [ // 44 submitted
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 19,
                 'status' => 'submitted',
@@ -735,7 +736,7 @@ class SubmissionSeeder extends Seeder
                 'test_submission_date' => $now->copy()->addDays(rand(7, 14)),
             ],
             [ // 45 approved
-                'user_id' => 5,
+                'user_id' => 6,
                 'submission_type' => 'internal',
                 'submission_internal_detail_id' => 20,
                 'status' => 'approved',
