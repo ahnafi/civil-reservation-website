@@ -6,9 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Reviews extends Model
+class Review extends Model
 {
-    use softDeletes;
+    use SoftDeletes;
 
     protected $fillable = [
         'rating',
