@@ -61,7 +61,7 @@ class TestingsRelationManager extends RelationManager
 
                 Forms\Components\DatePicker::make('test_date')
                     ->label('Tanggal Pengujian')
-                    ->minDate(now())
+                    ->minDate(today('Asia/Jakarta'))
                     ->rule(function () {
                         return function (string $attribute, $value, \Closure $fail) {
                             if ($value) {
@@ -142,7 +142,7 @@ class TestingsRelationManager extends RelationManager
                     }),
                 Tables\Columns\TextColumn::make('test_date')
                     ->label('Tanggal Pengujian')
-                    ->dateTime()
+                    ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('completed_at')
                     ->label('Selesai')
@@ -168,11 +168,11 @@ class TestingsRelationManager extends RelationManager
                         return $query
                             ->when(
                                 $data['test_date_from'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('test_date', '>=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('test_date', '>=', $date),
                             )
                             ->when(
                                 $data['test_date_until'],
-                                fn (Builder $query, $date): Builder => $query->whereDate('test_date', '<=', $date),
+                                fn(Builder $query, $date): Builder => $query->whereDate('test_date', '<=', $date),
                             );
                     }),
             ])
@@ -192,7 +192,7 @@ class TestingsRelationManager extends RelationManager
                     ->successNotificationTitle('Pengujian berhasil dibuat'),
             ])
             ->actions([
-               Tables\Actions\Action::make("Selesaikan")
+                Tables\Actions\Action::make("Selesaikan")
                     ->form([
                         Forms\Components\FileUpload::make('documents')
                             ->label('Lampiran')

@@ -107,7 +107,7 @@ class SubmissionExternalDetailResource extends Resource
                         Forms\Components\DatePicker::make('test_submission_date')
                             ->label('Tanggal pengujian')
                             ->required()
-                            ->minDate(now())
+                            ->minDate(today("Asia/Jakarta"))
                             ->rule(function () {
                                 return function (string $attribute, $value, \Closure $fail) {
                                     if ($value) {

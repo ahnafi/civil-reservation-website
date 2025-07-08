@@ -91,7 +91,7 @@ class TestingResource extends Resource
 
                 Forms\Components\DatePicker::make('test_date')
                     ->label('Tanggal Pengujian')
-                    ->minDate(now())
+                    ->minDate(today('Asia/Jakarta'))
                     ->rule(function () {
                         return function (string $attribute, $value, \Closure $fail) {
                             if ($value) {

@@ -50,6 +50,7 @@ class LaboratoryResource extends Resource
                         ->maxLength(65535),
                     Forms\Components\FileUpload::make('images')
                         ->label('Gambar laboratorium')
+                        ->helperText('Maksimal ukuran file: 2MB per gambar')
                         ->image()
                         ->reorderable()
                         ->required()
@@ -87,10 +88,6 @@ class LaboratoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\ImageColumn::make('image')
-                    ->label('Gambar')
-                    ->size(50)
-                    ->circular(),
                 Tables\Columns\TextColumn::make('code')
                     ->label('Kode Lab')
                     ->searchable(),
