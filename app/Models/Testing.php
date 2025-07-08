@@ -47,8 +47,8 @@ use Illuminate\Support\Facades\DB;
             $testing->code = 'UJI-' . $submissionCode . '-' . strtoupper($randomString);
             $testing->saveQuietly();
 //             send mail
-             $userEmail = $testing->submission->user->email;
-             Mail::to($userEmail)->send(new TestingWip($testing->id));
+//             $userEmail = $testing->submission->user->email;
+//             Mail::to($userEmail)->send(new TestingWip($testing->id));
         });
 
         static::updating(function ($model) {
@@ -97,7 +97,7 @@ use Illuminate\Support\Facades\DB;
 
     public function reviews(): HasOne
     {
-        return $this->hasOne(Reviews::class);
+        return $this->hasOne(Review::class);
     }
 
     public function schedules(): BelongsToMany
