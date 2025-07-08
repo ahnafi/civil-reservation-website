@@ -61,11 +61,6 @@ const orderNavItems: NavItem[] = [
         url: '/orders/cart',
         icon: ClipboardPen,
     },
-    {
-        title: 'Hasil Pengujian',
-        url: '/',
-        icon: FileText,
-    },
 ];
 
 const historyNavItems: NavItem[] = [
@@ -81,9 +76,17 @@ const historyNavItems: NavItem[] = [
     },
     {
         title: 'Pengujian',
-        url: '/history/tests',
+        url: '/history/testings',
         icon: History,
     },
+];
+
+const otherNavItems: NavItem[] = [
+    {
+        title: 'Panduan Reservasi',
+        url: '/tutorial',
+        icon: BookOpen,
+    }
 ];
 
 const adminItems: NavItem[] = [
@@ -122,6 +125,7 @@ export function AppSidebar() {
                 <NavMain label="Layanan" items={serviceNavItems} />
                 <NavMain label="Reservasi" items={orderNavItems} />
                 <NavMain label="Riwayat" items={historyNavItems} />
+                <NavMain label="Lainnya" items={otherNavItems} />
                 { user.role === 'admin' && (
                     <NavMain label="Admin" items={adminItems} />
                 )}

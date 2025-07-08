@@ -32,7 +32,7 @@ class BookingService
         string $submission_type,
         array $detailData, // array khusus untuk internal atau external
         string $test_submission_date,
-        string $user_note,
+        ?string $user_note,
         array $submission_tests,
         array $submission_packages
     ): void {
@@ -116,7 +116,7 @@ class BookingService
                 'submission_internal_detail_id' => $internalDetailId,
                 'submission_external_detail_id' => $externalDetailId,
                 'test_submission_date' => $test_submission_date,
-                'user_note' => $user_note,
+                'user_note' => $user_note ?? '', // Pastikan selalu string
             ]);
 
             // 4. Tambah relasi pengujian & paket

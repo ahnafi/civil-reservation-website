@@ -1,21 +1,16 @@
-"use client"
+'use client';
 
-import { DatePicker } from "@/components/DatePicker"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import {
-    DropdownMenu,
-    DropdownMenuCheckboxItem,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import DropdownSelect from "@/components/ui/DropdownSelect"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import AppLayout from "@/layouts/app-layout"
-import type { BreadcrumbItem, LaboratorySimple, SimpleOption, SubmissionSchedule, Testing, Transaction } from "@/types"
-import { Head } from "@inertiajs/react"
-import type { Table as TanStackTable } from "@tanstack/react-table"
+import { DatePicker } from '@/components/DatePicker';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import DropdownSelect from '@/components/ui/DropdownSelect';
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import type { BreadcrumbItem, LaboratorySimple, SimpleOption, SubmissionSchedule, Testing, Transaction } from '@/types';
+import { Head } from '@inertiajs/react';
+import type { Table as TanStackTable } from '@tanstack/react-table';
 import {
     type ColumnFiltersState,
     flexRender,
@@ -26,46 +21,46 @@ import {
     type SortingState,
     useReactTable,
     type VisibilityState,
-} from "@tanstack/react-table"
-import { Check, ChevronDown, X } from "lucide-react"
-import type * as React from "react"
-import { useEffect, useState } from "react"
-import { toast, ToastContainer } from "react-toastify"
-import { transactionColumnLabels, transactionColumns, transactionStatusOptions } from "./tableConfig"
+} from '@tanstack/react-table';
+import { Check, ChevronDown, X } from 'lucide-react';
+import type * as React from 'react';
+import { useEffect, useState } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import { transactionColumnLabels, transactionColumns, transactionStatusOptions } from './tableConfig';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: "Riwayat Transaksi",
-        href: "/history/transactions",
+        title: 'Riwayat Transaksi',
+        href: '/history/transactions',
     },
-]
+];
 
 export default function Transactions({
-                                         userTransactions,
-                                     }: {
-    userSubmissions: SubmissionSchedule[]
-    userTransactions: Transaction[]
-    userTestings: Testing[]
-    tests: SimpleOption[]
-    packages: SimpleOption[]
-    laboratories: LaboratorySimple[]
+    userTransactions,
+}: {
+    userSubmissions: SubmissionSchedule[];
+    userTransactions: Transaction[];
+    userTestings: Testing[];
+    tests: SimpleOption[];
+    packages: SimpleOption[];
+    laboratories: LaboratorySimple[];
 }) {
     // Transaction Table State
-    const [transactionSorting, setTransactionSorting] = useState<SortingState>([])
-    const [transactionFilters, setTransactionFilters] = useState<ColumnFiltersState>([])
-    const [transactionVisibility, setTransactionVisibility] = useState<VisibilityState>({})
-    const [transactionSelection, setTransactionSelection] = useState({})
-    const [transactionRows, setTransactionRows] = useState<number>(10)
+    const [transactionSorting, setTransactionSorting] = useState<SortingState>([]);
+    const [transactionFilters, setTransactionFilters] = useState<ColumnFiltersState>([]);
+    const [transactionVisibility, setTransactionVisibility] = useState<VisibilityState>({});
+    const [transactionSelection, setTransactionSelection] = useState({});
+    const [transactionRows, setTransactionRows] = useState<number>(10);
 
     // Transaction Table Filter State
-    const [transactionSelectedStatus, setTransactionSelectedStatus] = useState<SimpleOption | null>(null)
+    const [transactionSelectedStatus, setTransactionSelectedStatus] = useState<SimpleOption | null>(null);
 
-    const [transactionInitialDate, setTransactionInitialDate] = useState<Date | undefined>()
-    const [transactionFinalDate, setTransactionFinalDate] = useState<Date | undefined>()
-    const [transactionFinalDateKey, setTransactionFinalDateKey] = useState<number>(Date.now())
+    const [transactionInitialDate, setTransactionInitialDate] = useState<Date | undefined>();
+    const [transactionFinalDate, setTransactionFinalDate] = useState<Date | undefined>();
+    const [transactionFinalDateKey, setTransactionFinalDateKey] = useState<number>(Date.now());
 
     // Alert State
-    const [alertMessage, setAlertMessage] = useState<string | null>(null)
+    const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
     // Initial Date Select Handlers
     const handleInitialDateSelect = (
@@ -74,18 +69,18 @@ export default function Transactions({
         setFinalDate: (date: Date | undefined) => void,
         finalDate: Date | undefined,
     ) => {
-        const selected = date ?? new Date()
-        setInitialDate(selected)
+        const selected = date ?? new Date();
+        setInitialDate(selected);
 
         if (!finalDate || (date && finalDate.getTime() === selected.getTime())) {
-            setFinalDate(selected)
+            setFinalDate(selected);
         } else if (selected.getTime() > finalDate.getTime()) {
-            setAlertMessage("Tanggal awal tidak boleh lebih besar dari tanggal akhir")
-            setFinalDate(selected)
+            setAlertMessage('Tanggal awal tidak boleh lebih besar dari tanggal akhir');
+            setFinalDate(selected);
         } else {
-            setAlertMessage(null)
+            setAlertMessage(null);
         }
-    }
+    };
 
     // Final Date Select Handlers
     const handleFinalDateSelect = (
@@ -97,28 +92,28 @@ export default function Transactions({
         setFinalDateKey: (key: number) => void,
     ) => {
         if (!initialDate || !date) {
-            setFinalDate(date)
-            return
+            setFinalDate(date);
+            return;
         }
 
         if (!initialDate) {
-            setInitialDate(date)
-            setFinalDate(date)
-            setAlertMessage(null)
-            return
+            setInitialDate(date);
+            setFinalDate(date);
+            setAlertMessage(null);
+            return;
         }
 
         if (date.getTime() === initialDate.getTime()) {
-            setFinalDate(date)
+            setFinalDate(date);
         } else if (date.getTime() < initialDate.getTime()) {
-            setAlertMessage("Tanggal akhir tidak boleh lebih kecil dari tanggal awal")
-            setFinalDate(initialDate)
-            setFinalDateKey(Date.now())
+            setAlertMessage('Tanggal akhir tidak boleh lebih kecil dari tanggal awal');
+            setFinalDate(initialDate);
+            setFinalDateKey(Date.now());
         } else {
-            setFinalDate(date)
-            setAlertMessage(null)
+            setFinalDate(date);
+            setAlertMessage(null);
         }
-    }
+    };
 
     // Transaction Table Definition
     const transactionTable = useReactTable<Transaction>({
@@ -138,34 +133,30 @@ export default function Transactions({
             columnVisibility: transactionVisibility,
             rowSelection: transactionSelection,
         },
-    })
+    });
 
     // Column Filter Update
-    const updateColumnFilter = (
-        setFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>,
-        columnId: string,
-        value: unknown,
-    ) => {
+    const updateColumnFilter = (setFilters: React.Dispatch<React.SetStateAction<ColumnFiltersState>>, columnId: string, value: unknown) => {
         setFilters((prevFilters) => {
-            const otherFilters = prevFilters.filter((f) => f.id !== columnId)
-            if (value === undefined || value === null || value === "") {
-                return otherFilters
+            const otherFilters = prevFilters.filter((f) => f.id !== columnId);
+            if (value === undefined || value === null || value === '') {
+                return otherFilters;
             }
-            return [...otherFilters, { id: columnId, value }]
-        })
-    }
+            return [...otherFilters, { id: columnId, value }];
+        });
+    };
 
     // Transaction Date Column Filter Effect
     useEffect(() => {
         if (transactionInitialDate) {
-            updateColumnFilter(setTransactionFilters, "created_at", {
+            updateColumnFilter(setTransactionFilters, 'created_at', {
                 start: transactionInitialDate,
                 end: transactionFinalDate ?? transactionInitialDate,
-            })
+            });
         } else {
-            updateColumnFilter(setTransactionFilters, "created_at", undefined)
+            updateColumnFilter(setTransactionFilters, 'created_at', undefined);
         }
-    }, [transactionInitialDate, transactionFinalDate])
+    }, [transactionInitialDate, transactionFinalDate]);
 
     // Reusable Column Filter Effect
     const useColumnFilterEffect = (
@@ -175,46 +166,46 @@ export default function Transactions({
     ) => {
         useEffect(() => {
             if (selectedOption?.name) {
-                updateColumnFilter(setFilters, columnId, selectedOption.name)
+                updateColumnFilter(setFilters, columnId, selectedOption.name);
             } else {
-                updateColumnFilter(setFilters, columnId, undefined)
+                updateColumnFilter(setFilters, columnId, undefined);
             }
-        }, [selectedOption, columnId, setFilters])
-    }
+        }, [selectedOption, columnId, setFilters]);
+    };
 
     // Transaction Status Column Filter Effect
-    useColumnFilterEffect(transactionSelectedStatus, setTransactionFilters, "status")
+    useColumnFilterEffect(transactionSelectedStatus, setTransactionFilters, 'status');
 
     // Row Pagination Effect
     const usePageSizeEffect = <T,>(table: TanStackTable<T>, rows: number) => {
         useEffect(() => {
-            table.setPageSize(rows)
-        }, [rows, table])
-    }
+            table.setPageSize(rows);
+        }, [rows, table]);
+    };
 
     // Transaction Table Row Pagination Effect
-    usePageSizeEffect(transactionTable, transactionRows)
+    usePageSizeEffect(transactionTable, transactionRows);
 
     // Alert Message
     useEffect(() => {
         if (alertMessage) {
             toast.error(alertMessage, {
-                position: "top-center",
+                position: 'top-center',
                 autoClose: 5000,
                 hideProgressBar: false,
                 closeOnClick: true,
                 pauseOnHover: true,
                 draggable: true,
                 progress: undefined,
-            })
-            setAlertMessage(null)
+            });
+            setAlertMessage(null);
         }
-    }, [alertMessage])
+    }, [alertMessage]);
 
     // Filter Dialog State
-    const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false)
+    const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
 
-    console.log(userTransactions)
+    console.log(userTransactions);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -224,13 +215,11 @@ export default function Transactions({
                 <div className="flex h-full flex-1 flex-col gap-6 overflow-hidden p-6">
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                         <div className="transaction col-span-full space-y-2">
-                            <div className="border-b border-zinc-200 dark:border-zinc-800 pb-6 mb-6">
+                            <div className="mb-6 border-b border-zinc-200 pb-6 dark:border-zinc-800">
                                 <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">Riwayat Transaksi</h1>
-                                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                                    Kelola dan pantau riwayat transaksi pembayaran Anda
-                                </p>
+                                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">Kelola dan pantau riwayat transaksi pembayaran Anda</p>
                             </div>
-                            <div className="transaction-table-filters small-font-size mb-4 hidden justify-end gap-4 lg:mb-6 lg:flex lg:flex-wrap bg-gray-50 dark:bg-zinc-900/50 p-4 rounded-lg border border-gray-200 dark:border-zinc-800">
+                            <div className="transaction-table-filters small-font-size mb-4 hidden justify-end gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 lg:mb-6 lg:flex lg:flex-wrap dark:border-zinc-800 dark:bg-zinc-900/50">
                                 <div className="status-type">
                                     <DropdownSelect
                                         label="Status"
@@ -282,8 +271,8 @@ export default function Transactions({
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                setTransactionInitialDate(undefined)
-                                                setTransactionFinalDate(undefined)
+                                                setTransactionInitialDate(undefined);
+                                                setTransactionFinalDate(undefined);
                                             }}
                                             className="text-muted-foreground hover:text-foreground mt-1 flex items-center gap-1"
                                         >
@@ -300,12 +289,12 @@ export default function Transactions({
                                     <DialogTrigger asChild>
                                         <Button
                                             variant="outline"
-                                            className="bg-blue-600 hover:bg-blue-700 text-white small-font-size font-medium border-blue-600 dark:bg-blue-700 dark:hover:bg-blue-800 dark:border-blue-700"
+                                            className="small-font-size border-blue-600 bg-blue-600 font-medium text-white hover:bg-blue-700 dark:border-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
                                         >
                                             Filter
                                         </Button>
                                     </DialogTrigger>
-                                    <DialogContent className="animate-slide-up w-fit p-4 md:p-6 lg:p-8 bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+                                    <DialogContent className="animate-slide-up w-fit border-gray-200 bg-white p-4 md:p-6 lg:p-8 dark:border-gray-800 dark:bg-gray-900">
                                         <DialogHeader>
                                             <DialogTitle>Filter</DialogTitle>
                                         </DialogHeader>
@@ -359,8 +348,8 @@ export default function Transactions({
                                                     <button
                                                         type="button"
                                                         onClick={() => {
-                                                            setTransactionInitialDate(undefined)
-                                                            setTransactionFinalDate(undefined)
+                                                            setTransactionInitialDate(undefined);
+                                                            setTransactionFinalDate(undefined);
                                                         }}
                                                         className="text-muted-foreground hover:text-foreground mt-1 flex items-center gap-1"
                                                     >
@@ -374,21 +363,21 @@ export default function Transactions({
                                 </Dialog>
                             </div>
 
-                            <div className="transaction-table-main bg-white dark:bg-zinc-900 rounded-lg border border-gray-200 dark:border-zinc-800 shadow-sm">
-                                <div className="transaction-table-option mb-4 flex justify-between lg:mb-6 p-4 border-b border-zinc-200 dark:border-zinc-800">
+                            <div className="transaction-table-main rounded-lg border border-gray-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                                <div className="transaction-table-option mb-4 flex justify-between border-b border-zinc-200 p-4 lg:mb-6 dark:border-zinc-800">
                                     <div className="flex w-full flex-wrap justify-end gap-2">
                                         <div className="code-Search">
                                             <Input
                                                 placeholder="Cari Kode Transaksi..."
-                                                value={(transactionTable.getColumn("code")?.getFilterValue() as string) ?? ""}
-                                                onChange={(e) => transactionTable.getColumn("code")?.setFilterValue(e.target.value)}
-                                                className="border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:ring-blue-500 dark:focus:ring-blue-400 small-font-size w-full rounded-md border py-2 shadow-sm focus:ring-1 focus:outline-none placeholder-zinc-500 dark:placeholder-zinc-400"
+                                                value={(transactionTable.getColumn('code')?.getFilterValue() as string) ?? ''}
+                                                onChange={(e) => transactionTable.getColumn('code')?.setFilterValue(e.target.value)}
+                                                className="small-font-size w-full rounded-md border border-zinc-300 bg-white py-2 text-zinc-900 placeholder-zinc-500 shadow-sm focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-400 dark:focus:ring-blue-400"
                                             />
                                         </div>
                                         <div className="table-column-filter mb-2">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="outline" className="small-font-size ml-auto font-normal bg-transparent">
+                                                    <Button variant="outline" className="small-font-size ml-auto bg-transparent font-normal">
                                                         Kolom <ChevronDown />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -406,7 +395,7 @@ export default function Transactions({
                                                                 >
                                                                     {transactionColumnLabels[column.id] ?? column.id}
                                                                 </DropdownMenuCheckboxItem>
-                                                            )
+                                                            );
                                                         })}
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
@@ -414,7 +403,7 @@ export default function Transactions({
                                         <div className="pagination-rows-selector mb-2">
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="outline" className="small-font-size ml-auto font-normal bg-transparent">
+                                                    <Button variant="outline" className="small-font-size ml-auto bg-transparent font-normal">
                                                         Tampilkan {transactionRows} Baris <ChevronDown className="ml-1 h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -435,7 +424,7 @@ export default function Transactions({
                                     </div>
                                 </div>
                                 <div className="transaction-table-body">
-                                    <div className="rounded-md border border-zinc-200 dark:border-zinc-800 mx-4 mb-4">
+                                    <div className="mx-4 mb-4 rounded-md border border-zinc-200 dark:border-zinc-800">
                                         <Table className="small-font-size bg-white dark:bg-zinc-900">
                                             <TableHeader className="bg-zinc-50 dark:bg-zinc-800/50">
                                                 {transactionTable.getHeaderGroups().map((headerGroup) => (
@@ -447,7 +436,7 @@ export default function Transactions({
                                                                         ? null
                                                                         : flexRender(header.column.columnDef.header, header.getContext())}
                                                                 </TableHead>
-                                                            )
+                                                            );
                                                         })}
                                                     </TableRow>
                                                 ))}
@@ -458,7 +447,7 @@ export default function Transactions({
                                                         <TableRow
                                                             key={row.id}
                                                             className={
-                                                                index % 2 === 0 ? "bg-white dark:bg-zinc-900" : "bg-gray-50 dark:bg-zinc-800/30"
+                                                                index % 2 === 0 ? 'bg-white dark:bg-zinc-900' : 'bg-gray-50 dark:bg-zinc-800/30'
                                                             }
                                                         >
                                                             {row.getVisibleCells().map((cell) => (
@@ -478,18 +467,15 @@ export default function Transactions({
                                             </TableBody>
                                         </Table>
                                     </div>
-                                    <div className="flex items-center justify-between space-x-2 py-4 px-4 border-t border-gray-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/30">
+                                    <div className="flex items-center justify-between space-x-2 border-t border-gray-200 bg-zinc-50 px-4 py-4 dark:border-zinc-800 dark:bg-zinc-800/30">
                                         <div className="text-sm text-zinc-600 dark:text-zinc-400">
-                                            Menampilkan{" "}
-                                            {transactionTable.getState().pagination.pageIndex *
-                                                transactionTable.getState().pagination.pageSize +
-                                                1}{" "}
-                                            -{" "}
+                                            Menampilkan{' '}
+                                            {transactionTable.getState().pagination.pageIndex * transactionTable.getState().pagination.pageSize + 1} -{' '}
                                             {Math.min(
                                                 (transactionTable.getState().pagination.pageIndex + 1) *
-                                                transactionTable.getState().pagination.pageSize,
+                                                    transactionTable.getState().pagination.pageSize,
                                                 transactionTable.getFilteredRowModel().rows.length,
-                                            )}{" "}
+                                            )}{' '}
                                             dari {transactionTable.getFilteredRowModel().rows.length} data
                                         </div>
                                         <div className="space-x-2">
@@ -522,5 +508,5 @@ export default function Transactions({
 
             <ToastContainer />
         </AppLayout>
-    )
+    );
 }

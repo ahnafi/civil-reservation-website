@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import AppLayout from "@/layouts/app-layout"
 import type { BreadcrumbItem, Package, PackageCart, PaginatedPackage, Test } from "@/types"
 import { Head, Link } from "@inertiajs/react"
+import { ShoppingCart } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast, ToastContainer } from "react-toastify"
 
@@ -160,16 +161,9 @@ export default function Packages({ paginated }: { paginated: PaginatedPackage })
                                                     handleAddTestToCart(data)
                                                 }}
                                                 disabled={isAdding}
-                                                className="w-full bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+                                                className="w-full bg-blue-600 cursor-pointer hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
                                             >
-                                                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth={2}
-                                                        d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0V19a2 2 0 002 2h7a2 2 0 002-2v-.5"
-                                                    />
-                                                </svg>
+                                                <ShoppingCart className="h-5 w-5" />
                                                 {isAdding ? "Menambahkan..." : "Tambah ke Keranjang"}
                                             </Button>
                                         </div>

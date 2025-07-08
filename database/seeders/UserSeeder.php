@@ -60,7 +60,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Athallah Tsany Satriyaji',
                 'email' => 'external@demo.com',
-                'email_verified_at' => now()->subDays(179),
+                'email_verified_at' => now(),
                 'password' => Hash::make('qwerty123'),
                 'phone' => '085375502733',
                 'photo' => 'user_photos\/default-user_profile.jpg',
@@ -71,7 +71,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Bintang Putra Akbar',
                 'email' => 'internal@demo.com',
-                'email_verified_at' => now()->subDay(178),
+                'email_verified_at' => now(),
                 'password' => Hash::make('qwerty123'),
                 'phone' => '081326804033',
                 'photo' => 'user_photos\/default-user_profile.jpg',

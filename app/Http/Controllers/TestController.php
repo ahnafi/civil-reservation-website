@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Laboratory;
 use App\Models\Test;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -15,7 +16,12 @@ class TestController extends Controller
     public function index(): Response
     {
         $tests = Test::active()->with(["category", "laboratory"])->paginate(20);
-        return Inertia::render("tests/index", ['tests' => $tests]);
+        $laboratories = Laboratory::all();
+
+        return Inertia::render("tests/index", [
+            'tests' => $tests,
+            'laboratories' => $laboratories
+        ]);
     }
 
     public function detail(Test $test): RedirectResponse|Response
