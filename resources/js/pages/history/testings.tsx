@@ -235,7 +235,7 @@ export default function Test({ userTestings }: { userTestings: Testing[] }) {
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
                         <div className="testing col-span-full space-y-2">
                             <div className="mb-6 border-b border-zinc-200 pb-6 dark:border-zinc-800">
-                                <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">Daftar Pengujian</h1>
+                                <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">Riwayat Pengujian</h1>
                                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
                                     Kelola dan pantau daftar pengujian yang sedang berlangsung
                                 </p>
