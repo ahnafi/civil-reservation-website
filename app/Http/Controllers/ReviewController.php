@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Reviews;
+use App\Models\Review;
 use App\Models\Testing;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ReviewController extends Controller
 {
@@ -24,15 +23,15 @@ class ReviewController extends Controller
         }
 
         // Check if user already reviewed this testing
-        $existingReview = Reviews::where('testing_id', $request->testing_id)->first();
+        $existingReview = Review::where('testing_id', $request->testing_id)->first();
         if ($existingReview) {
             return redirect()->back()->with('error', 'Anda sudah memberikan review untuk pengujian ini');
         }
 
-        $review = Reviews::create([
-            'rating' => $request->rating,
-            'content' => $request->content,
-            'testing_id' => $request->testing_id,
+        $review = Review::create([
+            'rating' => $request->input('rating'),
+            'content' => $request->input('content'),
+            'testing_id' => $request->input('testing_id'),
         ]);
 
         return redirect()->back()->with('success', 'Review berhasil dikirim. Terima kasih atas feedback Anda!');
@@ -45,7 +44,7 @@ class ReviewController extends Controller
             'content' => 'required|string|max:1000',
         ]);
 
-        $review = Reviews::findOrFail($id);
+        $review = Review::findOrFail($id);
 
         // Check if testing is still completed
         $testing = Testing::findOrFail($review->testing_id);
@@ -54,9 +53,10 @@ class ReviewController extends Controller
         }
 
         $review->update([
-            'rating' => $request->rating,
-            'content' => $request->content,
+            'rating' => $request->input('rating'),
+            'content' => $request->input('content'),
         ]);
+
 
         return redirect()->back()->with('success', 'Review berhasil diperbarui. Terima kasih atas feedback Anda!');
     }
