@@ -101,9 +101,9 @@ const InfoItem = ({ icon, label, value }: { icon: React.ReactNode; label: string
     );
 };
 
-export default function TestDetail({ testHistoryDetail }: { testHistoryDetail: ReviewTesting[] }) {
+export default function TestingDetail({ testingHistoryDetail }: { testingHistoryDetail: ReviewTesting[] }) {
     // Get the first test record
-    const testRecord: ReviewTesting = testHistoryDetail[0];
+    const testRecord: ReviewTesting = testingHistoryDetail[0];
 
     // Review form state
     const [showReviewForm, setShowReviewForm] = useState(false);
