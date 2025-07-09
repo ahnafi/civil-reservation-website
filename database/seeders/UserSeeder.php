@@ -13,7 +13,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $users = [
-            [
+            [ // 1
                 'name' => 'Super Admin',
                 'email' => 'super@example.com',
                 'email_verified_at' => now(),
@@ -24,7 +24,7 @@ class UserSeeder extends Seeder
                 'role' => 'superadmin',
                 'created_at' => now(),
             ],
-            [
+            [ // 2
                 'name' => 'Admin User',
                 'email' => 'admin@example.com',
                 'email_verified_at' => now(),
@@ -35,7 +35,7 @@ class UserSeeder extends Seeder
                 'role' => 'admin',
                 'created_at' => now(),
             ],
-            [
+            [ // 3
                 'name' => 'External User',
                 'email' => 'external@example.com',
                 'email_verified_at' => now(),
@@ -46,7 +46,7 @@ class UserSeeder extends Seeder
                 'role' => 'external',
                 'created_at' => now(),
             ],
-            [
+            [ // 4
                 'name' => 'Internal User',
                 'email' => 'internal@example.com',
                 'email_verified_at' => now(),
@@ -57,7 +57,7 @@ class UserSeeder extends Seeder
                 'role' => 'internal',
                 'created_at' => now(),
             ],
-            [
+            [ // 5
                 'name' => 'Athallah Tsany Satriyaji',
                 'email' => 'external@demo.com',
                 'email_verified_at' => now(),
@@ -68,7 +68,7 @@ class UserSeeder extends Seeder
                 'role' => 'external',
                 'created_at' => now()->subDays(180),
             ],
-            [
+            [ // 6
                 'name' => 'Bintang Putra Akbar',
                 'email' => 'bintang.akbar@mhs.unsoed.ac.id',
                 'email_verified_at' => now(),

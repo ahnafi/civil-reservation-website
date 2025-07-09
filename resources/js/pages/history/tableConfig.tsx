@@ -57,6 +57,11 @@ const transactionStatusMap: Record<string, string> = {
     failed: 'Gagal',
 };
 
+const transactionTypeMap: Record<string, string> = {
+    main: 'Utama',
+    additional: 'Tambahan',
+};
+
 // Testing Status Options
 export const testingStatusOptions: SimpleOption[] = [
     { id: 1, name: 'Testing' },
@@ -77,6 +82,7 @@ export const paymentMethodOptions: SimpleOption[] = [
 export const transactionColumnLabels: Record<string, string> = {
     code: 'Kode Transaksi',
     created_at: 'Tanggal Dibuat',
+    payment_type: 'Jenis',
     amount: 'Jumlah',
     payment_invoice_files: 'Invoice',
     status: 'Status Pembayaran',
@@ -352,7 +358,7 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
                 onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
                 className="flex w-[5rem] justify-center text-center"
             >
-                Tanggal
+                Tanggal Dibuat
                 <ArrowUpDown />
             </Button>
         ),
@@ -375,6 +381,21 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
 
             return <div className="flex w-[5rem] justify-center text-center capitalize">{formatted}</div>;
         },
+    },
+    {
+        accessorKey: 'payment_type',
+        header: () => <div className="text-center">Jenis</div>,
+        cell: ({ row }) => {
+            const paymentType = transactionTypeMap[row.getValue('payment_type') as string];
+            return (
+                <div className="flex w-full justify-center">
+                    <span className="max-w-[6rem] truncate md:max-w-full md:whitespace-normal capitalize">
+                        {paymentType}
+                    </span>
+                </div>
+            );
+        },
+
     },
     {
         accessorKey: 'amount',
@@ -407,7 +428,7 @@ export const transactionColumns: ColumnDef<Transaction>[] = [
                     {invoices && invoices.length > 0 ? (
                         <Button onClick={handleDownloadAll} className="h-auto cursor-pointer gap-1 px-2 py-1 text-xs" size="sm">
                             <Download size={12} />
-                            {invoices.length > 1 ? 'Download Semua' : 'Download'}
+                            Download
                         </Button>
                     ) : (
                         '-'

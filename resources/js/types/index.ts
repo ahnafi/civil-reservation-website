@@ -232,6 +232,7 @@ export interface SubmissionSchedule {
     supervisor: string;
 
     created_at: string;
+    updated_at: string;
 }
 
 // Schedule Type
@@ -260,11 +261,13 @@ export interface LaboratorySimple {
 // Transaction Types
 export type TransactionStatus = 'pending' | 'success' | 'failed';
 export type PaymentMethod = 'BANK JATENG' | 'BANK MANDIRI' | 'BANK BNI' | 'BANK BRI' | 'BANK BSI' | 'BANK BTN';
+export type PaymentType = 'main' | 'additional';
 
 export interface Transaction {
     id: number;
     code: string;
     amount: number;
+    payment_type: PaymentType;
     payment_method?: PaymentMethod;
     note?: string;
     status: TransactionStatus;
