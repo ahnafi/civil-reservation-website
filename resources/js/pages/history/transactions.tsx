@@ -258,7 +258,7 @@ export default function Transactions({
                                 <Card className="border-l-4 border-l-yellow-500 bg-white dark:bg-zinc-900">
                                     <CardHeader className="flex flex-row items-center justify-between space-y-0">
                                         <CardTitle className="text-base font-medium text-gray-600 dark:text-gray-400">
-                                            {transactionStatusMap.pending}
+                                            {transactionStatusMap.pending} Pembayaran
                                         </CardTitle>
                                         <Clock className="h-4 w-4 text-yellow-500" />
                                     </CardHeader>
@@ -443,7 +443,7 @@ export default function Transactions({
                                 </Dialog>
                             </div>
 
-                            <div className="transaction-table-main rounded-lg border border-gray-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                                <div className="transaction-table-main rounded-lg border border-gray-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
                                 <div className="transaction-table-option mb-4 flex justify-between border-b border-zinc-200 p-4 lg:mb-6 dark:border-zinc-800">
                                     <div className="flex w-full flex-wrap justify-end gap-2">
                                         <div className="code-Search">
