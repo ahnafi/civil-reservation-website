@@ -95,13 +95,12 @@ class HistoryController extends Controller
 
     public function transactionHistoryDetail($code): Response
     {
-        $transactionHistoryDetail = Transaction::where('code', $code)
-            ->whereHas('submission', function ($query) {
-                $query->where('user_id', auth()->id());
-            })
-            ->with('submission')
-            ->firstOrFail();
-
+        $transactionHistoryDetail = Transaction::query()
+            ->join('submissions', 'transactions.submission_id', '=', 'submissions.id')
+            ->where('submissions.user_id', auth()->id())
+            ->where('transactions.code', $code)
+            ->select('transactions.*', 'submissions.code as submission_code')
+            ->get();
 
         return Inertia::render('history/detail/transaction', [
             'transactionHistoryDetail' => $transactionHistoryDetail,
