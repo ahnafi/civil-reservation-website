@@ -167,7 +167,7 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                         />
                                         <InfoItem
                                             icon={<Link2 className="h-5 w-5 text-blue-600" />}
-                                            label="ID Pengajuan"
+                                            label="Kode Pengajuan"
                                             value={
                                                 <Link
                                                     href={`/history/submission/${transaction.submission_code}`}
@@ -276,8 +276,8 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                                         Silakan selesaikan pembayaran Anda sebelum {formatDate(transaction.payment_deadline)}.
                                                     </p>
                                                 </div>
-                                                <Link href={`/payment/${transaction.code}`} className="mt-4">
-                                                    <Button className="w-full">Upload Bukti Pembayaran</Button>
+                                                <Link href={`/payment/${transaction.code}`} className="mt-4 cursor-pointer">
+                                                    <Button className="w-full cursor-pointer">Upload Bukti Pembayaran</Button>
                                                 </Link>
                                             </>
                                         )}
