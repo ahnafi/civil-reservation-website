@@ -684,7 +684,7 @@ export default function SubmissionDetail({
                                                     </div>
                                                     <div className="mt-2 text-right">
                                                         <Link
-                                                            href={`/history/transactions/${transaction.code}`}
+                                                            href={`/history/transaction/${transaction.code}`}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline"
