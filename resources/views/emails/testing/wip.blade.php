@@ -89,7 +89,7 @@
                     <td align="center" bgcolor="#4f46e5" role="presentation"
                         style="border:none;border-radius:6px;cursor:auto;mso-padding-alt:12px 24px;background:#4f46e5;"
                         valign="middle">
-                        <a href="{{ route('history-test-detail', $testing->code) }}"
+                        <a href="{{ route('history-testing-detail', $testing->code) }}"
                             style="display:inline-block;background:#4f46e5;color:#ffffff;font-family:'Helvetica Neue',Arial,sans-serif;font-size:14px;font-weight:bold;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:12px 24px;mso-padding-alt:0px;border-radius:6px;">
                             Lihat Status Pengujian
                         </a>

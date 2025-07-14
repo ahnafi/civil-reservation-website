@@ -63,5 +63,4 @@ class SubmissionService
                 ->send();
         }
     }
-
 }
