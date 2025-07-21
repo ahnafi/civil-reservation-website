@@ -33,6 +33,11 @@ class CreateTesting extends CreateRecord
                 ->send();
 
             $this->halt();
+        } else{
+            Notification::make()
+                ->title("Pengujian berhasil dibuat")
+                ->success()
+                ->send();
         }
 
         return $record;
