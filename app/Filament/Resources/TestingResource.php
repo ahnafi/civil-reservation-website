@@ -165,7 +165,7 @@ class TestingResource extends Resource
                         "completed" => "success",
                     })
                     ->formatStateUsing(fn(string $state): string => match ($state) {
-                        "testing" => "Sedang diuji",
+                        "testing" => "Sedang Berjalan",
                         "completed" => "Selesai",
                         default => ucfirst($state),
                     }),
