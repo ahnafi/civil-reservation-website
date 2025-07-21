@@ -51,21 +51,17 @@ class ScheduleResource extends Resource
                     ->label('Laboratorium')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('available_slots')
-                    ->label('Slot Tersedia')
+                Tables\Columns\TextColumn::make('test.daily_slot')
+                    ->label('Slot Harian')
                     ->numeric()
                     ->sortable()
                     ->badge()
-                    ->color(fn (string $state): string => match (true) {
-                        $state > 10 => 'success',
-                        $state > 5 => 'warning',
-                        default => 'danger',
-                    }),
+                    ->color('success'),
                 Tables\Columns\TextColumn::make('used_slots')
                     ->label('Slot Terpakai')
                     ->badge()
                     ->color('info'),
-                Tables\Columns\TextColumn::make('remaining_slots')
+                Tables\Columns\TextColumn::make('available_slots')
                     ->label('Slot Tersisa')
                     ->badge()
                     ->color(fn (string $state): string => match (true) {
