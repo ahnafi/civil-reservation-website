@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SubmissionInternalDetailResource\RelationManagers;
 
+use App\Services\BookingUtils;
 use App\Services\FileNaming;
 use Filament\Forms;
 use Filament\Forms\Components\ToggleButtons;
@@ -19,6 +20,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
 use App\Services\TestingService;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use App\Services\BookingService;
 
 class TestingsRelationManager extends RelationManager
 {
@@ -128,18 +130,17 @@ class TestingsRelationManager extends RelationManager
 
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
-                    ->sortable()
-                    ->formatStateUsing(fn($state): string => match ($state) {
-                        "testing" => "Sedang berjalan",
-                        "completed" => "Selesai",
-                        default => $state,
-                    })
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
                         "testing" => "warning",
                         "completed" => "success",
-                        default => "secondary",
-                    }),
+                    })
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        "testing" => "Sedang Berjalan",
+                        "completed" => "Selesai",
+                        default => ucfirst($state),
+                    })
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('test_date')
                     ->label('Tanggal Pengujian')
                     ->date()
@@ -179,17 +180,38 @@ class TestingsRelationManager extends RelationManager
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->mutateFormDataUsing(function (array $data) {
-                        // Set submission_id - the Testing model will auto-generate the code
                         $internalDetail = $this->getOwnerRecord();
                         $submission = $internalDetail->submission;
-                        $data['submission_id'] = $submission?->id;
 
-                        // Remove any manually set code as the model will generate it
+                        $data['submission_id'] = $submission?->id;
                         unset($data['code']);
 
                         return $data;
                     })
-                    ->successNotificationTitle('Pengujian berhasil dibuat'),
+                    ->action(function (array $data, RelationManager $livewire) {
+                        $record = $livewire->getRelationship()->create($data);
+                        $testIds = BookingUtils::getTestIdsFromTesting($record->id);
+
+                        $unavailableTestNames = BookingUtils::getUnavailableTestNames($testIds, $record->test_date);
+
+                        app(BookingService::class)->storeScheduleTesting($record->id);
+
+                        if (!empty($unavailableTestNames)) {
+                            Notification::make()
+                                ->title('Pengujian berhasil dibuat, tapi jadwal penuh!')
+                                ->body('Pengujian berhasil dibuat, namun slot jadwal pada tanggal tersebut telah penuh. Silakan atur ulang tanggal pengujian atau sesuaikan jadwal secara manual jika diperlukan.')
+                                ->warning()
+                                ->persistent()
+                                ->send();
+                        } else{
+                            Notification::make()
+                                ->title("Pengujian berhasil dibuat")
+                                ->success()
+                                ->send();
+                        }
+
+                        return $record;
+                    })
             ])
             ->actions([
                 Tables\Actions\Action::make("Selesaikan")
@@ -243,3 +265,4 @@ class TestingsRelationManager extends RelationManager
     }
 
 }
+
