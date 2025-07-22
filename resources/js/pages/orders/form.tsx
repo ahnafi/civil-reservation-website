@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils';
 import type { BreadcrumbItem } from '@/types';
 import { formatDate } from '@/utils/date-utils';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { format, isWeekend } from 'date-fns';
 import {
     ArrowLeft,
     ArrowRight,
@@ -110,7 +111,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function ReservationForm() {
-    const { auth } = usePage<{ auth: { user: User } }>().props;
+    const { auth, fullSlotDate } = usePage<{ auth: { user: User }; fullSlotDate: string[] }>().props;
     const user = auth.user;
     const [cartEmpty, setCartEmpty] = useState(false);
     const [submissionType, setSubmissionType] = useState<'external' | 'internal'>(
@@ -321,6 +322,16 @@ export default function ReservationForm() {
             packageIds,
         });
     }
+
+    const isDisabledDate = (date: Date) => {
+        const formatted = format(date, 'yyyy-MM-dd');
+        const isSpecific = fullSlotDate.includes(formatted);
+        const today = new Date();
+        const threeMonthsFromNow = new Date();
+        threeMonthsFromNow.setMonth(today.getMonth() + 3);
+        const isWithinRange = date >= today && date <= threeMonthsFromNow;
+        return isWeekend(date) || isSpecific || !isWithinRange;
+    };
 
     if (cartEmpty) {
         return (
@@ -581,11 +592,7 @@ export default function ReservationForm() {
                                                                     onSelect={(date) => handleExternalFormChange('test_submission_date', date)}
                                                                     selected={externalForm.test_submission_date}
                                                                     disabled={(date) => {
-                                                                        const today = new Date();
-                                                                        const threeMonthsFromNow = new Date();
-                                                                        threeMonthsFromNow.setMonth(today.getMonth() + 3);
-                                                                        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-                                                                        return date < today || date > threeMonthsFromNow || isWeekend;
+                                                                        return isDisabledDate(date);
                                                                     }}
                                                                 />
                                                             </PopoverContent>
