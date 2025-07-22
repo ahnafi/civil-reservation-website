@@ -115,7 +115,19 @@ class TestingsRelationManager extends RelationManager
         return $table
             ->columns([
                 TextColumn::make('code')->label('Kode'),
-                Tables\Columns\TextColumn::make('status')->label('Status')->sortable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        "testing" => "warning",
+                        "completed" => "success",
+                    })
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        "testing" => "Sedang Berjalan",
+                        "completed" => "Selesai",
+                        default => ucfirst($state),
+                    })
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('test_date')->label('Tanggal Pengujian')->date(),
                 Tables\Columns\TextColumn::make('completed_at')->label('Selesai')->dateTime(),
             ])
@@ -154,9 +166,10 @@ class TestingsRelationManager extends RelationManager
                     ->action(function (array $data, RelationManager $livewire) {
                         $record = $livewire->getRelationship()->create($data);
                         $testIds = BookingUtils::getTestIdsFromTesting($record->id);
-                        app(BookingService::class)->storeScheduleTesting($record->id);
 
                         $unavailableTestNames = BookingUtils::getUnavailableTestNames($testIds, $record->test_date);
+
+                        app(BookingService::class)->storeScheduleTesting($record->id);
 
                         if (!empty($unavailableTestNames)) {
                             Notification::make()

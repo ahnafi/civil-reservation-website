@@ -113,13 +113,13 @@ class TransactionResource extends Resource
                     ->columnSpanFull()
                     ->options(function (Forms\Get $get) {
                         $paymentType = $get('payment_type');
-                        
+
                         if ($paymentType === 'additional') {
                             return [
                                 "BANK BNI SIPIL" => "BANK BNI SIPIL"
                             ];
                         }
-                        
+
                         return [
                             "BANK JATENG" => "BANK JATENG",
                             "BANK MANDIRI" => "BANK MANDIRI",
@@ -290,14 +290,14 @@ class TransactionResource extends Resource
                     ->label("Status")
                     ->badge()
                     ->color(fn(string $state): string => match ($state) {
-                        "pending" => "info",
+                        "pending" => "warning",
                         "success" => "success",
                         "failed" => "danger",
                     })
                     ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'pending' => 'Diajukan',
-                        'success' => 'Diterima',
-                        'failed' => 'Ditolak',
+                        'pending' => 'Menunggu',
+                        'success' => 'Dibayar',
+                        'failed' => 'Gagal',
                         default => ucfirst($state),
                     }),
                 Tables\Columns\TextColumn::make('created_at')
