@@ -43,6 +43,8 @@ class BookingController extends Controller
                     'supervisor' => $validated['supervisor'],
                 ];
 
+            $documentFiles = $request->file('documents', []);
+
             // Create the submission
             $bookingService->createSubmission(
                 $userId,
@@ -51,7 +53,8 @@ class BookingController extends Controller
                 $validated['test_submission_date'],
                 $validated['user_note'] ?? null,
                 $validated['submission_tests'] ?? [],
-                $validated['submission_packages'] ?? []
+                $validated['submission_packages'] ?? [],
+                $documentFiles
             );
 
             return redirect()->route('orders-cart-checkout')
