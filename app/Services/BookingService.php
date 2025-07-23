@@ -34,7 +34,8 @@ class BookingService
         string $test_submission_date,
         ?string $user_note,
         array $submission_tests,
-        array $submission_packages
+        array $submission_packages,
+        array $documentFiles,
     ): void {
 
         $testIds = collect($submission_tests)->pluck('test_id')->filter()->toArray();
@@ -127,6 +128,24 @@ class BookingService
             }
 
             $submission->packages()->attach($packageIds);
+
+            // 5. File handling logic
+            if (!empty($documentFiles)) {
+                $storedPaths = [];
+
+                foreach ($documentFiles as $file) {
+                    $extension = $file->getClientOriginalExtension();
+
+                    $customFilename = FileNaming::generateSubmissionName($submission->id, $extension);
+
+                    $path = $file->storeAs('submission_documents', $customFilename, 'public');
+
+                    $storedPaths[] = $path;
+                }
+
+                $submission->documents = $storedPaths;
+                $submission->save();
+            }
 
             DB::commit();
         } catch (\Throwable $e) {
