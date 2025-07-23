@@ -387,37 +387,6 @@ export default function Submissions({
                                 </Card>
                             </div>
 
-                            {(userRole === 'admin' || userRole === 'internal') && (
-                                <div className="submission-type mb-4 flex items-center justify-center">
-                                    <div className="bg-muted relative flex rounded-lg p-1">
-                                        {/* Sliding background indicator */}
-                                        <div
-                                            className={`bg-background absolute top-1 bottom-1 rounded-md shadow-sm transition-all duration-300 ease-in-out ${
-                                                submissionType === 'internal' ? 'right-1/2 left-1' : 'right-1 left-1/2'
-                                            }`}
-                                        />
-
-                                        {/* Buttons */}
-                                        <button
-                                            onClick={() => setSubmissionType('internal')}
-                                            className={`relative z-10 rounded-md px-6 py-2 text-sm font-medium transition-colors duration-200 ${
-                                                submissionType === 'internal' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
-                                            }`}
-                                        >
-                                            Pengajuan Internal
-                                        </button>
-                                        <button
-                                            onClick={() => setSubmissionType('external')}
-                                            className={`relative z-10 rounded-md px-6 py-2 text-sm font-medium transition-colors duration-200 ${
-                                                submissionType === 'external' ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
-                                            }`}
-                                        >
-                                            Pengajuan Eksternal
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
                             <div className="submission-table-filters small-font-size mb-4 hidden justify-end gap-4 rounded-lg border border-gray-200 bg-gray-50 p-4 lg:mb-6 lg:flex lg:flex-wrap dark:border-zinc-800 dark:bg-zinc-900/50">
                                 {/* Daftar filter untuk layar besar */}
                                 <div className="test-type">
