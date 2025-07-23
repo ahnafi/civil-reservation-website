@@ -173,25 +173,6 @@ export default function Submissions({
         }
     };
 
-    // const submissionTable = useReactTable<SubmissionWithDetails>({
-    //     data: submissionType === "internal" ? internalSubmissions : externalSubmissions,
-    //     columns: submissionType === "internal" ? internalSubmissionColumns : externalSubmissionColumns,
-    //     onSortingChange: setSubmissionSorting,
-    //     onColumnFiltersChange: setSubmissionFilters,
-    //     getCoreRowModel: getCoreRowModel(),
-    //     getPaginationRowModel: getPaginationRowModel(),
-    //     getSortedRowModel: getSortedRowModel(),
-    //     getFilteredRowModel: getFilteredRowModel(),
-    //     onColumnVisibilityChange: setSubmissionVisibility,
-    //     onRowSelectionChange: setSubmissionSelection,
-    //     state: {
-    //         sorting: submissionSorting,
-    //         columnFilters: submissionFilters,
-    //         columnVisibility: submissionVisibility,
-    //         rowSelection: submissionSelection,
-    //     },
-    // })
-
     // Replace the single submissionTable with separate instances
     const internalSubmissionTable = useReactTable<InternalSubmission>({
         data: internalSubmissions,
