@@ -47,6 +47,8 @@ class SubmitSubmissionRequest extends FormRequest
             'submission_packages' => ['nullable', 'array'],
             'user_note' => ['nullable', 'string'],
             'admin_note' => ['nullable', 'string'],
+            'documents' => ['nullable', 'array'],
+            'documents.*' => ['file', 'max:2048', 'mimes:pdf,doc,docx,png,jpg,jpeg'],
 
             // submission_tests is required if submission_packages is not present
             'submission_tests' => 'required_without:submission_packages|array',
@@ -74,6 +76,9 @@ class SubmitSubmissionRequest extends FormRequest
 
             'test_submission_date.required' => 'Tanggal pengajuan pengujian wajib diisi.',
             'test_submission_date.date' => 'Format tanggal pengajuan uji tidak valid.',
+            'documents.*.max' => 'Ukuran setiap file dokumen tidak boleh lebih dari 2MB.',
+            'documents.*.file' => 'Setiap lampiran harus berupa file yang valid.',
+            'documents.*.mimes' => 'Format file tidak diperbolehkan. Hanya boleh mengunggah: PDF, DOC, DOCX, JPG, PNG.',
 
             'submission_tests.required_without' => 'Minimal satu pengujian atau paket harus dipilih.',
             'submission_tests.array' => 'Format data pengujian tidak valid.',
