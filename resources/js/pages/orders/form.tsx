@@ -118,6 +118,8 @@ export default function ReservationForm() {
         user.role === 'admin' ? 'external' : (user.role as 'external' | 'internal'),
     );
 
+    console.info('Full Slot Dates:', fullSlotDate);
+
     const searchParams = new URLSearchParams(window.location.search);
 
     const paramsTestIds = Array.from(searchParams.entries())
@@ -326,12 +328,16 @@ export default function ReservationForm() {
     const isDisabledDate = (date: Date) => {
         const formatted = format(date, 'yyyy-MM-dd');
         const isSpecific = fullSlotDate.includes(formatted);
+
         const today = new Date();
         const threeMonthsFromNow = new Date();
         threeMonthsFromNow.setMonth(today.getMonth() + 3);
+
         const isWithinRange = date >= today && date <= threeMonthsFromNow;
+
         return isWeekend(date) || isSpecific || !isWithinRange;
     };
+
 
     if (cartEmpty) {
         return (
@@ -534,7 +540,7 @@ export default function ReservationForm() {
                                                             id="project_address"
                                                             value={externalForm.project_address}
                                                             onChange={(e) => handleExternalFormChange('project_address', e.target.value)}
-                                                            placeholder="Jl. Raya Suramadu, Surabaya, Jawa Timur"
+                                                            placeholder="Jalan MT. Haryono No.3 Kandang Gampang, Dusun 3, Bojanegara, Kec. Purbalingga, Kabupaten Purbalingga"
                                                             className="min-h-[100px] resize-none border-zinc-300 bg-white text-zinc-900 placeholder-zinc-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-400"
                                                             disabled={processing}
                                                         />
@@ -544,67 +550,76 @@ export default function ReservationForm() {
                                                                 {errors.project_address}
                                                             </p>
                                                         )}
+
+                                                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                                                            <strong>Jika pengujian dilakukan di laboratorium, alamat yang dapat diisi adalah:</strong> Jl. Raya Mayjen Sungkono No.KM 5, Dusun 2, Blater, Kec. Kalimanah, Kabupaten Purbalingga.
+                                                        </p>
+
                                                     </div>
                                                 </div>
 
-                                                {/* Schedule Section for External */}
-                                                <div className="space-y-6">
-                                                    <div className="flex items-center space-x-2">
-                                                        <div className="rounded-full bg-green-100 p-1.5 dark:bg-green-900/30">
-                                                            <Clock className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                                    {/* Schedule Section for External */}
+                                                    <div className="space-y-6">
+                                                        <div className="flex items-center space-x-2">
+                                                            <div className="rounded-full bg-green-100 p-1.5 dark:bg-green-900/30">
+                                                                <Clock className="h-4 w-4 text-green-600 dark:text-green-400" />
+                                                            </div>
+                                                            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Jadwal Pengajuan</h3>
                                                         </div>
-                                                        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Jadwal Pengajuan</h3>
-                                                    </div>
-                                                    <Separator className="bg-zinc-200 dark:bg-zinc-700" />
+                                                        <Separator className="bg-zinc-200 dark:bg-zinc-700" />
 
-                                                    <div className="space-y-2">
-                                                        <label
-                                                            htmlFor="test_submission_date_external"
-                                                            className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300"
-                                                        >
-                                                            Tanggal Pengajuan *
-                                                        </label>
-                                                        <Popover>
-                                                            <PopoverTrigger asChild>
-                                                                <Button
-                                                                    id="test_submission_date_external"
-                                                                    variant={'outline'}
-                                                                    className={cn(
-                                                                        'h-12 w-full justify-start border-zinc-300 bg-white pl-4 text-left font-normal text-zinc-900 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700',
-                                                                        !externalForm.test_submission_date && 'text-zinc-500 dark:text-zinc-400',
-                                                                    )}
-                                                                    disabled={processing}
-                                                                >
-                                                                    <CalendarIcon className="mr-3 h-4 w-4" />
-                                                                    {externalForm.test_submission_date ? (
-                                                                        formatDate(externalForm.test_submission_date)
-                                                                    ) : (
-                                                                        <span>Pilih Tanggal Pengajuan</span>
-                                                                    )}
-                                                                </Button>
-                                                            </PopoverTrigger>
-                                                            <PopoverContent
-                                                                className="w-auto border-zinc-200 bg-white p-0 dark:border-zinc-700 dark:bg-zinc-800"
-                                                                align="start"
+                                                        <div className="space-y-2">
+                                                            <label
+                                                                htmlFor="test_submission_date_external"
+                                                                className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300"
                                                             >
-                                                                <Calendar
-                                                                    mode="single"
-                                                                    onSelect={(date) => handleExternalFormChange('test_submission_date', date)}
-                                                                    selected={externalForm.test_submission_date}
-                                                                    disabled={(date) => {
-                                                                        return isDisabledDate(date);
-                                                                    }}
-                                                                />
-                                                            </PopoverContent>
-                                                        </Popover>
-                                                        {errors.test_submission_date && (
-                                                            <p className="flex items-center text-sm text-red-500 dark:text-red-400">
-                                                                <span className="mr-1">⚠</span>
-                                                                {errors.test_submission_date}
+                                                                Tanggal Pengajuan *
+                                                            </label>
+                                                            <Popover>
+                                                                <PopoverTrigger asChild>
+                                                                    <Button
+                                                                        id="test_submission_date_external"
+                                                                        variant={'outline'}
+                                                                        className={cn(
+                                                                            'h-12 w-full justify-start border-zinc-300 bg-white pl-4 text-left font-normal text-zinc-900 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700',
+                                                                            !externalForm.test_submission_date && 'text-zinc-500 dark:text-zinc-400',
+                                                                        )}
+                                                                        disabled={processing}
+                                                                    >
+                                                                        <CalendarIcon className="mr-3 h-4 w-4" />
+                                                                        {externalForm.test_submission_date ? (
+                                                                            formatDate(externalForm.test_submission_date)
+                                                                        ) : (
+                                                                            <span>Pilih Tanggal Pengajuan</span>
+                                                                        )}
+                                                                    </Button>
+                                                                </PopoverTrigger>
+                                                                <PopoverContent
+                                                                    className="w-auto border-zinc-200 bg-white p-0 dark:border-zinc-700 dark:bg-zinc-800"
+                                                                    align="start"
+                                                                >
+                                                                    <Calendar
+                                                                        mode="single"
+                                                                        onSelect={(date) => handleExternalFormChange('test_submission_date', date)}
+                                                                        selected={externalForm.test_submission_date}
+                                                                        disabled={(date) => {
+                                                                            return isDisabledDate(date);
+                                                                        }}
+                                                                    />
+                                                                </PopoverContent>
+                                                            </Popover>
+                                                            {errors.test_submission_date && (
+                                                                <p className="flex items-center text-sm text-red-500 dark:text-red-400">
+                                                                    <span className="mr-1">⚠</span>
+                                                                    {errors.test_submission_date}
+                                                                </p>
+                                                            )}
+
+                                                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                                                                **Jika tanggal tidak dapat dipilih, kemungkinan tanggal tersebut sudah berlalu, jatuh pada akhir pekan, atau seluruh slot pengujian pada tanggal tersebut telah penuh.
                                                             </p>
-                                                        )}
+                                                        </div>
                                                     </div>
-                                                </div>
 
                                                 {/* Additional Notes for External */}
                                                 <div className="space-y-6">
@@ -822,11 +837,7 @@ export default function ReservationForm() {
                                                                     onSelect={(date) => handleInternalFormChange('test_submission_date', date)}
                                                                     selected={internalForm.test_submission_date}
                                                                     disabled={(date) => {
-                                                                        const today = new Date();
-                                                                        const threeMonthsFromNow = new Date();
-                                                                        threeMonthsFromNow.setMonth(today.getMonth() + 3);
-                                                                        const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-                                                                        return date < today || date > threeMonthsFromNow || isWeekend;
+                                                                        return isDisabledDate(date);
                                                                     }}
                                                                 />
                                                             </PopoverContent>
@@ -837,6 +848,10 @@ export default function ReservationForm() {
                                                                 {errors.test_submission_date}
                                                             </p>
                                                         )}
+
+                                                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                                                            **Jika tanggal tidak dapat dipilih, kemungkinan tanggal tersebut sudah berlalu, jatuh pada akhir pekan, atau seluruh slot pengujian pada tanggal tersebut telah penuh.
+                                                        </p>
                                                     </div>
                                                 </div>
 
