@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Test;
 use Illuminate\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Models\Test;
+use App\Models\Package;
+use App\Models\Schedule;
 
 class SubmitSubmissionRequest extends FormRequest
 {
@@ -91,6 +93,7 @@ class SubmitSubmissionRequest extends FormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function ($validator) {
+            // Validation if unit is less than minimum unit for each test
             $tests = $this->input('submission_tests', []);
 
             $testIds = collect($tests)->pluck('test_id')->filter()->toArray();
@@ -108,6 +111,41 @@ class SubmitSubmissionRequest extends FormRequest
                         );
                     }
                 }
+            }
+
+            $testSubmissionDate = $this->input('test_submission_date');
+            $packageIds = $this->input('submission_packages', []);
+            $packageTestIds = Package::whereIn('id', $packageIds)
+                ->with('tests:id')
+                ->get()
+                ->pluck('tests')
+                ->flatten()
+                ->pluck('id')
+                ->unique()
+                ->values();
+            $mergeTestIds = collect($testIds)->merge($packageTestIds)->unique()->values()->toArray();
+
+            // validation if test_submission_date is in the past
+            if ($testSubmissionDate && strtotime($testSubmissionDate) < time()) {
+                $validator->errors()->add('test_submission_date', 'Tanggal pengajuan uji tidak boleh di masa lalu.');
+            }
+
+
+            // validation if test_submission_date schedule has full slots
+            $fullSlotSchedules = Schedule::whereIn('test_id', $mergeTestIds)
+                ->where('date', $testSubmissionDate)
+                ->where('available_slots', 0)
+                ->get();
+
+            if ($fullSlotSchedules->isNotEmpty()) {
+                $fullNames = $fullSlotSchedules->map(function ($schedule) {
+                    return $schedule->test->name ?? "ID {$schedule->test_id}";
+                })->implode(', ');
+
+                $validator->errors()->add(
+                    'test_submission_date',
+                    "Slot untuk pengujian berikut penuh pada tanggal ini. Silakan pilih tanggal lain: $fullNames."
+                );
             }
         });
     }
