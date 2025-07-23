@@ -11,12 +11,12 @@ use Illuminate\Http\Request;
 use App\Http\Requests\submitSubmissionRequest;
 use App\Models\Transaction;
 use App\Services\BookingService;
+use App\Services\BookingUtils;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Exception;
 use App\Exceptions\SlotUnavailableException;
-use App\Utils\BookingUtils;
 
 class BookingController extends Controller
 {
