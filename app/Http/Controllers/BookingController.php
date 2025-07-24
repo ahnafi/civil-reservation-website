@@ -44,6 +44,9 @@ class BookingController extends Controller
                 ];
 
             $documentFiles = $request->file('documents', []);
+            if (!is_array($documentFiles)) {
+                $documentFiles = $documentFiles ? [$documentFiles] : [];
+            }
 
             // Create the submission
             $bookingService->createSubmission(

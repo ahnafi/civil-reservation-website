@@ -63,8 +63,19 @@ class Submission extends Model
 
         static::updating(function ($model) {
             if ($model->isDirty('documents')) {
-                $originalDocuments = $model->getOriginal('documents') ?? [];
-                $newDocuments = $model->documents ?? [];
+                $originalDocuments = $model->getOriginal('documents');
+                if (is_string($originalDocuments)) {
+                    $originalDocuments = json_decode($originalDocuments, true) ?: [];
+                } elseif (!is_array($originalDocuments)) {
+                    $originalDocuments = [];
+                }
+
+                $newDocuments = $model->documents;
+                if (is_string($newDocuments)) {
+                    $newDocuments = json_decode($newDocuments, true) ?: [];
+                } elseif (!is_array($newDocuments)) {
+                    $newDocuments = [];
+                }
 
                 $removedDocuments = array_diff($originalDocuments, $newDocuments);
 

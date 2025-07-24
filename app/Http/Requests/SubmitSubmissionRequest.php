@@ -47,7 +47,8 @@ class SubmitSubmissionRequest extends FormRequest
             'submission_packages' => ['nullable', 'array'],
             'user_note' => ['nullable', 'string'],
             'admin_note' => ['nullable', 'string'],
-            'documents' => ['nullable', 'array'],
+            // 'documents' => ['nullable', 'array'],
+            'documents' => ['nullable'],
             'documents.*' => ['file', 'max:2048', 'mimes:pdf,doc,docx,png,jpg,jpeg'],
 
             // submission_tests is required if submission_packages is not present

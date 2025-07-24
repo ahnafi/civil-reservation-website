@@ -83,6 +83,7 @@ type SubmissionData = {
     user_note: string;
     submission_tests: SimplifiedTest[];
     submission_packages: SimplifiedPackage[];
+    documents: File[];
     // External fields
     company_name?: string;
     project_name?: string;
@@ -157,12 +158,13 @@ export default function ReservationForm() {
         user_note: '',
     });
 
-    const { setData, post, processing, errors, reset } = useForm<SubmissionData>({
+    const { setData, processing, errors, reset } = useForm<SubmissionData>({
         submission_type: submissionType,
         test_submission_date: undefined,
         user_note: '',
         submission_tests: [],
         submission_packages: [],
+        documents: [],
     });
 
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -249,6 +251,7 @@ export default function ReservationForm() {
             submission_packages: packages.map((pkg: SimplifiedPackage) => ({
                 package_id: pkg.package_id,
             })),
+            documents: [],
         };
 
         if (submissionType === 'external') {
@@ -273,6 +276,14 @@ export default function ReservationForm() {
             });
         }
     }, [externalForm, internalForm, submissionType]);
+
+    function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+        const files = event.target.files;
+        if (files && files.length > 0) {
+            const fileArray = Array.from(files);
+            setData('documents', fileArray);
+        }
+    }
 
     const handleExternalFormChange = (field: keyof ExternalForm, value: string | Date | undefined) => {
         setExternalForm((prev) => ({
@@ -307,7 +318,50 @@ export default function ReservationForm() {
     const handleConfirmSubmit = () => {
         setShowConfirmDialog(false);
 
-        post(route('createSubmission'), {
+        // Buat FormData manual
+        const formData = new FormData();
+
+        // Data utama
+        formData.append('submission_type', submissionType);
+
+        if (submissionType === 'external') {
+            formData.append('company_name', externalForm.company_name);
+            formData.append('project_name', externalForm.project_name);
+            formData.append('project_address', externalForm.project_address);
+            formData.append('test_submission_date', formatDateForSubmission(externalForm.test_submission_date) || '');
+            formData.append('user_note', externalForm.user_note || '');
+        } else {
+            formData.append('name', internalForm.name);
+            formData.append('program_study', internalForm.program_study);
+            formData.append('research_title', internalForm.research_title);
+            formData.append('personnel_count', String(internalForm.personnel_count));
+            formData.append('supervisor', internalForm.supervisor);
+            formData.append('test_submission_date', formatDateForSubmission(internalForm.test_submission_date) || '');
+            formData.append('user_note', internalForm.user_note || '');
+        }
+
+        // Tests
+        tests.forEach((test: SimplifiedTest, idx: number) => {
+            formData.append(`submission_tests[${idx}][test_id]`, String(test.test_id));
+            formData.append(`submission_tests[${idx}][unit]`, String(test.unit));
+        });
+
+        // Packages
+        packages.forEach((pkg: SimplifiedPackage, idx: number) => {
+            formData.append(`submission_packages[${idx}][package_id]`, String(pkg.package_id));
+        });
+
+        // Documents
+        const files = (document.getElementById('documents') as HTMLInputElement)?.files;
+        if (files && files.length > 0) {
+            Array.from(files).forEach((file, idx) => {
+                formData.append(`documents[${idx}]`, file);
+            });
+        }
+
+        // Kirim pakai Inertia router.post dengan FormData
+        router.post(route('createSubmission'), formData, {
+            forceFormData: true,
             onSuccess: () => {
                 reset();
                 localStorage.removeItem('tests');
@@ -337,7 +391,6 @@ export default function ReservationForm() {
 
         return isWeekend(date) || isSpecific || !isWithinRange;
     };
-
 
     if (cartEmpty) {
         return (
@@ -552,74 +605,75 @@ export default function ReservationForm() {
                                                         )}
 
                                                         <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                                                            <strong>Jika pengujian dilakukan di laboratorium, alamat yang dapat diisi adalah:</strong> Jl. Raya Mayjen Sungkono No.KM 5, Dusun 2, Blater, Kec. Kalimanah, Kabupaten Purbalingga.
+                                                            <strong>Jika pengujian dilakukan di laboratorium, alamat yang dapat diisi adalah:</strong>{' '}
+                                                            Jl. Raya Mayjen Sungkono No.KM 5, Dusun 2, Blater, Kec. Kalimanah, Kabupaten Purbalingga.
                                                         </p>
-
                                                     </div>
                                                 </div>
 
-                                                    {/* Schedule Section for External */}
-                                                    <div className="space-y-6">
-                                                        <div className="flex items-center space-x-2">
-                                                            <div className="rounded-full bg-green-100 p-1.5 dark:bg-green-900/30">
-                                                                <Clock className="h-4 w-4 text-green-600 dark:text-green-400" />
-                                                            </div>
-                                                            <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Jadwal Pengajuan</h3>
+                                                {/* Schedule Section for External */}
+                                                <div className="space-y-6">
+                                                    <div className="flex items-center space-x-2">
+                                                        <div className="rounded-full bg-green-100 p-1.5 dark:bg-green-900/30">
+                                                            <Clock className="h-4 w-4 text-green-600 dark:text-green-400" />
                                                         </div>
-                                                        <Separator className="bg-zinc-200 dark:bg-zinc-700" />
-
-                                                        <div className="space-y-2">
-                                                            <label
-                                                                htmlFor="test_submission_date_external"
-                                                                className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300"
-                                                            >
-                                                                Tanggal Pengajuan *
-                                                            </label>
-                                                            <Popover>
-                                                                <PopoverTrigger asChild>
-                                                                    <Button
-                                                                        id="test_submission_date_external"
-                                                                        variant={'outline'}
-                                                                        className={cn(
-                                                                            'h-12 w-full justify-start border-zinc-300 bg-white pl-4 text-left font-normal text-zinc-900 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700',
-                                                                            !externalForm.test_submission_date && 'text-zinc-500 dark:text-zinc-400',
-                                                                        )}
-                                                                        disabled={processing}
-                                                                    >
-                                                                        <CalendarIcon className="mr-3 h-4 w-4" />
-                                                                        {externalForm.test_submission_date ? (
-                                                                            formatDate(externalForm.test_submission_date)
-                                                                        ) : (
-                                                                            <span>Pilih Tanggal Pengajuan</span>
-                                                                        )}
-                                                                    </Button>
-                                                                </PopoverTrigger>
-                                                                <PopoverContent
-                                                                    className="w-auto border-zinc-200 bg-white p-0 dark:border-zinc-700 dark:bg-zinc-800"
-                                                                    align="start"
-                                                                >
-                                                                    <Calendar
-                                                                        mode="single"
-                                                                        onSelect={(date) => handleExternalFormChange('test_submission_date', date)}
-                                                                        selected={externalForm.test_submission_date}
-                                                                        disabled={(date) => {
-                                                                            return isDisabledDate(date);
-                                                                        }}
-                                                                    />
-                                                                </PopoverContent>
-                                                            </Popover>
-                                                            {errors.test_submission_date && (
-                                                                <p className="flex items-center text-sm text-red-500 dark:text-red-400">
-                                                                    <span className="mr-1">⚠</span>
-                                                                    {errors.test_submission_date}
-                                                                </p>
-                                                            )}
-
-                                                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                                                                **Jika tanggal tidak dapat dipilih, kemungkinan tanggal tersebut sudah berlalu, jatuh pada akhir pekan, atau seluruh slot pengujian pada tanggal tersebut telah penuh.
-                                                            </p>
-                                                        </div>
+                                                        <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Jadwal Pengajuan</h3>
                                                     </div>
+                                                    <Separator className="bg-zinc-200 dark:bg-zinc-700" />
+
+                                                    <div className="space-y-2">
+                                                        <label
+                                                            htmlFor="test_submission_date_external"
+                                                            className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300"
+                                                        >
+                                                            Tanggal Pengajuan *
+                                                        </label>
+                                                        <Popover>
+                                                            <PopoverTrigger asChild>
+                                                                <Button
+                                                                    id="test_submission_date_external"
+                                                                    variant={'outline'}
+                                                                    className={cn(
+                                                                        'h-12 w-full justify-start border-zinc-300 bg-white pl-4 text-left font-normal text-zinc-900 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white dark:hover:bg-zinc-700',
+                                                                        !externalForm.test_submission_date && 'text-zinc-500 dark:text-zinc-400',
+                                                                    )}
+                                                                    disabled={processing}
+                                                                >
+                                                                    <CalendarIcon className="mr-3 h-4 w-4" />
+                                                                    {externalForm.test_submission_date ? (
+                                                                        formatDate(externalForm.test_submission_date)
+                                                                    ) : (
+                                                                        <span>Pilih Tanggal Pengajuan</span>
+                                                                    )}
+                                                                </Button>
+                                                            </PopoverTrigger>
+                                                            <PopoverContent
+                                                                className="w-auto border-zinc-200 bg-white p-0 dark:border-zinc-700 dark:bg-zinc-800"
+                                                                align="start"
+                                                            >
+                                                                <Calendar
+                                                                    mode="single"
+                                                                    onSelect={(date) => handleExternalFormChange('test_submission_date', date)}
+                                                                    selected={externalForm.test_submission_date}
+                                                                    disabled={(date) => {
+                                                                        return isDisabledDate(date);
+                                                                    }}
+                                                                />
+                                                            </PopoverContent>
+                                                        </Popover>
+                                                        {errors.test_submission_date && (
+                                                            <p className="flex items-center text-sm text-red-500 dark:text-red-400">
+                                                                <span className="mr-1">⚠</span>
+                                                                {errors.test_submission_date}
+                                                            </p>
+                                                        )}
+
+                                                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                                                            **Jika tanggal tidak dapat dipilih, kemungkinan tanggal tersebut sudah berlalu, jatuh pada
+                                                            akhir pekan, atau seluruh slot pengujian pada tanggal tersebut telah penuh.
+                                                        </p>
+                                                    </div>
+                                                </div>
 
                                                 {/* Additional Notes for External */}
                                                 <div className="space-y-6">
@@ -850,7 +904,8 @@ export default function ReservationForm() {
                                                         )}
 
                                                         <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                                                            **Jika tanggal tidak dapat dipilih, kemungkinan tanggal tersebut sudah berlalu, jatuh pada akhir pekan, atau seluruh slot pengujian pada tanggal tersebut telah penuh.
+                                                            **Jika tanggal tidak dapat dipilih, kemungkinan tanggal tersebut sudah berlalu, jatuh pada
+                                                            akhir pekan, atau seluruh slot pengujian pada tanggal tersebut telah penuh.
                                                         </p>
                                                     </div>
                                                 </div>
@@ -890,6 +945,39 @@ export default function ReservationForm() {
                                                 </div>
                                             </>
                                         )}
+
+                                        <div className="space-y-6">
+                                            <div className="flex items-center space-x-2">
+                                                <div className="rounded-full bg-purple-100 p-1.5 dark:bg-purple-900/30">
+                                                    <FileText className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                                                </div>
+                                                <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">Dokumen Tambahan</h3>
+                                            </div>
+                                            <Separator className="bg-zinc-200 dark:bg-zinc-700" />
+
+                                            <div className="space-y-2">
+                                                <label htmlFor="documents" className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                                                    Unggah Dokumen Pendukung (Opsional)
+                                                </label>
+                                                <Input
+                                                    id="documents"
+                                                    type="file"
+                                                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                    onChange={handleFileChange}
+                                                    disabled={processing}
+                                                    className="border-zinc-300 bg-white text-zinc-900 placeholder-zinc-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-400"
+                                                />
+                                                {errors.documents && (
+                                                    <p className="flex items-center text-sm text-red-500 dark:text-red-400">
+                                                        <span className="mr-1">⚠</span>
+                                                        {errors.documents}
+                                                    </p>
+                                                )}
+                                                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                                                    **Format yang didukung: PDF, DOC, DOCX, JPG, JPEG, PNG. Maksimal ukuran file 5MB.
+                                                </p>
+                                            </div>
+                                        </div>
 
                                         {/* Action Buttons */}
                                         <div className="flex flex-col justify-between gap-4 border-t border-zinc-200 pt-8 sm:flex-row dark:border-zinc-700">

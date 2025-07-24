@@ -64,7 +64,8 @@ class BookingService
             'test_submission_date' => $test_submission_date,
             'user_note' => $user_note,
             'submission_tests' => $submission_tests,
-            'submission_packages' => $submission_packages
+            'submission_packages' => $submission_packages,
+            'documentFiles' => $documentFiles,
         ]);
         try {
 
@@ -118,6 +119,7 @@ class BookingService
                 'submission_external_detail_id' => $externalDetailId,
                 'test_submission_date' => $test_submission_date,
                 'user_note' => $user_note ?? '', // Pastikan selalu string
+                'documents' => json_encode([]), // Inisialisasi dengan array kosong
             ]);
 
             // 4. Tambah relasi pengujian & paket
@@ -131,6 +133,10 @@ class BookingService
 
             // 5. File handling logic
             if (!empty($documentFiles)) {
+                if(!is_array($documentFiles)) {
+                    $documentFiles = [$documentFiles];
+                }
+
                 $storedPaths = [];
 
                 foreach ($documentFiles as $file) {
@@ -143,7 +149,7 @@ class BookingService
                     $storedPaths[] = $path;
                 }
 
-                $submission->documents = $storedPaths;
+                $submission->documents = json_decode(json_encode($storedPaths));
                 $submission->save();
             }
 
