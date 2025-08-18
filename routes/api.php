@@ -5,6 +5,7 @@ use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\LaboratoryController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\ResearchController;
+use App\Http\Controllers\StandardController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TestController;
 use App\Mail\ContactFormMail;
@@ -38,6 +39,11 @@ Route::get("tests/search", [TestController::class, "apiSearch"])->name("tests.ap
 
 Route::get("labs", [LaboratoryController::class, "apiIndex"])->name("labs.api.index");
 Route::get("labs/{laboratory:slug}", [LaboratoryController::class, "apiDetail"])->name("labs.api.detail");
+
+// Standard Routes
+Route::get("standards", [StandardController::class, "index"])->name("standards.index");
+Route::get("standards/{standard}", [StandardController::class, "show"])->name("standards.show");
+Route::get("standards/search", [StandardController::class, "search"])->name("standards.search");
 
 // Contact Form Route
 Route::post("contact", [ContactController::class, "send"])->name("contact.send");
