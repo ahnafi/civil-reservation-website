@@ -10,8 +10,11 @@ use App\Http\Controllers\TestController;
 use App\Mail\ContactFormMail;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\ReviewController;
 
 // API Routes
+Route::get("review", [ReviewController::class, "index"])->name("review.index");
+
 // Team Routes
 Route::get("team", [TeamController::class, "index"])->name("team.index");
 
