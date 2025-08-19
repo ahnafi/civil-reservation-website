@@ -158,6 +158,8 @@ export default function ReservationForm() {
         user_note: '',
     });
 
+    const [fileNames, setFileNames] = useState<string[]>([]);
+
     const { setData, processing, errors, reset } = useForm<SubmissionData>({
         submission_type: submissionType,
         test_submission_date: undefined,
@@ -282,6 +284,7 @@ export default function ReservationForm() {
         if (files && files.length > 0) {
             const fileArray = Array.from(files);
             setData('documents', fileArray);
+            setFileNames(fileArray.map((f) => f.name));
         }
     }
 
@@ -959,14 +962,39 @@ export default function ReservationForm() {
                                                 <label htmlFor="documents" className="block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
                                                     Unggah Dokumen Pendukung (Opsional)
                                                 </label>
+
                                                 <Input
                                                     id="documents"
                                                     type="file"
+                                                    placeholder="Unggah dokumen pendukung"
                                                     accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
                                                     onChange={handleFileChange}
                                                     disabled={processing}
-                                                    className="border-zinc-300 bg-white text-zinc-900 placeholder-zinc-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-white dark:placeholder-zinc-400"
+                                                    className="hidden"
                                                 />
+
+                                                {fileNames.length > 0 && (
+                                                    <div className="mt-2 flex flex-wrap justify-center gap-2">
+                                                        {fileNames.map((name, idx) => (
+                                                            <div
+                                                                key={idx}
+                                                                className="flex items-center space-x-2 px-3 py-2 rounded-lg border border-zinc-300 bg-white shadow-sm text-sm text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200"
+                                                            >
+                                                                <FileText className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />
+                                                                <span className="truncate max-w-[300px]">{name}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                )}
+
+
+                                                <label
+                                                    htmlFor="documents"
+                                                    className="cursor-pointer block w-full px-5 py-3 rounded-lg border border-zinc-300 bg-zinc-50 text-zinc-800 text-center shadow-sm hover:bg-zinc-100 hover:shadow-md transition-all duration-200 dark:border-zinc-600 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600"
+                                                >
+                                                    Pilih File
+                                                </label>
+
                                                 {errors.documents && (
                                                     <p className="flex items-center text-sm text-red-500 dark:text-red-400">
                                                         <span className="mr-1">⚠</span>
