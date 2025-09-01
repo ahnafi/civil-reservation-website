@@ -295,7 +295,7 @@ export default function Tutorial() {
                                 </div>
                                 <p className="text-muted-foreground">
                                     Kirim pengajuan dan tunggu review admin (maksimal 2 x 24 jam). Jika disetujui, Anda akan menerima
-                                    notifikasi email dan admin akan menjadwalkan pengujian.
+                                    notifikasi email dan admin akan menjadwalkan pengujian. Pantau status pengajuan melalui halaman "<Link className="underline text-blue-500" href="/history/submissions">Riwayat Pengajuan</Link>".
                                 </p>
                             </div>
                         </div>
