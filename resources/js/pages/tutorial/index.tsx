@@ -1,4 +1,5 @@
 import AppLayout from "@/layouts/app-layout"
+import { Link } from "@inertiajs/react";
 import { BreadcrumbItem, SharedData } from '@/types';
 import {
     UserCheck,
@@ -81,7 +82,7 @@ export default function Tutorial() {
                                         <h3 className="font-semibold text-card-foreground">Pilih Pengujian & Paket</h3>
                                     </div>
                                     <p className="text-muted-foreground">
-                                        Buka halaman "Pengujian" untuk melihat katalog pengujian yang tersedia atau halaman "Paket" untuk
+                                        Buka halaman "<Link className="underline text-blue-500" href="/tests">Pengujian</Link>" untuk melihat katalog pengujian yang tersedia atau halaman "<Link className="underline text-blue-500" href="/packages">Paket</Link>" untuk
                                         paket pengujian. Klik pada salah satu untuk melihat detailnya, lalu tekan tombol "Tambahkan ke
                                         Keranjang".
                                     </p>
@@ -101,7 +102,7 @@ export default function Tutorial() {
                                         <h3 className="font-semibold text-card-foreground">Review & Lanjutkan</h3>
                                     </div>
                                     <p className="text-muted-foreground">
-                                        Buka halaman "Reservasi Pengujian" untuk melihat isi keranjang dan detail pengujian yang telah
+                                        Buka halaman "<Link className="underline text-blue-500" href="/orders/cart">Reservasi Pengujian</Link>" untuk melihat isi keranjang dan detail pengujian yang telah
                                         dipilih. Jika sudah sesuai, klik tombol "Lanjutkan ke Formulir Pesanan".
                                     </p>
                                 </div>
@@ -146,7 +147,7 @@ export default function Tutorial() {
                                     </div>
                                     <p className="text-muted-foreground">
                                         Klik tombol "Kirim Pengajuan" untuk mengirimkan permohonan. Pengajuan akan direview admin dalam
-                                        maksimal 2 x 24 jam. Pantau status melalui halaman "Riwayat Pengajuan".
+                                        maksimal 2 x 24 jam. Pantau status melalui halaman "<Link className="underline text-blue-500" href="/history/submissions">Riwayat Pengajuan</Link>".
                                     </p>
                                 </div>
                             </div>
@@ -166,7 +167,7 @@ export default function Tutorial() {
                                     </div>
                                     <p className="text-muted-foreground">
                                         Jika diterima, Anda akan menerima notifikasi email. Admin akan membuat transaksi pembayaran yang dapat
-                                        dilihat di "Riwayat Transaksi". Setelah pembayaran, admin akan menjadwalkan pengujian.
+                                        dilihat di "<Link className="underline text-blue-500" href="/history/transactions">Riwayat Transaksi</Link>". Setelah pembayaran, admin akan menjadwalkan pengujian.
                                     </p>
                                 </div>
                             </div>
@@ -186,8 +187,7 @@ export default function Tutorial() {
                                         <h3 className="font-semibold text-card-foreground">Pelaksanaan & Hasil</h3>
                                     </div>
                                     <p className="text-muted-foreground">
-                                        Persiapkan pengujian sebaik mungkin. Setelah selesai, dokumen hasil dapat diunduh melalui "Riwayat
-                                        Pengujian". Untuk pengujian ulang, gunakan tombol "Ajukan Pengujian Ulang" pada detail pengujian
+                                        Persiapkan pengujian sebaik mungkin. Setelah selesai, dokumen hasil dapat diunduh melalui "<Link className="underline text-blue-500" href="/history/testings">Riwayat Pengujian</Link>". Untuk pengujian ulang, gunakan tombol "Ajukan Pengujian Ulang" pada detail pengujian
                                         sebelumnya.
                                     </p>
                                 </div>
@@ -201,7 +201,7 @@ export default function Tutorial() {
                             </div>
                             <p className="text-yellow-700 dark:text-yellow-300">
                                 Sebelum memilih jadwal pelaksanaan pengujian, disarankan untuk mengecek ketersediaan slot melalui halaman
-                                "Jadwal Pengujian" terlebih dahulu.
+                                "<Link className="underline text-blue-500" href="/schedule">Jadwal Pengujian</Link>" terlebih dahulu.
                             </p>
                         </div>
                     </div>
@@ -247,8 +247,8 @@ export default function Tutorial() {
                                     <h3 className="font-semibold text-card-foreground">Pilih Pengujian & Review</h3>
                                 </div>
                                 <p className="text-muted-foreground">
-                                    Pilih pengujian dari halaman "Pengujian" atau "Paket", tambahkan ke keranjang, lalu review di halaman
-                                    "Reservasi Pengujian".
+                                    Pilih pengujian dari halaman "<Link className="underline text-blue-500" href="/tests">Pengujian</Link>" atau "<Link className="underline text-blue-500" href="/packages">Paket</Link>", tambahkan ke keranjang, lalu review di halaman
+                                    "<Link className="underline text-blue-500" href="/orders/cart">Reservasi Pengujian</Link>".
                                 </p>
                             </div>
                         </div>
@@ -315,7 +315,7 @@ export default function Tutorial() {
                                 </div>
                                 <p className="text-muted-foreground">
                                     Persiapkan pengujian dengan baik. Setelah selesai, hasil pengujian dapat diakses dan diunduh melalui
-                                    halaman "Riwayat Pengujian".
+                                    halaman "<Link className="underline text-blue-500" href="/history/testings">Riwayat Pengujian</Link>".
                                 </p>
                             </div>
                         </div>
@@ -328,7 +328,7 @@ export default function Tutorial() {
                                 <h4 className="font-semibold text-blue-800 dark:text-blue-200">Catatan Penting:</h4>
                             </div>
                             <ul className="text-blue-700 dark:text-blue-300 space-y-1">
-                                <li>• Cek ketersediaan slot melalui halaman "Jadwal Pengujian" sebelum memilih jadwal</li>
+                                <li>• Cek ketersediaan slot melalui halaman "<Link className="underline text-blue-500" href="/schedule">Jadwal Pengujian</Link>" sebelum memilih jadwal</li>
                                 <li>• Akun dengan email @unsoed.ac.id otomatis memiliki role "Internal"</li>
                                 <li>• Jika belum memiliki role "Internal", ajukan permohonan perubahan role kepada admin</li>
                                 <li>• Sangat disarankan menggunakan email @unsoed.ac.id untuk mempercepat verifikasi</li>
