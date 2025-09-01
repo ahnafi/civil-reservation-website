@@ -23,13 +23,13 @@ export default function Welcome() {
                         <>
                             <Link
                                 href={route('login')}
-                                className="hover:border-dark-secondary dark:hover:border-light-base inline-block rounded-sm border border-transparent px-5 py-1.5 leading-normal"
+                                className="hover:border-dark-secondary dark:hover:bg-zinc-900 dark:hover:border-light-base inline-block rounded-sm border border-transparent px-5 py-1.5 leading-normal"
                             >
                                 Masuk
                             </Link>
                             <Link
                                 href={route('register')}
-                                className="border-dark-tertiary hover:border-dark-secondary dark:border-light-base inline-block rounded-sm border px-5 py-1.5 leading-normal dark:hover:border-[#62605b]"
+                                className="border-dark-tertiary hover:border-dark-secondary dark:bg-zinc-900 dark:border-light-base inline-block rounded-sm border px-5 py-1.5 leading-normal dark:hover:border-[#62605b]"
                             >
                                 Daftar
                             </Link>
