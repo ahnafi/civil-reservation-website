@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import AppLayout from "@/layouts/app-layout"
 import type { BreadcrumbItem, Package, PackageCart, PaginatedPackage, Test } from "@/types"
 import { Head, Link } from "@inertiajs/react"
-import { ShoppingCart } from "lucide-react"
+import { ShoppingCart, ExternalLink } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast, ToastContainer } from "react-toastify"
 
@@ -32,7 +32,7 @@ export default function Packages({ paginated }: { paginated: PaginatedPackage })
         setIsAdding(true)
         const existingTest: PackageCart | undefined = packageCart.find((item) => item.package_id === selectedPackage.id)
         if (existingTest) {
-            toast.error("Paket sudah ada di keranjang!", {
+            toast.error("Paket pengujian sudah ada di keranjang!", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: false,
@@ -49,14 +49,30 @@ export default function Packages({ paginated }: { paginated: PaginatedPackage })
                 quantity: 1,
             }
             setPackageCart([...packageCart, newTestCart])
-            toast.success("Paket berhasil ditambahkan ke keranjang!", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-            })
+            toast.success(
+                <div className="flex flex-col min-h-[80px] p-1 sm:p-2">
+                    <div className="text-sm sm:text-base lg:text-base mb-3 sm:mb-4 leading-relaxed">
+                        Paket pengujian berhasil ditambahkan ke keranjang!
+                    </div>
+                    <div className="flex justify-end mt-auto">
+                        <Link
+                            href="/orders/cart"
+                            className="inline-flex items-center gap-1 sm:gap-1.5 lg:gap-2 px-2.5 py-1.5 sm:px-3 sm:py-2 lg:px-4 lg:py-2 rounded text-xs sm:text-sm lg:text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 shadow-sm whitespace-nowrap"
+                        >
+                            Lihat Keranjang
+                            <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 flex-shrink-0" />
+                        </Link>
+                    </div>
+                </div>,
+                {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                }
+            );
             localStorage.setItem("packages", JSON.stringify([...packageCart, newTestCart]))
             setIsAdding(false)
         }

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import AppLayout from "@/layouts/app-layout"
 import type { BreadcrumbItem, PaginatedTests, Test, TestCart, LaboratorySimple } from "@/types"
 import { Head, Link } from "@inertiajs/react"
-import { ChevronLeft, ChevronRight, ShoppingCart, Building2, Package, Wrench, Search } from "lucide-react"
+import { ChevronLeft, ChevronRight, ExternalLink, ShoppingCart, Building2, Package, Wrench, Search } from "lucide-react"
 import { useEffect, useState, useMemo } from "react"
 import { toast, ToastContainer } from "react-toastify"
 import DropdownSelect from "@/components/ui/DropdownSelect"
@@ -83,14 +83,30 @@ export default function Tests({
                 test: test,
             }
             setTestCart([...testCart, newTestCart])
-            toast.success("Pengujian berhasil ditambahkan ke keranjang!", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-            })
+            toast.success(
+                <div className="flex flex-col h-full">
+                    <div className="text-sm md:text-base mb-2">
+                        Pengujian berhasil ditambahkan ke keranjang!
+                    </div>
+                    <div className="flex justify-end mt-auto">
+                        <Link
+                            href="/orders/cart"
+                            className="inline-flex items-center gap-1.5 md:gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded text-xs md:text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 shadow-sm"
+                        >
+                            Lihat Keranjang
+                            <ExternalLink className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                        </Link>
+                    </div>
+                </div>,
+                {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                }
+            );
             localStorage.setItem("tests", JSON.stringify([...testCart, newTestCart]))
             setIsAdding(false)
         }
