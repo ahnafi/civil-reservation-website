@@ -174,7 +174,7 @@ export default function Tutorial() {
                             {/* Step 13-15 */}
                             <div className="flex gap-4">
                                 <div className="flex-shrink-0">
-                                    <div className="flex items-center justify-center w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                                    <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full">
                                         <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">13-15</span>
                                     </div>
                                 </div>
