@@ -7,6 +7,7 @@ import { Head, Link } from '@inertiajs/react';
 import {
     ArrowLeft,
     Beaker,
+    Paperclip,
     ClipboardCheck,
     Clock,
     CreditCard,
@@ -112,7 +113,7 @@ const formatDate = (dateString: string) => {
 };
 
 // Component for info items
-const InfoItem = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
+const InfoItem = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) => (
     <div className="mb-4 flex items-start gap-3">
         <div className="mt-0.5 text-gray-500">{icon}</div>
         <div>
@@ -488,6 +489,24 @@ export default function SubmissionDetail({
                                             label="Laboratorium"
                                             value={`${testRecord.lab_name} (${testRecord.lab_code})`}
                                         />
+                                        <InfoItem
+                                            icon={<Paperclip className="h-5 w-5" />}
+                                            label="Lampiran Dokumen"
+                                            value={
+                                                testRecord.documents && testRecord.documents.length > 0
+                                                    ? (
+                                                        <a
+                                                            href={`/storage/${testRecord.documents[0]}`}
+                                                            target='_self'
+                                                            rel="noopener noreferrer"
+                                                            className="text-blue-600 hover:underline"
+                                                        >
+                                                            {testRecord.documents[0].split('/').pop()}
+                                                        </a>
+                                                    )
+                                                    : 'Tidak ada dokumen'
+                                            }
+                                        />
                                     </div>
                                 </div>
                                 <div className="rounded-lg border p-4">
@@ -591,7 +610,7 @@ export default function SubmissionDetail({
                                                                 return (
                                                                     <React.Fragment key={test.test_id}>
                                                                         <Link
-                                                                            href={`/tests/${test.test_slug}`}
+                                                                            href={`/test/${test.test_slug}`}
                                                                             target="_blank"
                                                                             rel="noopener noreferrer"
                                                                             className="ml-3 rounded-lg bg-blue-50 p-2 transition-colors hover:bg-blue-100 lg:p-4 dark:bg-blue-900/20 dark:hover:bg-blue-800/40"
