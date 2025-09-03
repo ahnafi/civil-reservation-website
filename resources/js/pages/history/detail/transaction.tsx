@@ -152,12 +152,12 @@ export default function TransactionDetail({ transactionHistoryDetail }: { transa
                                         />
                                         <InfoItem
                                             icon={<Calendar className="h-5 w-5 text-blue-600" />}
-                                            label="Tanggal Transaksi"
-                                            value={formatDate(transaction.created_at)}
+                                            label="Deadline Pembayaran"
+                                            value={formatDate(transaction.payment_deadline)}
                                         />
                                         <InfoItem
                                             icon={<Clock className="h-5 w-5 text-blue-600" />}
-                                            label="Tanggal Pembayaran"
+                                            label="Tanggal Dibayar"
                                             value={formatDate(transaction.payment_date)}
                                         />
                                         <InfoItem
