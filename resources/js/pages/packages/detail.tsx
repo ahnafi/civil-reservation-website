@@ -26,12 +26,12 @@ const howItWorks: {
     {
         id: 2,
         title: 'Penyerahan Sampel',
-        description: 'Antar sampel air ke laboratorium atau gunakan layanan pengambilan sampel kami.',
+        description: 'Antar sampel pengujian ke laboratorium atau gunakan layanan pengambilan sampel kami.',
     },
     {
         id: 3,
         title: 'Pengujian',
-        description: 'Tim laboratorium kami akan melakukan semua pengujian yang termasuk dalam paket menggunakan peralatan kalibrasi terbaru.',
+        description: 'Tim laboratorium kami akan melakukan semua pengujian yang termasuk dalam paket menggunakan peralatan laboratorium',
     },
     {
         id: 4,
@@ -40,8 +40,8 @@ const howItWorks: {
     },
     {
         id: 5,
-        title: 'Hasil dan Konsultasi',
-        description: 'Terima laporan hasil dan dapatkan konsultasi dengan ahli kami untuk interpretasi dan rekomendasi.',
+        title: 'Hasil',
+        description: 'Pengguna akan menerima pemberiathuan hasil pengujian melalui email dan dapat mengunduhnya dari akun mereka di sistem.',
     },
 ];
 
