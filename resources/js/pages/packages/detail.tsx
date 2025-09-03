@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AppLayout from '@/layouts/app-layout';
 import type { BreadcrumbItem, PackageCart, Package as TestPackage } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Building2, CheckCircle2, Clock, MapPin, Package, ShoppingCart } from 'lucide-react';
+import { Building2, CheckCircle2, Clock, ExternalLink, MapPin, Package, ShoppingCart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 
@@ -90,14 +90,30 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                 quantity: 1,
             };
             setPackageCart([...packageCart, newTestCart]);
-            toast.success('Paket berhasil ditambahkan ke keranjang!', {
-                position: 'top-right',
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-            });
+            toast.success(
+                <div className="flex flex-col h-full">
+                    <div className="text-sm md:text-base mb-2">
+                        Pengujian berhasil ditambahkan ke keranjang!
+                    </div>
+                    <div className="flex justify-end mt-auto">
+                        <Link
+                            href="/orders/cart"
+                            className="inline-flex items-center gap-1.5 md:gap-2 px-3 py-1.5 md:px-4 md:py-2 rounded text-xs md:text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200 shadow-sm"
+                        >
+                            Lihat Keranjang
+                            <ExternalLink className="w-3.5 h-3.5 md:w-4 md:h-4" />
+                        </Link>
+                    </div>
+                </div>,
+                {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                }
+            );
             localStorage.setItem('packages', JSON.stringify([...packageCart, newTestCart]));
             setIsAdding(false);
         }
@@ -214,7 +230,7 @@ export default function PackageDetail({ data }: { data: TestPackage }) {
                                         <Button
                                             onClick={() => handleAddTestToCart(data)}
                                             disabled={isAdding}
-                                            className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 font-semibold text-white transition-colors duration-200 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+                                            className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 font-semibold text-white transition-colors duration-200 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 cursor-pointer"
                                             size="lg"
                                         >
                                             <ShoppingCart className="h-5 w-5" />
