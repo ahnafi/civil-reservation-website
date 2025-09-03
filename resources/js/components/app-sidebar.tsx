@@ -70,11 +70,6 @@ const historyNavItems: NavItem[] = [
         icon: History,
     },
     {
-        title: 'Transaksi',
-        url: '/history/transactions',
-        icon: History,
-    },
-    {
         title: 'Pengujian',
         url: '/history/testings',
         icon: History,
@@ -103,6 +98,19 @@ export function AppSidebar() {
     const user = auth.user;
     const page = usePage();
 
+    const historyNavItemsWithTransaksi: NavItem[] = [
+        historyNavItems[0],
+        ...(user.role === 'admin' || user.role === 'external'
+                ? [{
+                    title: 'Transaksi',
+                    url: '/history/transactions',
+                    icon: History,
+                }]
+                : []
+        ),
+        historyNavItems[1],
+    ];
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -124,7 +132,7 @@ export function AppSidebar() {
             <SidebarContent>
                 <NavMain label="Layanan" items={serviceNavItems} />
                 <NavMain label="Reservasi" items={orderNavItems} />
-                <NavMain label="Riwayat" items={historyNavItems} />
+                <NavMain label="Riwayat" items={historyNavItemsWithTransaksi} />
                 <NavMain label="Lainnya" items={otherNavItems} />
                 { (user.role === 'admin' || user.role === 'superadmin') && (
                     <NavMain label="Admin" items={adminItems} />
