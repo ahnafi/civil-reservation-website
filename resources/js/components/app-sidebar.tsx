@@ -126,7 +126,7 @@ export function AppSidebar() {
                 <NavMain label="Reservasi" items={orderNavItems} />
                 <NavMain label="Riwayat" items={historyNavItems} />
                 <NavMain label="Lainnya" items={otherNavItems} />
-                { user.role === 'admin' && (
+                { (user.role === 'admin' || user.role === 'superadmin') && (
                     <NavMain label="Admin" items={adminItems} />
                 )}
             </SidebarContent>
