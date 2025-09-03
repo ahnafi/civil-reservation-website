@@ -200,8 +200,7 @@ export default function Tutorial() {
                                 <h4 className="font-semibold text-yellow-800 dark:text-yellow-200">Catatan Penting:</h4>
                             </div>
                             <p className="text-yellow-700 dark:text-yellow-300">
-                                Sebelum memilih jadwal pelaksanaan pengujian, disarankan untuk mengecek ketersediaan slot melalui halaman
-                                <Link className="underline text-blue-500" href="/schedule">Jadwal Pengujian</Link> terlebih dahulu.
+                                Sebelum memilih jadwal pelaksanaan pengujian, disarankan untuk mengecek ketersediaan slot melalui halaman <Link className="underline text-blue-500" href="/schedule">Jadwal Pengujian</Link> terlebih dahulu.
                             </p>
                         </div>
                     </div>
