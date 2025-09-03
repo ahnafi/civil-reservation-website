@@ -202,6 +202,7 @@ export interface SubmissionSchedule {
     test_submission_date: string;
     submission_type: 'internal' | 'external';
     status: string;
+    documents: string[];
 
     test_id: number;
     test_name: string;
@@ -225,6 +226,7 @@ export interface SubmissionSchedule {
     project_name: string;
     project_address: string;
 
+    // internal details
     researcher_name: string;
     program_study: string;
     research_title: string;
