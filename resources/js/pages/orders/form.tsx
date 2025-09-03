@@ -31,6 +31,7 @@ import {
     Building2,
     CalendarIcon,
     CheckCircle2,
+    X,
     ClipboardList,
     Clock,
     CreditCard,
@@ -114,6 +115,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function ReservationForm() {
     const { auth, fullSlotDate } = usePage<{ auth: { user: User }; fullSlotDate: string[] }>().props;
     const user = auth.user;
+    const [documents, setDocuments] = useState<File[]>([]);
     const [cartEmpty, setCartEmpty] = useState(false);
     const [submissionType, setSubmissionType] = useState<'external' | 'internal'>(
         user.role === 'admin' ? 'external' : (user.role as 'external' | 'internal'),
@@ -286,6 +288,15 @@ export default function ReservationForm() {
             setData('documents', fileArray);
             setFileNames(fileArray.map((f) => f.name));
         }
+    }
+
+    function handleFileDelete(index: number) {
+        const newDocs = documents.filter((_, i) => i !== index);
+        const newNames = fileNames.filter((_, i) => i !== index);
+
+        setDocuments(newDocs);
+        setFileNames(newNames);
+        setData("documents", newDocs); // update Inertia dengan array baru
     }
 
     const handleExternalFormChange = (field: keyof ExternalForm, value: string | Date | undefined) => {
@@ -982,6 +993,13 @@ export default function ReservationForm() {
                                                             >
                                                                 <FileText className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />
                                                                 <span className="truncate max-w-[300px]">{name}</span>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleFileDelete(idx)}
+                                                                    className="ml-2 text-red-500 hover:text-red-700 dark:hover:text-red-300"
+                                                                >
+                                                                    <X className="h-4 w-4" />
+                                                                </button>
                                                             </div>
                                                         ))}
                                                     </div>
