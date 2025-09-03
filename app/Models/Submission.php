@@ -161,6 +161,8 @@ class Submission extends Model
                 'submissions.test_submission_date',
                 'submissions.status',
                 'submissions.user_note',
+                'submissions.admin_note',
+                'submissions.documents',
                 'submissions.created_at',
                 'submission_test.test_id',
                 'submission_test.quantity',
@@ -176,11 +178,13 @@ class Submission extends Model
                 DB::raw('COALESCE(test_labs.id, package_labs.id) as lab_id'),
                 DB::raw('COALESCE(test_labs.code, package_labs.code) as lab_code'),
                 DB::raw('COALESCE(test_labs.name, package_labs.name) as lab_name'),
+
                 // External detail fields
                 'submission_external_details.company_name',
                 'submission_external_details.project_name',
                 'submission_external_details.project_address',
                 'submission_external_details.total_cost',
+
                 // Internal detail fields
                 'submission_internal_details.name as researcher_name',
                 'submission_internal_details.program_study',
