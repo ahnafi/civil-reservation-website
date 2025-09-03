@@ -962,7 +962,7 @@ export default function TestingDetail({
                                                 <div className="mt-3">
                                                     <Button
                                                         onClick={handleRepeatSubmission}
-                                                        className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-green-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-green-700 disabled:opacity-50"
+                                                        className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-green-600 px-3 py-2 text-sm font-medium cursor-pointer text-white transition-colors hover:bg-green-700 disabled:opacity-50"
                                                         disabled={processing}
                                                     >
                                                         {processing ? (
