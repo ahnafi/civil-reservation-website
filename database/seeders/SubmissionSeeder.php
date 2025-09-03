@@ -746,6 +746,13 @@ class SubmissionSeeder extends Seeder
         ];
 
         foreach ($submissions as &$submission) {
+            if (!isset($submission['documents'])) {
+                $submission['documents'] = ['submission_documents/doc.pdf'];
+            }
+            $submission['updated_at'] = $submission['created_at'];
+        }
+
+        foreach ($submissions as &$submission) {
             $submission['updated_at'] = $submission['created_at'];
         }
         unset($submission);
