@@ -1,5 +1,5 @@
 export default function FloatingContact() {
-    const whatsappNumber = '6281234567890'; // Ganti dengan nomor WhatsApp tujuan
+    const whatsappNumber = '6281393133408';
     const whatsappLink = `https://wa.me/${whatsappNumber}`;
 
     return (
