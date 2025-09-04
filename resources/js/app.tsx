@@ -1,12 +1,13 @@
 import '../css/app.css';
 
+import { ModeToggle } from '@/components/mode-toggle';
+import { ThemeProvider } from '@/components/theme-provider';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { route as routeFn } from 'ziggy-js';
+import FloatingContact from './components/floating-contact';
 import { initializeTheme } from './hooks/use-appearance';
-import { ThemeProvider } from "@/components/theme-provider";
-import { ModeToggle } from "@/components/mode-toggle";
 
 declare global {
     const route: typeof routeFn;
@@ -24,7 +25,8 @@ createInertiaApp({
             <ThemeProvider>
                 <ModeToggle />
                 <App {...props} />
-            </ThemeProvider>
+                <FloatingContact />
+            </ThemeProvider>,
         );
     },
     progress: {
