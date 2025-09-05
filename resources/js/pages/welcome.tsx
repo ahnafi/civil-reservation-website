@@ -58,11 +58,11 @@ export default function Welcome() {
                                     <span>
                                         Lihat panduan penggunaan sistem reservasi di
                                         <a
-                                            href="https://laravel.com/docs"
+                                            href={route('tutorial')}
                                             target="_blank"
                                             className="ml-1 inline-flex items-center space-x-1 font-medium text-[#f53003] underline underline-offset-4 dark:text-[#FF4433]"
                                         >
-                                            <span>Video Berikut</span>
+                                            <span>Link Berikut</span>
                                             <svg
                                                 width={10}
                                                 height={11}
@@ -86,30 +86,30 @@ export default function Welcome() {
                                             <span className="h-1.5 w-1.5 rounded-full bg-[#dbdbd7] dark:bg-[#3E3E3A]" />
                                         </span>
                                     </span>
-                                    <span>
-                                        Baca aturan reservasi lab di
-                                        <a
-                                            href="https://laracasts.com"
-                                            target="_blank"
-                                            className="ml-1 inline-flex items-center space-x-1 font-medium text-[#f53003] underline underline-offset-4 dark:text-[#FF4433]"
-                                        >
-                                            <span>Terms and Conditions</span>
-                                            <svg
-                                                width={10}
-                                                height={11}
-                                                viewBox="0 0 10 11"
-                                                fill="none"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                className="h-2.5 w-2.5"
-                                            >
-                                                <path
-                                                    d="M7.70833 6.95834V2.79167H3.54167M2.5 8L7.5 3.00001"
-                                                    stroke="currentColor"
-                                                    strokeLinecap="square"
-                                                />
-                                            </svg>
-                                        </a>
-                                    </span>
+                                    {/*<span>*/}
+                                    {/*    Baca aturan reservasi lab di*/}
+                                    {/*    <a*/}
+                                    {/*        href="https://laracasts.com"*/}
+                                    {/*        target="_blank"*/}
+                                    {/*        className="ml-1 inline-flex items-center space-x-1 font-medium text-[#f53003] underline underline-offset-4 dark:text-[#FF4433]"*/}
+                                    {/*    >*/}
+                                    {/*        <span>Terms and Conditions</span>*/}
+                                    {/*        <svg*/}
+                                    {/*            width={10}*/}
+                                    {/*            height={11}*/}
+                                    {/*            viewBox="0 0 10 11"*/}
+                                    {/*            fill="none"*/}
+                                    {/*            xmlns="http://www.w3.org/2000/svg"*/}
+                                    {/*            className="h-2.5 w-2.5"*/}
+                                    {/*        >*/}
+                                    {/*            <path*/}
+                                    {/*                d="M7.70833 6.95834V2.79167H3.54167M2.5 8L7.5 3.00001"*/}
+                                    {/*                stroke="currentColor"*/}
+                                    {/*                strokeLinecap="square"*/}
+                                    {/*            />*/}
+                                    {/*        </svg>*/}
+                                    {/*    </a>*/}
+                                    {/*</span>*/}
                                 </li>
                             </ul>
                             <a
