@@ -129,7 +129,6 @@ class TestProdSeeder extends Seeder
                 "laboratory_id" => 2,
                 "category_id" => 3
             ],
-
             // 11 - 25
             [
                 "name" => "Pengukuran Sedimen Layang",
@@ -281,7 +280,157 @@ class TestProdSeeder extends Seeder
                 "laboratory_id" => 3, // Lab Struktur dan Bahan Bangunan
                 "category_id" => 1   // Sampel
             ],
-
+            // 26-40
+            [
+                "name" => "Uji Lentur Beton Bertulang, Kayu, Besi, Lainnya",
+                "description" => "Uji Lentur Beton Bertulang, Kayu, Besi, Lainnya adalah metode pengujian yang digunakan untuk menentukan kekuatan lentur material tersebut dengan cara memberikan beban pada spesimen hingga terjadi kegagalan. Minimum reservasi adalah 1 sampel. Estimasi maksimal penyelesaian laporan adalah 3 hari kerja.",
+                "images" => ["test_images/ULBBKL.jpeg"],
+                "price" => 250000,
+                "minimum_unit" => 1,
+                "daily_slot" => 20,
+                "laboratory_id" => 3,
+                "category_id" => 1
+            ],
+            [
+                "name" => "Mix Design Beton",
+                "description" => "Mix Design Beton adalah proses perancangan campuran beton yang optimal untuk digunakan dalam konstruksi, dengan mempertimbangkan berbagai faktor seperti jenis bahan, proporsi campuran, dan kondisi lingkungan. Minimum reservasi adalah 1 sampel. Estimasi maksimal penyelesaian laporan adalah 21 hari kerja.",
+                "images" => ["test_images/MDB.jpeg"],
+                "price" => 1500000,
+                "minimum_unit" => 1,
+                "daily_slot" => 1,
+                "laboratory_id" => 3,
+                "category_id" => 1
+            ],
+            [
+                "name" => "Uji Tekan Material (Alat Digital)",
+                "description" => "Uji Tekan Material (Alat Digital) adalah metode pengujian yang digunakan untuk menentukan kekuatan tekan material seperti beton, batu, atau logam dengan menggunakan alat digital yang memberikan hasil pengukuran secara akurat dan cepat. Minimum reservasi adalah 1 sampel. Estimasi maksimal penyelesaian laporan adalah 3 hari kerja.",
+                "images" => ["test_images/UTMD.jpg"],
+                "price" => 150000,
+                "minimum_unit" => 1,
+                "daily_slot" => 50,
+                "laboratory_id" => 3,
+                "category_id" => 1
+            ],
+            [
+                "name" => "Berat Volume Material",
+                "description" => "Uji Berat Volume Material adalah metode pengujian yang digunakan untuk menentukan berat volume material seperti tanah, agregat, atau bahan bangunan lainnya dengan cara mengukur massa dan volume material tersebut. Minimum reservasi adalah 1 sampel. Estimasi maksimal penyelesaian laporan adalah 3 hari kerja untuk satuan dan 7 hari kerja untuk paket kumplit.",
+                "images" => ["test_images/LSBB.jpeg"],
+                "price" => 150000,
+                "minimum_unit" => 1,
+                "daily_slot" => 2,
+                "laboratory_id" => 3,
+                "category_id" => 1
+            ],
+            [
+                "name" => "Core Drill Beton",
+                "description" => "Core Drill Beton adalah metode pengambilan sampel beton dari struktur yang ada untuk analisis lebih lanjut, seperti pengujian kekuatan atau karakteristik lainnya. Minimum reservasi adalah 5 titik. Estimasi maksimal penyelesaian laporan adalah 14 hari kerja. (Biaya utama belum termasuk biaya survei, transportasi, dan akomodasi)",
+                "images" => ["test_images/CDB.jpeg"],
+                "price" => 250000,
+                "minimum_unit" => 5,
+                "daily_slot" => 5,
+                "laboratory_id" => 3,
+                "category_id" => 2
+            ],
+            [
+                "name" => "Uji Kekekalan Agregat",
+                "description" => "Uji Kekekalan Agregat adalah metode pengujian yang digunakan untuk menentukan ketahanan agregat terhadap pelapukan dan degradasi akibat pengaruh lingkungan, seperti air, udara, dan bahan kimia. Minimum reservasi adalah 1 sampel. Estimasi maksimal penyelesaian laporan adalah 3 hari kerja untuk satuan dan 7 hari kerja untuk paket kumplit.",
+                "images" => ["test_images/LSBB.jpeg"],
+                "price" => 250000,
+                "minimum_unit" => 1,
+                "daily_slot" => 2,
+                "laboratory_id" => 3,
+                "category_id" => 1
+            ],
+            [
+                "name" => "Uji Kepipihan Agregat",
+                "description" => "Uji Kepipihan Agregat adalah metode pengujian yang digunakan untuk menentukan persentase kepipihan atau bentuk pipih dari butiran agregat, yang dapat mempengaruhi kualitas dan kinerja campuran beton atau aspal. Minimum reservasi adalah 1 sampel. Estimasi maksimal penyelesaian laporan adalah 3 hari kerja untuk satuan dan 7 hari kerja untuk paket kumplit.",
+                "images" => ["test_images/LSBB.jpeg"],
+                "price" => 200000,
+                "minimum_unit" => 1,
+                "daily_slot" => 2,
+                "laboratory_id" => 3,
+                "category_id" => 1
+            ],
+            [
+                "name" => "Berat Jenis Besi",
+                "description" => "Uji Berat Jenis Besi adalah metode pengujian yang digunakan untuk menentukan berat jenis atau densitas besi dengan cara mengukur massa dan volume besi tersebut. Minimum reservasi adalah 1 sampel. Estimasi maksimal penyelesaian laporan adalah 3 hari kerja. (Biaya utama belum termasuk biaya survei, transportasi, dan akomodasi)",
+                "images" => ["test_images/BJB.jpeg"],
+                "price" => 200000,
+                "minimum_unit" => 1,
+                "daily_slot" => 2,
+                "laboratory_id" => 3,
+                "category_id" => 1
+            ],
+            [
+                "name" => "Hammer Test",
+                "description" => "Hammer Test adalah metode pengujian non-destruktif yang digunakan untuk menilai kekuatan permukaan beton dengan cara memukul permukaan beton menggunakan palu khusus dan mengukur pantulan energi yang dihasilkan. Minimum reservasi adalah 10 titik. Estimasi maksimal penyelesaian laporan adalah 14 hari kerja. (Biaya utama belum termasuk biaya survei, transportasi, dan akomodasi)",
+                "images" => ["test_images/HT.jpeg"],
+                "price" => 100000,
+                "minimum_unit" => 10,
+                "daily_slot" => 10,
+                "laboratory_id" => 3,
+                "category_id" => 2
+            ],
+            [
+                "name" => "Uji Sondir",
+                "description" => "Uji Sondir adalah metode pengujian tanah yang digunakan untuk menentukan sifat fisik dan mekanik tanah dengan cara menekan alat sondir ke dalam tanah dan mengukur tahanan yang dihasilkan. Minimum reservasi adalah 2 titik. Estimasi maksimal penyelesaian laporan adalah 14 hari kerja. (Biaya utama belum termasuk biaya survei, transportasi, dan akomodasi)",
+                "images" => ["test_images/US.jpeg"],
+                "price" => 850000,
+                "minimum_unit" => 2,
+                "daily_slot" => 2,
+                "laboratory_id" => 5,
+                "category_id" => 2
+            ],
+            [
+                "name" => "Uji Bor Tangan",
+                "description" => "Uji Bor Tangan adalah metode pengujian tanah yang digunakan untuk mengambil sampel tanah dari kedalaman tertentu dengan menggunakan alat bor tangan, sehingga dapat dianalisis lebih lanjut di laboratorium. Minimum reservasi adalah 3 titik. Estimasi maksimal penyelesaian laporan adalah 14 hari kerja. (Biaya utama belum termasuk biaya survei, transportasi, dan akomodasi)",
+                "images" => ["test_images/UBT.jpeg"],
+                "price" => 500000,
+                "minimum_unit" => 3,
+                "daily_slot" => 3,
+                "laboratory_id" => 5,
+                "category_id" => 2
+            ],
+            [
+                "name" => "Uji Kadar Air Tanah",
+                "description" => "Uji Kadar Air Tanah adalah metode pengujian yang digunakan untuk menentukan persentase kadar air dalam sampel tanah, yang dapat mempengaruhi sifat fisik dan mekanik tanah tersebut. Minimum reservasi adalah 1 sampel. Estimasi maksimal penyelesaian laporan adalah 3 hari kerja dan 14 hari kerja untuk paket kumplit.",
+                "images" => ["test_images/LMT.jpeg"],
+                "price" => 150000,
+                "minimum_unit" => 1,
+                "daily_slot" => 2,
+                "laboratory_id" => 5,
+                "category_id" => 1
+            ],
+            [
+                "name" => "Uji Berat Jenis Tanah",
+                "description" => "Uji Berat Jenis Tanah adalah metode pengujian yang digunakan untuk menentukan berat jenis atau densitas tanah dengan cara mengukur massa dan volume tanah tersebut. Minimum reservasi adalah 1 sampel. Estimasi maksimal penyelesaian laporan adalah 3 hari kerja dan 14 hari kerja untuk paket kumplit.",
+                "images" => ["test_images/LMT.jpeg"],
+                "price" => 150000,
+                "minimum_unit" => 1,
+                "daily_slot" => 2,
+                "laboratory_id" => 5,
+                "category_id" => 1
+            ],
+            [
+                "name" => "Uji Gradasi Tanah",
+                "description" => "Uji Gradasi Tanah adalah metode pengujian yang digunakan untuk menentukan distribusi ukuran butiran dalam sampel tanah, yang dapat mempengaruhi sifat fisik dan mekanik tanah tersebut. Minimum reservasi adalah 1 sampel. Estimasi maksimal penyelesaian laporan adalah 3 hari kerja dan 14 hari kerja untuk paket kumplit.",
+                "images" => ["test_images/UGT.jpeg"],
+                "price" => 200000,
+                "minimum_unit" => 1,
+                "daily_slot" => 2,
+                "laboratory_id" => 5,
+                "category_id" => 1
+            ],
+            [
+                "name" => "Uji Batas Cair dan Batas Plastis Tanah",
+                "description" => "Uji Batas Cair dan Batas Plastis Tanah adalah metode pengujian yang digunakan untuk menentukan batas cair dan batas plastis tanah, yang dapat mempengaruhi sifat fisik dan mekanik tanah tersebut. Minimum reservasi adalah 1 sampel. Estimasi maksimal penyelesaian laporan adalah 3 hari kerja dan 14 hari kerja untuk paket kumplit.",
+                "images" => ["test_images/LMT.jpeg"],
+                "price" => 150000,
+                "minimum_unit" => 1,
+                "daily_slot" => 2,
+                "laboratory_id" => 5,
+                "category_id" => 1
+            ],
         ];
     }
 }
