@@ -128,7 +128,160 @@ class TestProdSeeder extends Seeder
                 "daily_slot" => 1,
                 "laboratory_id" => 2,
                 "category_id" => 3
-            ]
+            ],
+
+            // 11 - 25
+            [
+                "name" => "Pengukuran Sedimen Layang",
+                "description" => "Pengujian ini dilakukan untuk mengukur sedimen layang. Minimum reservasi adalah 3 titik (belum termasuk transport & akomodasi). Estimasi maksimal penyelesaian laporan adalah 14 hari kerja.",
+                "images" => ["test_images/LH.jpeg"],
+                "price" => 300000, // Harga tidak tersedia dalam dokumen
+                "minimum_unit" => 3,
+                "daily_slot" => 3,
+                "laboratory_id" => 2, // Lab Hidrologi
+                "category_id" => 2   // Titik
+            ],
+            [
+                "name" => "Pengukuran Sedimen Dasar",
+                "description" => "Pengujian ini dilakukan untuk mengukur sedimen dasar. Minimum reservasi adalah 3 titik (belum termasuk transport & akomodasi). Estimasi maksimal penyelesaian laporan adalah 14 hari kerja.",
+                "images" => ["test_images/LH.jpeg"],
+                "price" => 300000, // Harga tidak tersedia dalam dokumen
+                "minimum_unit" => 3,
+                "daily_slot" => 3,
+                "laboratory_id" => 2, // Lab Hidrologi
+                "category_id" => 2   // Titik
+            ],
+            [
+                "name" => "Uji Kualitas Air Pengecoran",
+                "description" => "Pengujian ini dilakukan untuk memeriksa kualitas air yang akan digunakan untuk pengecoran. Kuota harian saat ini belum tersedia. Estimasi maksimal penyelesaian laporan adalah 14 hari kerja.",
+                "images" => ["test_images/LH.jpeg"],
+                "price" => 200000, // Harga tidak tersedia dalam dokumen
+                "minimum_unit" => 1, // Tidak ada minimum, diasumsikan 1
+                "daily_slot" => 1, // Belum tersedia
+                "laboratory_id" => 2, // Lab Hidrologi
+                "category_id" => 1   // Sampel
+            ],
+            [
+                "name" => "Uji Tekan Material (Alat Analog)",
+                "description" => "Pengujian ini bertujuan untuk mengetahui kuat tekan material menggunakan alat analog. Minimum reservasi adalah 2 sampel (belum termasuk biaya capping). Estimasi maksimal penyelesaian laporan adalah 3 hari kerja.",
+                "images" => ["test_images/UTM_Analog.jpeg"],
+                "price" => 40000, // Harga tidak tersedia dalam dokumen
+                "minimum_unit" => 2,
+                "daily_slot" => 50,
+                "laboratory_id" => 3, // Lab Struktur dan Bahan Bangunan
+                "category_id" => 1   // Sampel
+            ],
+            [
+                "name" => "Uji Tarik Baja",
+                "description" => "Pengujian ini dilakukan untuk mengetahui kekuatan tarik baja. Minimum reservasi adalah 3 sampel (belum termasuk biaya bubut dan las). Estimasi maksimal penyelesaian laporan adalah 3 hari kerja.",
+                "images" => ["test_images/UTB.jpeg"],
+                "price" => 175000, // Harga tidak tersedia dalam dokumen
+                "minimum_unit" => 3,
+                "daily_slot" => 20,
+                "laboratory_id" => 3, // Lab Struktur dan Bahan Bangunan
+                "category_id" => 1   // Sampel
+            ],
+            [
+                "name" => "Scan Rebar Beton",
+                "description" => "Layanan ini untuk melakukan pemindaian tulangan (rebar) di dalam beton. Minimum reservasi adalah 4 titik (belum termasuk transport & akomodasi). Kuota harian hanya untuk 1 pelanggan. Estimasi maksimal penyelesaian laporan adalah 14 hari kerja.",
+                "images" => ["test_images/SRB.jpeg"],
+                "price" => 250000, // Harga tidak tersedia dalam dokumen
+                "minimum_unit" => 4,
+                "daily_slot" => 10,
+                "laboratory_id" => 3, // Lab Struktur dan Bahan Bangunan
+                "category_id" => 2   // Titik
+            ],
+            [
+                "name" => "Berat Jenis Kerikil",
+                "description" => "Pengujian ini untuk menentukan berat jenis dari agregat kasar (kerikil). Estimasi penyelesaian untuk satuan adalah 3 hari, dan untuk paket kumplit adalah 7 hari.",
+                "images" => ["test_images/BJK.jpeg"],
+                "price" => 100000, // Harga tidak tersedia dalam dokumen
+                "minimum_unit" => 1, // Tidak ada minimum, diasumsikan 1
+                "daily_slot" => 2,
+                "laboratory_id" => 3, // Lab Struktur dan Bahan Bangunan
+                "category_id" => 1   // Sampel
+            ],
+            [
+                "name" => "Berat Jenis Pasir",
+                "description" => "Pengujian ini untuk menentukan berat jenis dari agregat halus (pasir). Estimasi penyelesaian untuk satuan adalah 3 hari, dan untuk paket kumplit adalah 7 hari.",
+                "images" => ["test_images/BJP.jpeg"],
+                "price" => 100000, // Harga tidak tersedia dalam dokumen
+                "minimum_unit" => 1, // Tidak ada minimum, diasumsikan 1
+                "daily_slot" => 2,
+                "laboratory_id" => 3, // Lab Struktur dan Bahan Bangunan
+                "category_id" => 1   // Sampel
+            ],
+            [
+                "name" => "Uji Gradasi Kerikil",
+                "description" => "Pengujian ini bertujuan untuk mengetahui distribusi ukuran butiran kerikil. Estimasi penyelesaian untuk satuan adalah 3 hari, dan untuk paket kumplit adalah 7 hari.",
+                "images" => ["test_images/UGK.jpeg"],
+                "price" => 200000, // Harga tidak tersedia dalam dokumen
+                "minimum_unit" => 1, // Tidak ada minimum, diasumsikan 1
+                "daily_slot" => 2,
+                "laboratory_id" => 3, // Lab Struktur dan Bahan Bangunan
+                "category_id" => 1   // Sampel
+            ],
+            [
+                "name" => "Uji Gradasi Pasir",
+                "description" => "Pengujian ini bertujuan untuk mengetahui distribusi ukuran butiran pasir. Estimasi penyelesaian untuk satuan adalah 3 hari, dan untuk paket kumplit adalah 7 hari.",
+                "images" => ["test_images/UGP.jpeg"],
+                "price" => 200000, // Harga tidak tersedia dalam dokumen
+                "minimum_unit" => 1, // Tidak ada minimum, diasumsikan 1
+                "daily_slot" => 2,
+                "laboratory_id" => 3, // Lab Struktur dan Bahan Bangunan
+                "category_id" => 1   // Sampel
+            ],
+            [
+                "name" => "Uji Kandungan Lumpur Agregat",
+                "description" => "Pengujian ini untuk menentukan persentase kandungan lumpur dalam agregat. Estimasi penyelesaian untuk satuan adalah 3 hari, dan untuk paket kumplit adalah 7 hari.",
+                "images" => ["test_images/LSBB.jpeg"],
+                "price" => 150000, // Harga tidak tersedia dalam dokumen
+                "minimum_unit" => 1, // Tidak ada minimum, diasumsikan 1
+                "daily_slot" => 2,
+                "laboratory_id" => 3, // Lab Struktur dan Bahan Bangunan
+                "category_id" => 1   // Sampel
+            ],
+            [
+                "name" => "Uji Abrasi",
+                "description" => "Pengujian ini dilakukan untuk mengukur ketahanan aus (abrasi) pada agregat. Estimasi penyelesaian untuk satuan adalah 3 hari, dan untuk paket kumplit adalah 7 hari.",
+                "images" => ["test_images/UA.jpeg"],
+                "price" => 250000, // Harga tidak tersedia dalam dokumen
+                "minimum_unit" => 1, // Tidak ada minimum, diasumsikan 1
+                "daily_slot" => 2,
+                "laboratory_id" => 3, // Lab Struktur dan Bahan Bangunan
+                "category_id" => 1   // Sampel
+            ],
+            [
+                "name" => "Uji Absorbsi Beton",
+                "description" => "Pengujian ini untuk mengukur kemampuan beton dalam menyerap air (absorbsi). Estimasi maksimal penyelesaian laporan adalah 3 hari kerja.",
+                "images" => ["test_images/LSBB.jpeg"],
+                "price" => 200000, // Harga tidak tersedia dalam dokumen
+                "minimum_unit" => 1, // Tidak ada minimum, diasumsikan 1
+                "daily_slot" => 2,
+                "laboratory_id" => 3, // Lab Struktur dan Bahan Bangunan
+                "category_id" => 1   // Sampel
+            ],
+            [
+                "name" => "Uji Tarik Belah Beton",
+                "description" => "Pengujian ini bertujuan untuk mengetahui kekuatan tarik belah dari sampel beton. Estimasi maksimal penyelesaian laporan adalah 3 hari kerja.",
+                "images" => ["test_images/LSBB.jpeg"],
+                "price" => 200000, // Harga tidak tersedia dalam dokumen
+                "minimum_unit" => 1, // Tidak ada minimum, diasumsikan 1
+                "daily_slot" => 2,
+                "laboratory_id" => 3, // Lab Struktur dan Bahan Bangunan
+                "category_id" => 1   // Sampel
+            ],
+            [
+                "name" => "Uji Lentur Beton Polos",
+                "description" => "Pengujian ini dilakukan untuk mengukur kekuatan lentur dari beton polos. Estimasi maksimal penyelesaian laporan adalah 3 hari kerja.",
+                "images" => ["test_images/ULBP.jpeg"],
+                "price" => 200000, // Harga tidak tersedia dalam dokumen
+                "minimum_unit" => 1, // Tidak ada minimum, diasumsikan 1
+                "daily_slot" => 15,
+                "laboratory_id" => 3, // Lab Struktur dan Bahan Bangunan
+                "category_id" => 1   // Sampel
+            ],
+
         ];
     }
 }
