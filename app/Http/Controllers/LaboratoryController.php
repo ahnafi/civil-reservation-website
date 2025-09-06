@@ -36,4 +36,17 @@ class LaboratoryController extends Controller
             "packages" => $laboratory->packages()->with("tests")->get(),
         ]);
     }
+
+    public function carouselLaboratories(): JsonResponse
+    {
+        $laboratories = Laboratory::select(['id', 'name', 'images'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $laboratories,
+            'message' => 'Data laboratorium untuk carousel berhasil diambil'
+        ]);
+    }
 }

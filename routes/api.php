@@ -12,6 +12,7 @@ use App\Mail\ContactFormMail;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ReviewController;
+use App\Models\Laboratory;
 
 // API Routes
 Route::get("review", [ReviewController::class, "index"])->name("review.index");
@@ -44,6 +45,8 @@ Route::get("labs/{laboratory:slug}", [LaboratoryController::class, "apiDetail"])
 Route::get("standards", [StandardController::class, "index"])->name("standards.index");
 Route::get("standards/{standard}", [StandardController::class, "show"])->name("standards.show");
 Route::get("standards/search", [StandardController::class, "search"])->name("standards.search");
+
+Route::get("carousel/laboratories", [LaboratoryController::class, "carouselLaboratories"])->name("carousel.laboratories");
 
 // Contact Form Route
 Route::post("contact", [ContactController::class, "send"])->name("contact.send");
