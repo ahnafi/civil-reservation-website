@@ -45,6 +45,7 @@ class LaboratoryResource extends Resource
                         ->maxLength(255),
                     Forms\Components\Textarea::make('description')
                         ->label('Deskripsi laboratorium')
+                        ->columnSpanFull()
                         ->required()
                         ->maxLength(65535),
                     Forms\Components\FileUpload::make('images')
@@ -67,17 +68,6 @@ class LaboratoryResource extends Resource
                             $name = $get('name') ?? 'laboratory';
 
                             return FileNaming::generateLaboratoryName($id, $name, $extension);
-                        }),
-                    Forms\Components\BelongsToManyMultiSelect::make('equipments')
-                        ->relationship('equipments', 'name')
-                        ->label('Peralatan')
-                        ->preload()
-                        ->searchable()
-                        ->required()
-                        ->placeholder('Pilih Peralatan')
-                        ->reactive()
-                        ->afterStateUpdated(function ($state, callable $set) {
-                            $set('equipments', $state);
                         }),
                 ])->columns(),
             ]);

@@ -8,6 +8,17 @@ use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
+    /**
+     * Menampilkan semua review
+     */
+    public function index()
+    {
+        // $reviews = Review::with('testing')->get();
+        // $reviews = Review::all();
+        $reviews = Review::orderBy('created_at', 'desc')->get();
+        return response()->json($reviews);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
